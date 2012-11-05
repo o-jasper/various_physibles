@@ -7,7 +7,9 @@
 //  (at your option) any later verssion.
 //
 
-plate_w = 3.3
+//NOTE incomplete
+
+plate_w = 3.3;
 hinge_r = 3;
 hinge_d = hinge_r + 5;
 
@@ -36,6 +38,6 @@ module swivel_phi_plate_side()
     }
 }
 
-module swivel_theta()
+/*module swivel_theta()
 { square([3*plate_w, 
-}
+}*/
