@@ -7,6 +7,8 @@
 //  (at your option) any later verssion.
 //
 
+//Tunnels for wires. Maybe simply a plate and straight tunnels is better.
+
 module undirected_tunnel(r,d,w)
 {
   rotate(a=90, v=[1,0,0]) translate([r,0]) 

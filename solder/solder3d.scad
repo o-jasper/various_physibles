@@ -7,7 +7,7 @@
 //  (at your option) any later verssion.
 //
 
-include<solder.scad>
+include<solder2.5d.scad>
 
 module back3d()
 { color([1,0,0]) rotate(a=90, v=[0,0,1]) rotate(a=90,v=[1,0,0]) 
