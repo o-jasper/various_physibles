@@ -23,6 +23,9 @@ solder_hold_l = 30;
 
 holding_bar_r = 2;
 
+pi = 3.14;
+echo("length plate est ", holder_h+room_w+ pi*(solder_hold_w/2-plate_w));
+
 //Block with two slits in which the sheets are clamped.
 module sheet_holder()
 {
@@ -61,10 +64,10 @@ module holder_bar_extract()
 module solder_holder()
 { w = solder_hold_w - 4*plate_w;
   l = solder_hold_l;
-  f = 2;
+  f = 3;
   difference()
     { intersection()
-        { scale([1,f]) sphere(w/2 + 2*plate_w);
+        { translate([0,l/4]) scale([1,f]) sphere(w/2 + 2*plate_w);
           translate([-w,-l/2,-w]) cube([3*w,l,3*w]);
         }
       translate([0,-l]) rotate(a=-90, v=[1,0,0]) 
@@ -84,37 +87,43 @@ module gravestone(d,w,h)
         translate([w/2,h,-d]) cylinder(r=w/2, h=d);
 }
 
-module sheet_flange()
+module holder_part()
 {
-    w = holder_w;
-    h = holder_h + room_w;
     d = plate_w;
-    translate([plate_w,-plate_w,plate_w])
-    { difference()
-        { translate([-d,-d,-d]) gravestone(2*d,w,h);
-          gravestone(2*d, w-2*d,h-d);
-        }
-        translate([sheet_w,0]) gravestone(d, w-2*(d+sheet_w),h-d);
-    }
-}
+    s = sheet_w;
 
-module complete_holder()
-{
+    f_room = 1/2;
     w = solder_hold_w;
-    l = room_l;
+    l = room_l+2*d;
+    h = holder_h+room_w;
+
     difference()
     {   union()
-        { sheet_flange();
-          translate([0,l-2*plate_w]) scale([1,-1]) sheet_flange();
-          sheet_holder();
+        { gravestone(l, w,h);
+          translate([0,l]) gravestone(2*d, w,h);
           translate([holder_w/2,-solder_hold_l/2,holder_h + room_w]) 
               solder_holder();
         }
+        translate([holder_w/2,-solder_hold_l/2,holder_h + room_w]) 
+            holder_bar_extract()
         translate([holder_w/2, -2*holder_l ,holder_h + room_w]) 
             rotate(a=-90, v=[1,0,0]) 
-            cylinder(r=w/2-plate_w, h=3*holder_l + l);
+            cylinder(r=w/2-d, h=3*holder_l + l);
+        translate([-w,2*d,holder_h]) cube([3*w,room_l,2*room_w]);
+
+        translate([d,2*d,holder_h-room_w*f_room])
+            cube([w-2*d,room_l, room_w]);
+        translate([d,d,d]) difference()
+        { gravestone(l, w-2*d, h-2*d);
+          translate([s,-l]) gravestone(3*l, w-2*(d+s), h-2*d-s);
+        }
     }
+
+    translate([d+s+room_w/2,d,holder_h-f_room*room_w]) 
+        rotate(a=-90, v=[1,0,0]) 
+        scale([1,f_room]) cylinder(r=room_w/2, h=l+d);
 }
 
-complete_holder();
-//solder_holder();
+holder_part();
+
+
