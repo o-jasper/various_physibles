@@ -6,7 +6,7 @@ Currently contains a 2.5d mouse trap.
 
 * I dont think the trap hinge can get out of the way of the trap door part.
 
-* Does it work?
+* Tricky if it will work..
 
 * Not clear enough how the spring should go.
 
