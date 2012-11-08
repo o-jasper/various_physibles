@@ -1,13 +1,4 @@
-
-module rounded_cube(w,l,h,r)
-{   translate([r,0]) cube([w-2*r, l, h]);
-    translate([0,r]) cube([w, l-2*r, h]);
-    
-    translate([r,r]) cylinder(r=r, h=h);
-    translate([w-r,r]) cylinder(r=r, h=h);
-    translate([r,l-r]) cylinder(r=r, h=h);
-    translate([w-r,l-r]) cylinder(r=r, h=h);
-}
+include<../lib/rounded_box.scad>
 
 w = 40;
 l = 80;

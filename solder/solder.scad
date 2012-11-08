@@ -4,8 +4,10 @@
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
 //  by the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later verssion.
+//  (at your option) any later version.
 //
+
+include<../lib/rounded_box.scad>
 
 plate_w = 5;
 
@@ -142,6 +144,7 @@ holder_base_l = 60;
 holder_base_r = 2*plate_w;
 
 holder_bin_h = holder_base_l/4;
+
 module rounded_cube(w,l,h,r)
 {   translate([r,0]) cube([w-2*r, l, h]);
     translate([0,r]) cube([w, l-2*r, h]);
