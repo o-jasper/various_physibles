@@ -45,7 +45,9 @@ module rounded_box(w,l,h,r)
 
 //TODO less bad naming.
 module rounded_cube(w,l,h,r)
-{   translate([r,0]) cube([w-2*r, l, h]);
+{
+    r = (2*r> w ? w/2 : r);
+    translate([r,0]) cube([w-2*r, l, h]);
     translate([0,r]) cube([w, l-2*r, h]);
     
     translate([r,r]) cylinder(r=r, h=h);
