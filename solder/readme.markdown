@@ -61,4 +61,4 @@ It probably needs a lot of changes/complete rewrite.
 * Handle.
 
 ### 2.5d version..
-It is here. Unfavorable towards continuing on it. (Bookmark the git version.)
+Last version at c5d3f0dafb1af8ffeff528535ce00ad85af4edbf
