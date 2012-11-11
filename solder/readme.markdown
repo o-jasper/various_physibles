@@ -7,7 +7,7 @@ Note that it may be a fire hazzard, or *at least* ABS can fume if the solder
 touches it etcetera, continue at your own risk.
 
 ### Material-like parameters
-`plate_w`: width you like walls to be.
+`plate_w`: width you like walls to be.</br />
 `sheet_w`: width of sheet material.
 
 ### Object parameters
@@ -25,7 +25,7 @@ float.
 
 `holder_base_l`: how long in the `y` direction the 'stem' to the base is.
 (not very robust on this)</br />
-`holder_base_h`: how thick the basic base is.
+`holder_base_h`: how thick the basic base is.</br />
 `holder_base_r`: Rounding on the edges of the base.
 
 `holding_bar_r`: size of the bars that are supposed to hold the iron.
@@ -44,8 +44,6 @@ also be used simply to widen the base.
 
 ### TODO
 
-It probably needs a lot of changes/complete rewrite.
-
 * Separate params file.
 
 * Favorable default parameters and try it.
@@ -58,7 +56,9 @@ It probably needs a lot of changes/complete rewrite.
 
 * Attachable surfaces.
 
-* Handle.
+* Optional handle.
+
+* Optional static base-windener/alternative screw system.
 
 ### 2.5d version..
 Last version at c5d3f0dafb1af8ffeff528535ce00ad85af4edbf
