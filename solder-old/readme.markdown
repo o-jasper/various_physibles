@@ -6,6 +6,11 @@ using ten metal rods to(hopefully) hold the hot end in the air.
 Note that it may be a fire hazzard, or *at least* ABS can fume if the solder 
 touches it etcetera, continue at your own risk.
 
+One big TODO about this is to 'cut it up' for actualy printing, also since otherwise you cant 
+really fit the sheets in.
+
+The default is overkill, turn either `expanding_base_p` or `screwable_p` off, or both.
+
 ### Material-like parameters
 `plate_w`: width you like walls to be.</br />
 `sheet_w`: width of sheet material.
@@ -43,6 +48,8 @@ also be used simply to widen the base.
 (doesnt make sense to combine with expanding base)
 
 ### TODO
+
+* It will probably need to be optionally cut up to fit in build areas.
 
 * Separate params file.
 

@@ -1,3 +1,11 @@
+//
+//  Copyright (C) 02-02-2013 Jasper den Ouden.
+//
+//  This is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published
+//  by the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
 
 plate_w = 10;
 // Can-based soldering iron holder. 
@@ -5,7 +13,7 @@ plate_w = 10;
 pillar_r = plate_w*0.7;
 pillar_hole_r = pillar_r/2;
 
-flat_foot_p = true;
+single_p = false;
 
 solder_r = plate_w; //Radius at holding place soldering iron.
 solder_room = 2*plate_w;
@@ -16,7 +24,7 @@ can_a = 40; //Angle of can(and thus soldering iron.
 
 can_sheeth_w = -plate_w; //Optional sheeth over entire can.
 
-base_square_p = false; //Whether soldering iron base is square.
+base_square_p = true; //Whether soldering iron base is square.
 base_min_front_p = false; //Whether to minimize front width.
 base_back_p = true; //Whether backside has base too.
 
@@ -146,24 +154,27 @@ module holder()
     br = can_r*cos(can_a)+plate_w;
     ph = r*sin(can_a) +plate_w/2;
     q= can_h*cos(can_a)/cos(front_pillar_a); 
-    pl = base_front_w/(2*sin(60)*cos(front_pillar_a));
+    pl = (base_front_w-3*pillar_r)/(4*sin(60)*cos(front_pillar_a));
     difference()
     { union()
-        {   translate([0,0,ph]) rotate(v=[1,0,0], a= can_a) 
-                holder_part();
-            translate([can_r,0]) pillar(ph);
+        {   //Holder itself.
+            translate([0,0,ph]) rotate(v=[1,0,0], a= can_a) holder_part();
+            
+            translate([can_r,0]) pillar(ph); //Pillars at base.
             translate([-can_r,0]) pillar(ph);
             
-            if( flat_foot_p )
+            if( base_h>0 )
+            { holder_base(); }
+            
+            if( single_p ) //Flat base. (single pillar)
             {
                 translate([0,2*pillar_r-base_l, plate_w*sin(front_pillar_a)]) 
                     rotate(v=[1,0,0], a = -front_pillar_a) 
                     pillar(q);
-                holder_base();
+                
             }
-            else //fork_foot_p true
-            {   
-                translate([0,2*pillar_r-base_l, plate_w*sin(front_pillar_a)]) 
+            else //Pillar forking 'legs'.
+            {   translate([0,2*pillar_r-base_l, plate_w*sin(front_pillar_a)]) 
                 rotate(v=[1,0,0], a = -front_pillar_a) 
                     translate([0,0,pl])
                 {   pillar(q-pl);
@@ -176,13 +187,14 @@ module holder()
                         translate([0,0,pl/cos(60)]) sphere(pillar_r);
                     }
                 }
-                if( base_back_p )
-                {   if( base_wall_h > 0 )
+                //Backside may still have alternative base.
+                if( base_back_p && base_h<0) 
+                {   if( base_wall_h > 0 ) //with potentially a bin.
                     { difference()
-                        {   scale([1,br/r]) cylinder(r=r, h=base_h+base_wall_h);
-                            translate([0,0,base_h])
+                        {   scale([1,br/r]) cylinder(r=r, h=-base_h+base_wall_h);
+                            translate([0,0,-base_h])
                                 scale([(r-base_wall_w)/r,(br-base_wall_w)/r]) 
-                              cylinder(r=r, h=base_h+base_wall_h);
+                              cylinder(r=r, h=-base_h+base_wall_h);
                         }
                     }
                     else
@@ -190,6 +202,9 @@ module holder()
                 }
             }
         }
+        if( friction_plug_h>0 ) //Poles where rubber pads may go.
+        { friction_plug_holes(); }
+        
         translate([0,0,ph]) //Cleans out can holder.
                 rotate(v=[1,0,0], a= can_a) 
             cylinder(r=can_r, h = 3*can_h);

@@ -1,6 +1,6 @@
 
 ## Mouse trap
-Currently contains a 2.5d mouse trap.
+Currently contains a 2.5d mouse trap, and starts for 3d a version.
 
 ## TODO
 
