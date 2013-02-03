@@ -7,34 +7,36 @@
 //  (at your option) any later version.
 //
 
-plate_w = 10;
+plate_w = 15;
 // Can-based soldering iron holder. 
 
 pillar_r = plate_w*0.7;
 pillar_hole_r = pillar_r/2;
 
-single_p = false;
-
 solder_r = plate_w; //Radius at holding place soldering iron.
-solder_room = 2*plate_w;
 
-can_r = 30; //Radius of can.
-can_h = 100; //Height of can.
+can_r = 33; //Radius of can.
+can_h = 167; //Height of can.
 can_a = 40; //Angle of can(and thus soldering iron.
+
+can_tx = 10; //Can taper.
+can_ty = 10; //Can taper.
 
 can_sheeth_w = -plate_w; //Optional sheeth over entire can.
 
+base_h = 10; //Height of base.
+base_wall_h = 10; //Height of a little wall in the base.
+
 base_square_p = true; //Whether soldering iron base is square.
 base_min_front_p = false; //Whether to minimize front width.
-base_back_p = true; //Whether backside has base too.
-
-base_h = plate_w; //Height of base.
-base_wall_h = plate_w; //Height of a little wall in the base.
+base_back_p = (base_wall_h>0); //Whether backside has base too.
 
 base_l = (can_h*sin(can_a)+can_r*cos(can_a))+2*plate_w; //Length of base.
 //Width of front of soldering iron base.
 base_front_w = (base_square_p ? 2*(can_r+plate_w) : 
                 (base_min_front_p ? 2*pillar_r : 2*(can_r-plate_w)));
+
+single_p = (base_front_w < 3*pillar_r);
 
 reinforcement_r = can_r; //Radius of side reinforcement.
 base_wall_w = plate_w/3; //Wall of little container at bottom.(if any)
@@ -45,7 +47,9 @@ friction_plug_h = base_h/2;
 front_pillar_a = 20;
 
 can_inner_r = 25;
-can_inner_h = plate_w;;
+can_inner_h = 3;
+
+solder_room = can_inner_r*0.75;
 
 can_top_h = 2*plate_w;
 can_bottom_h = 1*plate_w;
@@ -55,7 +59,10 @@ can_hold_end_z = 0;
 module donut(R,r)
 { rotate_extrude(convexity = 10){ translate([R,0]) circle(r); } }
 
-//duct();
+module can_substract()
+{ translate([0,0,can_ty-0.1]) cylinder(r=can_r, h = 3*can_h);
+  cylinder(r1=can_r-can_tx,r2=can_r, h=can_ty);
+}
 
 module holder_part()
 {
@@ -69,7 +76,7 @@ module holder_part()
             if(can_sheeth_w>0) //The sheeth.
             { cylinder(r= can_r + can_sheeth_w, h = can_h); }
         }
-        cylinder(r=can_r, h = 3*can_h);
+        can_substract();
         translate([0,0,-plate_w]) cylinder(r=can_r-plate_w, h = 3*can_h);
     }
 }
@@ -96,6 +103,9 @@ module pillar(h)
 
 module holder_base_fn(bw,fw,l,h, br)
 {
+    echo(fw/2);
+    echo(base_front_w/2);
+    echo(pillar_r);
     r = bw/2;
     difference()
     { union()
@@ -121,16 +131,8 @@ module holder_base_fn(bw,fw,l,h, br)
     }
 }
 
-module friction_plug_holes()
-{
-    fpr = friction_plug_r; fph = friction_plug_h;
-    translate([can_r,0,-fph]) cylinder(r=fpr, h= 2*fph);
-    translate([-can_r,0,-fph]) cylinder(r=fpr, h= 2*fph);
-    translate([0,2*pillar_r-base_l,-fph]) cylinder(r=fpr, h= 2*fph);
-}
-
 module holder_base()
-{   bw = 2*(can_r+plate_w);
+{   bw = 2*(can_r+pillar_r);
     br = can_r*cos(can_a)+plate_w;
     w = base_wall_w;
     difference()
@@ -144,6 +146,22 @@ module holder_base()
         }
         else
         { holder_base_fn(bw, base_front_w, base_l, base_h, br); }
+    }
+}
+
+module friction_plug_holes()
+{
+    fpr = friction_plug_r; fph = friction_plug_h;
+    y = 2*pillar_r-base_l;
+    translate([0,0,-fph])
+    { translate([can_r,0]) cylinder(r=fpr, h= 2*fph);
+      translate([-can_r,0]) cylinder(r=fpr, h= 2*fph);
+      if( single_p )
+      { translate([0,y]) friction_plugcylinder(r=fpr, h= 2*fph); }
+      else
+      { translate([base_front_w/2 -pillar_r,y]) cylinder(r=fpr, h= 2*fph);
+        translate([-base_front_w/2+pillar_r,y]) cylinder(r=fpr, h= 2*fph);
+      }
     }
 }
 
@@ -206,16 +224,14 @@ module holder()
         { friction_plug_holes(); }
         
         translate([0,0,ph]) //Cleans out can holder.
-                rotate(v=[1,0,0], a= can_a) 
-            cylinder(r=can_r, h = 3*can_h);
-        translate([0,0,ph]) //Cleans out can holder.
-            rotate(v=[1,0,0], a= can_a) cylinder(r=can_r, h = 3*can_h);
+            rotate(v=[1,0,0], a= can_a) can_substract();
         //Cleans out bottom.
         translate([0,0,-2*(r+can_h)]) cube(4*(r+can_h)*[1,1,1], center=true);
     }
 }
 
 holder();
-translate([0,0,ph]) rotate(v=[1,0,0], a= can_a) 
-translate([0,reinforcement_r-can_r-plate_w+can_r,can_h+2*plate_w]) color([0,0,1])
-   holder_front();
+r= can_r + plate_w;
+ph = r*sin(can_a) +plate_w/2;
+translate([0,0,ph]) rotate(v=[1,0,0], a= can_a)  color([0,0,1]) 
+  translate([0,0,can_h+50]) holder_front();
