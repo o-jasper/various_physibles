@@ -7,6 +7,11 @@
 //  (at your option) any later version.
 //
 
+//TODO
+//* Distinguish between the 'end radius' and the 'in-corner' radius.
+//* 3d stuff.(those kinds of corners too.
+//* stuff will have to hold un somehow; screws/ tightening?
+
 module _grab(w,l, pd,pw, rr)
 {
     sl = l-rr;
@@ -20,43 +25,39 @@ module _grab(w,l, pd,pw, rr)
     }
    
 }
+
+//TODO 'end'
+
 //_grab(200,200, 100,100, 20);
+
+module _corner(w,l, pd,pw, rr)
+{
+    q = [1,1]*(w/2-pw/2+rr);
+   _grab(w,l,pd,pw,rr,cr);
+   rotate(a=-90) _grab(w,l,pd,pw,rr,cr);
+   translate([1,1]*pw/2) difference()
+   {   square(q);
+       translate(q) circle(rr);
+   }
+}
 
 module corner(w,l, pd,pw, rr, cr)
 {
-    q = [1,1]*(w/2-pw/2+rr);
     difference()
     {   union()
-        {   _grab(w,l,pd,pw,rr,cr);
-            rotate(a=-90) _grab(w,l,pd,pw,rr,cr);
+        {   _corner(w,l, pd,pw,rr);
             circle(w/2);
-            translate([1,1]*pw/2) difference()
-            {   square(q);
-                translate(q) circle(rr);
-            }
         }
         circle(cr);
     }
 }
 
-//corner(200,200, 100,100, 20, 20);
-
 module t_section(w,l, pd,pw, rr, cr)
 {
-    q = [1,1]*(w/2-pw/2+rr);
     difference()
     {   union()
-        {   _grab(w,l,pd,pw,rr,cr);
-            rotate(a=-90) _grab(w,l,pd,pw,rr,cr);
-            rotate(a=90) _grab(w,l,pd,pw,rr,cr);
-            translate([1,1]*pw/2) difference()
-            {   square(q);
-                translate(q) circle(rr);
-            }
-            translate([-pw/2 - q[1],pw/2]) difference()
-            {   square(q);
-                translate([0,q[1]]) circle(rr);
-            }
+        {   _corner(w,l,pd,pw,rr);
+            rotate(a=90) _corner(w,l,pd,pw,rr);
         }
         circle(cr);
     }
@@ -64,4 +65,20 @@ module t_section(w,l, pd,pw, rr, cr)
 
 //t_section(200,200, 100,100, 20, 20);
 
-cross_ces
+module x_section(w,l, pd,pw, rr, cr)
+{
+    difference()
+    {   union()
+        {   _corner(w,l,pd,pw,rr);
+            rotate(a=90) _corner(w,l,pd,pw,rr);
+            rotate(a=180) _corner(w,l,pd,pw,rr);
+            rotate(a=270) _corner(w,l,pd,pw,rr);
+        }
+        circle(cr);
+    }
+}
+
+corner(200,200, 100,100, 20, 20);
+translate([410,0]) t_section(200,200, 100,100, 20, 20);
+translate([820,0]) x_section(200,200, 100,100, 50, 20);
+
