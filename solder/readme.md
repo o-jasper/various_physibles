@@ -4,17 +4,16 @@ Uses a long tin can to protect the PLA/ABS from the hot end.
 The expectation is that that will provide enough heat conduction to prevent any
 melting/fire. Currently untested and, no guarantees on this!
 
-It *might* be printable as two pieces.
+It *might* be printable as two pieces; the cap and the body. 
+Not sure, especially for the body.
 
 ### TODO
-* Make the top screw into the holder? More stuff for holding the top in place?
-* `holder front` can have a thing that can hold the top side outside the can.
 * Attachments:(like previously)
  + optional extendable feet
  + holes for screws to attach it to
  + there is space for weight, maybe any kinds of weight to aim for?
 * Printing it.. (one day)
-* List parameters.
+* List parameters.(better)
 * Check parameter range. gifs of the thing changing through them would be nice for
   presentation.
 
@@ -32,7 +31,8 @@ Of course the default parameters aim at a particular
 `can_r,can_h,can_tx,can_ty=33,167,10,10`
 
 `can_a`: Angle of the can. And thus the soldering iron. Can do 0&deg;-90&deg;,
-only really reasonable 10&deg;-80&deg;
+only really reasonable 10&deg;-80&deg; note that especially for lower angles,
+it might be needed to add weight on the back.
 
 `can_r`: Radius of the can.
 

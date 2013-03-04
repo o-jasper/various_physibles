@@ -15,6 +15,10 @@ pillar_hole_r = pillar_r/2;
 
 solder_r = plate_w; //Radius at holding place soldering iron.
 
+screw_cnt = 4;
+screw_twist_n = 0.5;
+screw_twist_a = 360*screw_twist_n;
+
 can_r = 33; //Radius of can.
 can_h = 167; //Height of can.
 can_a = 40; //Angle of can(and thus soldering iron.
@@ -56,12 +60,37 @@ can_bottom_h = 1*plate_w;
 can_hold_start_z = plate_w;
 can_hold_end_z = 0;
 
+screw_r = can_bottom_h/screw_cnt;
+
 module donut(R,r)
 { rotate_extrude(convexity = 10){ translate([R,0]) circle(r); } }
 
 module can_substract()
 { translate([0,0,can_ty-0.1]) cylinder(r=can_r, h = 3*can_h);
   cylinder(r1=can_r-can_tx,r2=can_r, h=can_ty);
+}
+
+//Screwing grooves.
+module holder_screw_grooves(f)
+{   linear_extrude(height= can_bottom_h, twist=screw_twist_a)
+    {
+        for( a= [ 0 : 360/screw_cnt :360 ] )
+        { 
+            rotate(a=a) translate([can_r,0]) scale([1,2]) circle(screw_r*f);
+        }
+    }
+}
+//Top the soldering iron goes through.
+module holder_front()
+{   rotate_extrude(convexity = 10)
+    {
+        polygon([[solder_room,-can_bottom_h],
+                 [solder_room+plate_w/2,-can_bottom_h],
+                 [can_inner_r,0], [can_r,0], [can_r,plate_w],
+                 [solder_room+plate_w/2, can_top_h], [solder_room, can_top_h],
+                 [solder_r,can_hold_start_z], [solder_r,can_hold_end_z]]);
+    }
+    holder_screw_grooves(1);
 }
 
 module holder_part()
@@ -76,20 +105,10 @@ module holder_part()
             if(can_sheeth_w>0) //The sheeth.
             { cylinder(r= can_r + can_sheeth_w, h = can_h); }
         }
+        translate([0,0,can_h]) holder_screw_grooves(1.1);
+        
         can_substract();
         translate([0,0,-plate_w]) cylinder(r=can_r-plate_w, h = 3*can_h);
-    }
-}
-
-module holder_front()
-{
-    rotate_extrude(convexity = 10)
-    {
-        polygon([[solder_room,-can_bottom_h],
-                 [solder_room+plate_w/2,-can_bottom_h],
-                 [can_inner_r,0], [can_r,0], [can_r,plate_w],
-                 [solder_room+plate_w/2, can_top_h], [solder_room, can_top_h],
-                 [solder_r,can_hold_start_z], [solder_r,can_hold_end_z]]);
     }
 }
 
@@ -103,9 +122,6 @@ module pillar(h)
 
 module holder_base_fn(bw,fw,l,h, br)
 {
-    echo(fw/2);
-    echo(base_front_w/2);
-    echo(pillar_r);
     r = bw/2;
     difference()
     { union()
@@ -230,8 +246,23 @@ module holder()
     }
 }
 
-holder();
-r= can_r + plate_w;
-ph = r*sin(can_a) +plate_w/2;
-translate([0,0,ph]) rotate(v=[1,0,0], a= can_a)  color([0,0,1]) 
-  translate([0,0,can_h+50]) holder_front();
+module solder_for_show()
+{
+    holder();
+    r= can_r + plate_w;
+    ph = r*sin(can_a) +plate_w/2;
+    translate([0,0,ph]) rotate(v=[1,0,0], a= can_a)  color([0,0,1]) 
+        translate([0,0,can_h+50]) holder_front();
+}
+//NOTE: not sure if it will print!
+module solder_for_print()
+{
+    holder();
+    color([0,0,1]) translate([2*(can_r+plate_w),0, can_top_h]) 
+        rotate(v=[1,0,0], a=180) holder_front();
+}
+solder_for_print();
+
+echo(base_l, 
+     can_h*sin(can_a) + 2*(can_r + plate_w)*cos(can_a) + 2*plate_w);
+
