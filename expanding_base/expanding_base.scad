@@ -12,7 +12,7 @@ include<../lib/rounded_box.scad>
 module expanding_base()
 {
     difference()
-    { rounded_cube($w,$l,$h,$r);
+    { linear_extrude(h=$h) rounded_rect($w,$l,$r);
       translate([$w/4,$w/4,-$h]) 
       { cylinder(r= $hinge_y-$w/4, h= $h+$hinge_h);
         cylinder(r= $w/16, h= 1.75*$h); //TODO add screw
@@ -27,7 +27,8 @@ module expanding_base()
 module hinge()
 {
     color([0,0,1]) difference()
-    { translate([-$w/4,-$w/4]) rounded_cube($w/2,$hinge_y,$hinge_h, $r);
+    { translate([-$w/4,-$w/4]) linear_extrude(h=,$hinge_h) 
+            rounded_rect($w/2,$hinge_y, $r);
       translate([0,0,-$hinge_h/2])
       {
           cylinder(r= $w/8, h= $hinge_h);
