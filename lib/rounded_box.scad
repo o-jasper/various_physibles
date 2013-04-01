@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 05-11-2012 Jasper den Ouden.
+//  Copyright (C) 01-04-2012 Jasper den Ouden.
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -26,12 +26,24 @@ module sph_cyl(r,h, x,y)
     translate([0,0,h-2*r]) rotate(v=[1,0,0],a=-90) cylinder(r=r,h=-y);
   }
 }
-//If only minkowski was fast.
-module rounded_box(w,l,h,r)
+
+module rounded_rect(w,l,r)
 {
-    translate([r,r])
-    { cube([w-2*r,l-2*r,h]);
-    }
+    r = (2*r> w ? w/2 : r);
+    translate([r,0]) square([w-2*r, l]);
+    translate([0,r]) square([w, l-2*r]);
+    
+    translate([r,   r])   circle(r);
+    translate([w-r, r])   circle(r);
+    translate([r,   l-r]) circle(r);
+    translate([w-r, l-r]) circle(r);
+}
+
+
+//If only minkowski was fast.
+module rounded_cube(w,l,h,r)
+{
+    translate([r,r]) cube([w-2*r,l-2*r,h]);
     translate([0,r,r]) cube([w,l-2*r,h-2*r]);
     translate([r,0,r]) cube([w-2*r,l,h-2*r]);
 
@@ -43,15 +55,3 @@ module rounded_box(w,l,h,r)
 
 //rounded_box(40,40,80,10);
 
-//TODO less bad naming.
-module rounded_cube(w,l,h,r)
-{
-    r = (2*r> w ? w/2 : r);
-    translate([r,0]) cube([w-2*r, l, h]);
-    translate([0,r]) cube([w, l-2*r, h]);
-    
-    translate([r,r]) cylinder(r=r, h=h);
-    translate([w-r,r]) cylinder(r=r, h=h);
-    translate([r,l-r]) cylinder(r=r, h=h);
-    translate([w-r,l-r]) cylinder(r=r, h=h);
-}
