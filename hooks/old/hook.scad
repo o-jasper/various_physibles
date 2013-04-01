@@ -10,6 +10,8 @@
 //Well, the best design of a wall coat hanger hook i could think of looks like
 // a penis...
 
+//TODO go at this anew.
+
 // TODO make the height on the wall side configureable.
 
 use <nut_hole.scad>
@@ -42,7 +44,7 @@ module quarter_torus(R,r)
     d= R+2*r;
     difference()
     {   rotate_extrude() translate([R,0]) circle(r);
-        translate([0,2*d]) cube(4*d*[1,1,1], center=true);
+        rotate(a = 60) translate([0,2*d]) cube(4*d*[1,1,1], center=true);
         translate([-2*d,0]) cube(4*d*[1,1,1], center=true);
     }
 }

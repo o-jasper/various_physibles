@@ -7,6 +7,11 @@
 //  (at your option) any later version.
 //
 
+// NOTE/TODO
+// * under hooks probably not printable on its back(horns do slightly better)
+// * very square..
+// * lay it flat on the back in the first place.
+
 //Very square-ish hook coat hanger.
 
 h=100;
