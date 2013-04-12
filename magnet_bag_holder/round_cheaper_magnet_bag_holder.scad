@@ -1,4 +1,3 @@
-
 //
 //  Copyright (C) 11-04-2012 Jasper den Ouden.
 //
@@ -33,8 +32,6 @@ inf=2*(h+r);
 
 skimmer=true;
 
-skim_top =true;
-
 module magnet_hole()
 {   rotate([90,0]) translate([0,h/2,-mh]) cylinder(r=mr,h=2*mh); }
 
@@ -52,33 +49,26 @@ module bag_holder()
 // 1-cos(da) = (fd/r)^2/2
     da = acos(1-fd*fd/(2*r*r));
     intersection()
-    {   union()
-        {   difference()
-            {   scale([1,1,h/t]) translate([0,0,t/3]) union()
-                {   rotate_extrude() translate([r-t/2,0]) circle(2*t/3);
-                    translate([t/3-r,0]) rotate([0,90]) cylinder(r=2*t/3, h=2*(r-t/3));
+    {   difference()
+        {   translate([0,0,t/3]) union()
+            {   rotate([-90,0]) translate([0,t/3-h/2]) cylinder(r=mr+t/2,h=t);
+                translate([0,t/2,h/2-t/3])
+                {   rotate([0,-45]) translate([mr,0,-sqrt(2)*h]) 
+                        cylinder(r=t/2,h=sqrt(2)*h);
+                    rotate([0,225]) translate([mr,0]) 
+                        cylinder(r=t/2,h=sqrt(2)*h);
                 }
-                magnet_hole();
-                if( fr>0 ) translate([0,0,-h]) for( a=[0 : da/2 : 80] )
-                {   rotate(-a) feature_hole();
-                    rotate(+a) feature_hole();
-                }
+                translate([t/2-r,0]) rotate([0,90])  
+                    scale([1,3/2]) cylinder(r=2*t/3,h=2*r-t);
+                rotate_extrude() translate([r-t/2,0]) circle(2*t/3);
             }
-            difference()
-            {   cylinder(r=r-t/2, h=h);
-                translate([0,r-t/2]) if( skimmer )
-                {   if( skim_top )
-                    {   cylinder(r2=r-t/2,r1=3*r/2, h=h); }
-                    else
-                    {   cylinder(r1=r-t/2,r2=3*r/2, h=h); }
-                        
-                }
-                else //TODO this kindah ugly
-                {   cylinder(r=sqrt(2)*(r-t/2)-1.2*t, h=h); }
+            magnet_hole();
+            if( fr>0 ) translate([0,0,-h]) for( a=[0 : da/2 : 80] )
+            {   rotate(-a) feature_hole();
+                rotate(+a) feature_hole();
             }
         }
         translate([0,inf,inf]) cube(2*[inf,inf,inf], center=true);
-        translate([r,0]) scale([1,1,h/(1.7*r)]) rotate([0,-90]) cylinder(r=1.7*r,h=2*r);
     }
 }
 

@@ -7,6 +7,8 @@
 //  (at your option) any later version.
 //
 
+//NOTE doesnt work
+
 include<../lib/rounded_box.scad>
 
 module expanding_base()
@@ -27,7 +29,7 @@ module expanding_base()
 module hinge()
 {
     color([0,0,1]) difference()
-    { translate([-$w/4,-$w/4]) linear_extrude(h=,$hinge_h) 
+    { translate([-$w/4,-$w/4]) linear_extrude(h=$hinge_h)
             rounded_rect($w/2,$hinge_y, $r);
       translate([0,0,-$hinge_h/2])
       {
@@ -58,3 +60,5 @@ module expanding_base_module()
     }
     expanding_base();
 }
+
+expanding_base_module();

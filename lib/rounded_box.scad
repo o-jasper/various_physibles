@@ -27,7 +27,7 @@ module sph_cyl(r,h, x,y)
   }
 }
 
-module rounded_rect(w,l,r)
+module rounded_square(w,l,r)
 {
     r = (2*r> w ? w/2 : r);
     translate([r,0]) square([w-2*r, l]);
