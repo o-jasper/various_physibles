@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 11-04-2013 Jasper den Ouden.
+//  Copyright (C) 12-04-2013 Jasper den Ouden.
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -12,114 +12,113 @@
 //* Print layout `module` bridging, and possibly half-cuts.
 //* Assembly `module`
 
-lr =10;
+//All are times ~10.(not yet exact)
+pr=100;
+pl=1000;
 
-t = 20;
-pr= 50;
+lr = 10;
 
-ir=pr-t;
+t=50;
+cr=1.1*t; //Clicker radius.
+cl=max(pl/8, 4*cr+t);  //.. length
 
-cl= 2*(ir+t);
-hl = 5*ir;
-bl= cl + hl;
+bl = pl/4; //Length of bottom of pen.
+tl = pl/2;
 
-fl = 160;
-pl = 600;
+inf = pl;
 
-ff=0.15;
-
-inf=2*(pl+bl);
-
-module holding_profile()
-{
-    for( y = [ 2*ir-bl: ir : hl-bl-ir ] )
-    {   translate([0,y]) square([ir,ir/2], center=true);
+module default_base_shape()
+{  
+    intersection()
+    {   translate([0,0,pl/2]) scale([1,1,pl/pr]) sphere(pr);
+        translate([0,0,(pl-tl)/2]) cube([inf,inf,pl-tl], center=true);
+    }
+    eff_z = (pl-tl)*pr/pl;
+    r = sqrt(pr*pr - eff_z);
+    intersection()
+    {   translate([0,0,pl-tl]) scale([1,1,1.06*tl/r]) sphere(r);
+        translate([0,0,pl/2]) cube(2*[inf,inf,pl/2], center=true);
     }
 }
 
-_rs = (ir - 3*lr/2 + t/2)/2;
-module _clicker()
+module base_clicker(d)
 {
-    translate([pr-_rs-t/2,   bl]) circle(_rs);
-    translate([-(pr-_rs-t/2),bl]) circle(_rs);
-
-    translate([0,ir+bl/2]) square([2*ir,bl-2*ir], center=true);
-    translate([0,2*ir]) circle(ir);
+    translate([pr-t,cl]) circle(t/2);
+    translate([-pr+t,cl]) circle(t/2);
+    translate([-pr+t,0]) square([2*(pr-t),cl+d]);
 }
 
+s=max(4*lr,t+lr);
 module clicker()
-{    
-    difference()
-    {   linear_extrude(height=ir) difference()
-        { 
-            _clicker();
-            translate([0,bl]) holding_profile();        
-            translate([0,bl]) square([3*lr-2*ir,2*cl], center=true);
-        }
-        translate([0,pr+ir/2,ir/2]) rotate([-90,0]) cylinder(r=lr,h=3*inf);
-    }
-}
-
-
-
-module base_shape(r,h)
 {
-    linear_extrude(height=h) difference()
-    {   circle(r);
-        translate([0,+inf + r*(1-ff)]) square(2*inf*[1,1], center=true);
-        translate([0,-inf - r*(1-ff)]) square(2*inf*[1,1], center=true);
+    translate([0,0,-cr/2]) linear_extrude(height= cr) difference()
+    {   base_clicker(0);
+        translate([0,cl]) square([s,2*cl], center=true);
     }
 }
 
-module pen_back()
-{   difference()
-    {   translate([0,ir-bl+ir]) union() 
-        {   sphere(pr);
-            rotate([-90,0]) cylinder(r=pr,h=bl-cl-pr);
-        }
-        translate([0,0,+inf + pr*(1-ff)]) cube(2*inf*[1,1,1], center=true);
-        translate([0,0,-inf - pr*(1-ff)]) cube(2*inf*[1,1,1], center=true);
-        
-        translate([0,-bl,-ir/2]) linear_extrude(height=ir) _clicker();
-        translate([0,0,-inf]) linear_extrude(height=3*inf) holding_profile();
+module sub_clicker()
+{   translate([0,0,-cr/2]) linear_extrude(height= cr) 
+    {   base_clicker(cr);
+        translate([0,cl]) scale([1,3]) circle(pr-t);
+        translate([0,-2*cr]) base_clicker(cr);
     }
 }
 
-module pen_front()
-{
-    difference()
-    { 
-        translate([0,-cl+lr]) union()
-        {   rotate([-90,0]) cylinder(r=pr,h=pl-bl-fl);
-            translate([0,pl-bl-fl]) scale([1,fl/pr,1]) sphere(pr);
-        }
-        translate([0,-bl,-ir/2]) linear_extrude(height=ir) _clicker();
-        translate([0,-bl-2*_rs,-ir/2]) linear_extrude(height=ir) _clicker();
-
-        translate([0,0,+inf + pr*(1-ff)]) cube(2*inf*[1,1,1], center=true);
-        translate([0,0,-inf - pr*(1-ff)]) cube(2*inf*[1,1,1], center=true);
-
-        //Pen lead hole.
-        translate([0,inf]) rotate([90,0]) cylinder(r=lr,h=3*inf);
-    }
+module pushthing() 
+{   rotate([0,180+45]) cylinder(r=lr,h=inf);
+    rotate([0,135]) cylinder(r=lr,h=inf);
+    sphere(lr);
 }
-
-module holder()
+module lead_space()
 {
     difference()
     {   union()
-        {   translate([-2*lr/3,lr/2-lr*ff]) cylinder(r=lr/2, h=2*pr);
-            translate([2*lr/3,lr/2-lr*ff]) cylinder(r=lr/2, h=2*pr);
-            translate([-pr/2,0]) cube([pr,pr/2,pr/2]);
-            translate([-pr/2,0,3*pr/2]) cube([pr,pr/2,pr/2]);
+        {   translate([0,0,-inf]) cylinder(r=lr, h=3*inf);
+            translate([0,0,bl/2]) scale([1,1,4]) sphere(4*lr);
         }
-        translate([0,-inf]) cube(inf*[2,2,2],center=true);
+        for( z= [bl/2-10*lr : 6*lr : bl/2+10*lr] )
+        {   translate([0,1.5*lr,z]) pushthing();
+            translate([0,-1.5*lr,z]) pushthing();
+        }
     }
 }
 
-translate([-2*pr,0])holder();
+module base_shape()
+{   default_base_shape(); }
 
-translate([2*pr,0]) color([0,0,1]) pen_front();
+module default_pen_bottom()
+{
+    intersection()
+    {   base_shape();
+        union()
+        {   difference()
+            {   union()
+                {   color([0,0,1]) translate([0,0,bl-inf]) cube(2*[inf,inf,inf], center=true);
+                    translate([0,0,bl]) rotate([90,0]) clicker();
+                }
+                translate([0,0,t]) cylinder(r=s/2,h=inf);
+            }
+            rotate(90) for( z= [t : 6*lr : bl+t] )
+            {   translate([0,1.5*lr,z]) pushthing();
+                translate([0,-1.5*lr,z]) pushthing();
+            }
+        }
+    }
+}
+module default_pen_top()
+{
+    difference()
+    {   base_shape();
+        translate([0,0,bl-inf]) cube(2*[inf,inf,inf], center=true);
+        translate([0,0,bl]) rotate([90,0]) sub_clicker();
+        translate([0,0,-inf]) cylinder(r=lr,h=3*inf);
+    }
+}
 
-pen_back();
-translate([0,-bl,2*pr]) clicker();
+module as_print()
+{   translate(2*pr*[1,1]) default_pen_bottom();
+    translate([0,0,-bl]) default_pen_top();
+}
+
+as_print();
