@@ -23,8 +23,14 @@ fr = 2;
 
 t= 6;   //Thickness of walls.
 
-mr = 9;   //Radius of embedded magnets.(Get it right!)
-mh = t; //.. height
+//Negative radius for no magnets.
+mr = -9;   //Radius of embedded magnets.(Get it right!)
+mh = -t; //.. height
+
+//Negative thickness for no clamp.
+ct = 15; //clamped thickness. 
+cd = 3; //Clamp distance
+ch  = 50; //Clamp height.
 
 h = max(2*mr+t/2, 2*t); //Calculated height
 
@@ -42,6 +48,32 @@ module feature_hole()
 //        scale([1/8,h/(4*fd)]) cylinder(r=fd, h=3*h);
 }
 
+module clamp()
+{
+    cw = ct+2*t;
+    rotate([0,-90]) linear_extrude(height=t)
+    {
+        difference()
+        {   union()
+            {   translate([2*t/3,0]) square([ch-cw-2*t/3,cw]);
+                translate([0,t]) square([ch-cw,cw-2*t]);
+                translate([2*t/3,t]) circle(t);
+                translate([2*t/3,cw-t]) circle(t);
+                translate([ch-cw,cw/2]) scale([1,1]) circle(cw/2);
+            }
+            translate([-inf,0]) square(2*[inf,inf], center=true);
+            translate([0,cw/2]) 
+            {   square([2*(ch-2*ct-t/2),ct], center=true);
+                translate([ch-2*ct-t/2,0]) scale([1,1/2]) circle(ct);
+            }
+        }
+        translate([2*cd,(cw-ct)/2]) scale([2,1])
+        {   circle(cd);
+            translate([0,ct]) circle(cd);
+        }
+    }
+}
+
 module bag_holder()
 {
 
@@ -51,12 +83,14 @@ module bag_holder()
     intersection()
     {   difference()
         {   translate([0,0,t/3]) union()
-            {   rotate([-90,0]) translate([0,t/3-h/2]) cylinder(r=mr+t/2,h=t);
-                translate([0,t/2,h/2-t/3])
-                {   rotate([0,-45]) translate([mr,0,-sqrt(2)*h]) 
-                        cylinder(r=t/2,h=sqrt(2)*h);
-                    rotate([0,225]) translate([mr,0]) 
-                        cylinder(r=t/2,h=sqrt(2)*h);
+            {   if( mr>0 )
+                {   rotate([-90,0]) translate([0,t/3-h/2]) cylinder(r=mr+t/2,h=t);
+                    translate([0,t/2,h/2-t/3])
+                    {   rotate([0,-45]) translate([mr,0,-sqrt(2)*h]) 
+                            cylinder(r=t/2,h=sqrt(2)*h);
+                        rotate([0,225]) translate([mr,0]) 
+                            cylinder(r=t/2,h=sqrt(2)*h);
+                    }
                 }
                 translate([t/2-r,0]) rotate([0,90])  
                     scale([1,3/2]) cylinder(r=2*t/3,h=2*r-t);
@@ -69,6 +103,12 @@ module bag_holder()
             }
         }
         translate([0,inf,inf]) cube(2*[inf,inf,inf], center=true);
+    }
+    cw = ct+2*t;
+    if( ct>0 )
+    {
+        translate([r,-cw+t]) clamp();
+        translate([-r+t,-cw+t]) clamp();
     }
 }
 
