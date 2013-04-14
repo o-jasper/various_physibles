@@ -34,30 +34,30 @@ module handy_clamp_profile(r,t,fr,a)
             rotate(a) translate([r,0]) square([t,fr]);
             scale([1,-1]) rotate(a) translate([r,0]) square([t,fr]);
         }
-        translate([r+t/2,0]) square([r,t], center=true);
+        translate([r+t/2,0]) square([2*r,t], center=true);
         circle(r);
     }
 }
 
-pr = 2.5; //Pencil radius.
-fr = 10;  //Grabable thing radius.
+pr = 4; //Smaller-than-pencil radius.
+fr = 15;  //Grabable thing radius.
 a=80;     //Angle of grabable thing.
 d = 20;   //Distance to mendel.
-t = 2;    //Wall thicknesses.
+t = 3;    //Wall thicknesses.
 
-mr = 3; //Mendel bolt radius.
-sr = 1; //bolt radius.
+mr = 4.25; //Mendel bolt radius.
+sr = 1.4; //screw radius.
 
 module pencil_holder_clamp()
 {
     h= 2*t;
     linear_extrude(height=h) handy_clamp_profile(pr,t,fr,a);
     translate([-t/2,pr+t/2]) 
-    {   cube([t,d,t/2]);
-        translate([0,d]) cube([t,t/2,4*t]);
-        translate([0,d-t/2]) difference()
-        {   cube([t,t,t]);
-            translate([-t,0,t]) rotate([0,90]) cylinder(r=t/2,h=3*t);
+    {   cube([t/2,d,t]);
+        translate([t/2,d]) cube([4*t,t/2,t]);
+        translate([t/2,d]) difference()
+        {   cylinder(r=t/2,h=t);
+            translate([t/2,-t/2,-t]) cylinder(r=t/2,h=3*t);
         }
     }
 }
@@ -68,7 +68,7 @@ module mendel_clamp()
     difference()
     {   union()
         {   clamp(mr,t,sr);
-            translate([0,mr+t]) scale([2,1]) cylinder(r=t/2,h=h);
+            translate([0,mr+2*t/3]) scale([2,1]) cylinder(r=2*t/3,h=h);
         }
         translate([0,mr]) cube([t,0.9*t,4*h], center=true);
     }
