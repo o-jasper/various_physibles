@@ -1,0 +1,83 @@
+//
+//  Copyright (C) 14-04-2012 Jasper den Ouden.
+//
+//  This is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published
+//  by the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+
+module clamp(r,t,sr)
+{
+    w= r+2*(t+2*sr);
+    h= sr+2*t;
+    difference()
+    {   linear_extrude(height= h) difference()
+        {   union()
+            {   circle(r+t);
+                translate([-w,-3*t/2]) square([w + sr,3*t]);
+            }
+            circle(r);
+            translate([-2*w,-t/2]) square([2*w + sr,t]);
+        }
+        translate([sr+t-w,w,h/2])  rotate([90,0]) cylinder(r=sr,h=3*w);
+    }
+}
+
+//Clamp for hand opening
+module handy_clamp_profile(r,t,fr,a)
+{
+    difference()
+    {
+        union()
+        {   circle(r+t);
+            rotate(a) translate([r,0]) square([t,fr]);
+            scale([1,-1]) rotate(a) translate([r,0]) square([t,fr]);
+        }
+        translate([r+t/2,0]) square([r,t], center=true);
+        circle(r);
+    }
+}
+
+pr = 2.5; //Pencil radius.
+fr = 10;  //Grabable thing radius.
+a=80;     //Angle of grabable thing.
+d = 20;   //Distance to mendel.
+t = 2;    //Wall thicknesses.
+
+mr = 3; //Mendel bolt radius.
+sr = 1; //bolt radius.
+
+module pencil_holder_clamp()
+{
+    h= 2*t;
+    linear_extrude(height=h) handy_clamp_profile(pr,t,fr,a);
+    translate([-t/2,pr+t/2]) 
+    {   cube([t,d,t/2]);
+        translate([0,d]) cube([t,t/2,4*t]);
+        translate([0,d-t/2]) difference()
+        {   cube([t,t,t]);
+            translate([-t,0,t]) rotate([0,90]) cylinder(r=t/2,h=3*t);
+        }
+    }
+}
+
+module mendel_clamp()
+{
+    h= sr+2*t;
+    difference()
+    {   union()
+        {   clamp(mr,t,sr);
+            translate([0,mr+t]) scale([2,1]) cylinder(r=t/2,h=h);
+        }
+        translate([0,mr]) cube([t,0.9*t,4*h], center=true);
+    }
+}
+module items()
+{
+    mendel_clamp();
+    translate([0,pr+t+fr]) pencil_holder_clamp();
+}
+items();
+//handy_clamp_profile(20,5,50,80);
+//clamp(20,5,1.5);
