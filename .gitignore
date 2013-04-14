@@ -1,17 +1,14 @@
-
+myprints/
 */*.stl
-*/*/*.stl
-*/*/*/*.stl
-
 */*.gcode
+*/*/*.stl
 */*/*.gcode
-*/*/*/*.gcode
-
-*/*.deps
-*/*/*.deps
-*/*/*/*.deps
-
+*/pics/
 .#*
 */.#*
 */*/.#*
 */*/*/.#*
+*/old/
+# Possibly add these later
+cooler/
+reprap/

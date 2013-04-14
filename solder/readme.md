@@ -8,6 +8,7 @@ It *might* be printable as two pieces; the cap and the body.
 Not sure, especially for the body.
 
 ### TODO
+* It is gi-normous. Cut it into more pieces.
 * Attachments:(like previously)
  + optional extendable feet
  + holes for screws to attach it to
@@ -16,6 +17,7 @@ Not sure, especially for the body.
 * List parameters.(better)
 * Check parameter range. gifs of the thing changing through them would be nice for
   presentation.
+* About the screw: are there standards?
 
 # Parameters:
 Note that there really aught to be a system to very standardly list them, i am

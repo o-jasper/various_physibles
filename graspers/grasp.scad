@@ -29,11 +29,25 @@ module grasp_female2d(w,h,r)
     }
 }
 
+module grasp_hor()
+{
+    translate([-$grasp_d/2,$h/2-$r]) scale([1,-1]) linear_extrude(height=$dx) difference()
+    {   union()
+        {   square([2*$grasp_d, $w/3]); //translate([0,$r]) circle($r);
+            translate([0,$grasp_d/2]) circle($grasp_d/2);
+        }
+        translate([0,$grasp_d/2]) circle($grasp_d_r);
+    }
+}
+
 module grasp_head()
 {   translate([0,-$h/2-$dy]) difference() 
     {   rounded_cube($w,$h+$dy,$dx+$r, $r);
         translate([-$w,-$h-$dy,$dx])
             cube([3*$w,3*($h+$dy),$l]);
+    }
+    if( $grasp_d>0 )
+    {   grasp_hor();
     }
     
     if($round_hook) 
@@ -54,30 +68,29 @@ module grasp_head()
 
 module grasp_female()
 {   grasp_head();
-    translate([0,0,$dx]) linear_extrude(h=$l-$dx) 
+    translate([0,0,$dx]) linear_extrude(height=$l-$dx) 
         grasp_female2d($w,$h,$r);
 }
 
 module grasp_male()
 {   grasp_head();
-    translate([0,0,$dx]) linear_extrude(h=$l-$dx) 
+    translate([0,0,$dx]) linear_extrude(height=$l-$dx) 
         grasp_male2d($w,$h,$r);
 }
 
 
-{ 
-    $w = 60;
-    $h = $w/2;
-    $l = 80;
-    $dx = 20;
-    $dy = $h;
-    $r = 10;
-    
-//    $square_hook=true;
-    $round_hook=true;
-    
-//    $grab_plate_r = 5; //TODO plate to grab on to.
+$w = 60;
+$h = $w/2;
+$l = 80;
+$dx = 20;
+$dy = $h;
+$r = 10;
 
-    grasp_male();
-    translate([2*$w+10,0]) grasp_female();
-}
+$grasp_d = -2;
+$grasp_d_r = -3;
+
+$round_hook=true;
+
+grasp_male();
+translate([2*$w+10,0]) grasp_female();
+
