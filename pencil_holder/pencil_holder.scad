@@ -26,6 +26,8 @@ module clamp(r,t,sr)
 
 module handy_clamp_leg(r,fr)
 {   translate([r,0]) square([t,fr]);
+    translate([r+t,fr-t]) circle(t);
+
     square([r+t,r+t]);
 }
 
