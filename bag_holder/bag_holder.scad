@@ -27,6 +27,9 @@ t= 6;   //Thickness of walls.
 mr = -9;   //Radius of embedded magnets.(Get it right!)
 mh = -t; //.. height
 
+worry_stickiness = true; //Turn this on/off if you worry about the stickiness of
+                         // the surface.
+
 //Negative thickness for no clamp.
 ct = 15; //clamped thickness. 
 cd = 3; //Clamp distance
@@ -55,11 +58,11 @@ module clamp()
     {
         difference()
         {   union()
-            {   translate([2*t/3,0]) square([ch-cw-2*t/3,cw]);
+            {   translate([2*t/3,0]) square([ch-1.5*cw-2*t/3,cw]);
                 translate([0,t]) square([ch-cw,cw-2*t]);
                 translate([2*t/3,t]) circle(t);
                 translate([2*t/3,cw-t]) circle(t);
-                translate([ch-cw,cw/2]) scale([1,1]) circle(cw/2);
+                translate([ch-1.5*cw,cw/2]) scale([2,1]) circle(cw/2);
             }
             translate([-inf,0]) square(2*[inf,inf], center=true);
             translate([0,cw/2]) 
@@ -72,6 +75,8 @@ module clamp()
             translate([0,ct]) circle(cd);
         }
     }
+    if( worry_stickiness )
+    {   translate([-t,2*t/3]) scale([3,1]) cylinder(r1=(2*t/3),r2=0,h=t); }
 }
 
 module bag_holder()
@@ -82,7 +87,7 @@ module bag_holder()
     da = acos(1-fd*fd/(2*r*r));
     intersection()
     {   difference()
-        {   translate([0,0,t/3]) union()
+        {   translate([0,0,t/6]) union()
             {   if( mr>0 )
                 {   rotate([-90,0]) translate([0,t/3-h/2]) cylinder(r=mr+t/2,h=t);
                     translate([0,t/2,h/2-t/3])
@@ -92,9 +97,11 @@ module bag_holder()
                             cylinder(r=t/2,h=sqrt(2)*h);
                     }
                 }
-                translate([t/2-r,0]) rotate([0,90])  
-                    scale([1,3/2]) cylinder(r=2*t/3,h=2*r-t);
-                rotate_extrude() translate([r-t/2,0]) circle(2*t/3);
+                scale([1,1,1/2])
+                {   translate([t/2-r,0]) rotate([0,90])  
+                        scale([1,3/2]) cylinder(r=2*t/3,h=2*r-t);
+                    rotate_extrude() translate([r-t/2,0]) circle(2*t/3);
+                }
             }
             magnet_hole();
             if( fr>0 ) translate([0,0,-h]) for( a=[0 : da/2 : 80] )
@@ -108,7 +115,7 @@ module bag_holder()
     if( ct>0 )
     {
         translate([r,-cw+t]) clamp();
-        translate([-r+t,-cw+t]) clamp();
+        scale([-1,1]) translate([r,-cw+t]) clamp();
     }
 }
 
