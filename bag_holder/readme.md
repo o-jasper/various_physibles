@@ -4,6 +4,10 @@ Bag holders for ziplock bags(may work on other types too.
 
 There are cylindrical holes for magnets and clamps too.
 
+Unfortunately due to extrusion difficults i havent been able to test anything
+other than what is effectively the 'vanilla' thing. I have no need for any more,
+so wont be testing myself.
+
 ### Features
 
 * Indicate the circumference with `cl`, it'll calcuate the radius.

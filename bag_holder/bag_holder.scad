@@ -9,8 +9,6 @@
 
 //Note: only really suitable for mh<t;
 
-use<../lib/rounded_box.scad>
-
 cl= 260; //circumference.
 
 pi=3.141592653589793;
@@ -25,13 +23,13 @@ t= 6;   //Thickness of walls.
 
 //Negative radius for no magnets.
 mr = -9;   //Radius of embedded magnets.(Get it right!)
-mh = -t; //.. height
+mh = t; //.. height
 
 worry_stickiness = true; //Turn this on/off if you worry about the stickiness of
                          // the surface.
 
 //Negative thickness for no clamp.
-ct = 15; //clamped thickness. 
+ct = -15; //clamped thickness. 
 cd = 3; //Clamp distance
 ch  = 50; //Clamp height.
 
@@ -93,17 +91,23 @@ module bag_holder()
                     translate([0,t/2,h/2-t/3])
                     {   rotate([0,-45]) translate([mr,0,-sqrt(2)*h]) 
                             cylinder(r=t/2,h=sqrt(2)*h);
-                        rotate([0,225]) translate([mr,0]) 
+                        rotate([0,225]) translate([mr,0])
                             cylinder(r=t/2,h=sqrt(2)*h);
                     }
                 }
+                if( mr<0 && ct<0 )
+                {   translate([t/2-r,0]) cylinder(r=t/2,h=2*t);
+                    translate([r-t/2,0]) cylinder(r=t/2,h=2*t);
+                }
+                
                 scale([1,1,1/2])
                 {   translate([t/2-r,0]) rotate([0,90])  
                         scale([1,3/2]) cylinder(r=2*t/3,h=2*r-t);
                     rotate_extrude() translate([r-t/2,0]) circle(2*t/3);
                 }
             }
-            magnet_hole();
+            if( mr>0 )
+            {   magnet_hole(mr=mr,mh=mh,h=h); }
             if( fr>0 ) translate([0,0,-h]) for( a=[0 : da/2 : 80] )
             {   rotate(-a) feature_hole();
                 rotate(+a) feature_hole();
@@ -111,11 +115,12 @@ module bag_holder()
         }
         translate([0,inf,inf]) cube(2*[inf,inf,inf], center=true);
     }
+
     cw = ct+2*t;
     if( ct>0 )
     {
-        translate([r,-cw+t]) clamp();
-        scale([-1,1]) translate([r,-cw+t]) clamp();
+        translate([r,-cw+t]) clamp(ct=ct,t=t,r=r,h=h,cd=cd);
+        scale([-1,1]) translate([r,-cw+t]) clamp(ct=ct,t=t,r=r,h=h,cd=cd);
     }
 }
 
