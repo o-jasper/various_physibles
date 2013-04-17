@@ -25,7 +25,7 @@ ll = 1050; //length of lead.
 
 pl= ll + pr; //length of pen.
 
-rc = 4*pr/3-lr; //Cut radius of lead holder.
+rc = 4*pr/3-0.8*lr; //Cut radius of lead holder.
 
 bl = pr + 2*rc; //Length of bottom of pen.
 tl = pl/2; //..top
@@ -57,7 +57,7 @@ module base_shape()
 {   
     intersection()
     {   translate([0,0,bl+6.5*pr]) img();
-        scale(1.05) default_base_shape();
+        scale(1.1) default_base_shape();
     }
     default_base_shape();
 }
@@ -69,27 +69,32 @@ module bottom_cut()
         translate([0, pr]) cylinder(r=rc, h=4*pr);
     }
 }
-
+d = pr/4;
 module bottom()
 {
-    difference()
-    {   base_shape();
-        bottom_cut();
-        scale(-1) bottom_cut();
-        inficube([0,0,bl+inf]);
-    }
-    translate([0,0,bl])
-    {
-        cylinder(r1=pr, h=1.5*pr);
-        translate([0,0,pr]) sphere(pr-t);
-        translate([0,0,2.5*pr]) sphere(pr-t);
-        cylinder(r=pr/2, h = 3.5*pr);
+    intersection()
+    {   union()
+        {
+            difference()
+            {   base_shape();
+                bottom_cut();
+                scale(-1) bottom_cut();
+                inficube([0,0,bl+inf]);
+            }
+            translate([0,0,bl])
+            {
+                cylinder(r1=pr, h=1.5*pr);
+                translate([0,0,pr]) sphere(pr-t-d);
+                translate([0,0,2.5*pr]) sphere(pr-t-d);
+                cylinder(r=pr/2, h = 3.5*pr);
+            }
+        }
+        cylinder(r1=pr,r2=0.8*pr, h =2*bl);
     }
 }
 
 module cut_torus()
-{   d = pr/4;
-    rotate_extrude() translate([pr,0]) rotate(45) square([d,d]);
+{   rotate_extrude() translate([pr,0]) rotate(45) square([d,d]);
 }
 
 module top()
@@ -100,8 +105,7 @@ module top()
         translate([0,0,1.5*pr + pr/4]) cut_torus();
         translate([0,0,3*pr + pr/4]) cut_torus();
         inficube([0,0,-inf]);
-    }
-    
+    }    
 }
 
 module as_assembled()
