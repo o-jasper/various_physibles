@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 12-04-2013 Jasper den Ouden.
+//  Copyright (C) 12-04-2013 Jasper den Ouden.(ojasper.nl)
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -13,12 +13,13 @@
 //* Assembly `module`
 
 //All are times ~10.(not yet exact)
-pr=100;
-pl=1000;
+pr=75;
+pl=1050 + pr;
 
-lr = 10;
+lr = 20;
+slr = 15;
 
-t=50;
+t=30;
 cr=1.1*t; //Clicker radius.
 cl=max(pl/8, 4*cr+t);  //.. length
 
@@ -26,6 +27,8 @@ bl = pl/4; //Length of bottom of pen.
 tl = pl/2;
 
 inf = pl;
+
+echo(pl-bl);
 
 module default_base_shape()
 {  
@@ -48,7 +51,7 @@ module base_clicker(d)
     translate([-pr+t,0]) square([2*(pr-t),cl+d]);
 }
 
-s=max(4*lr,t+lr);
+s= t+lr;
 module clicker()
 {
     translate([0,0,-cr/2]) linear_extrude(height= cr) difference()
@@ -74,7 +77,7 @@ module lead_space()
 {
     difference()
     {   union()
-        {   translate([0,0,-inf]) cylinder(r=lr, h=3*inf);
+        {   translate([0,0,-inf]) cylinder(r=lr, h=inf);
             translate([0,0,bl/2]) scale([1,1,4]) sphere(4*lr);
         }
         for( z= [bl/2-10*lr : 6*lr : bl/2+10*lr] )
@@ -112,7 +115,8 @@ module default_pen_top()
     {   base_shape();
         translate([0,0,bl-inf]) cube(2*[inf,inf,inf], center=true);
         translate([0,0,bl]) rotate([90,0]) sub_clicker();
-        translate([0,0,-inf]) cylinder(r=lr,h=3*inf);
+        translate([0,0,-inf]) cylinder(r=lr,h=inf+pl-bl);
+        translate([0,0,-inf]) cylinder(r=slr,h=3*inf);
     }
 }
 
