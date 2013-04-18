@@ -50,7 +50,7 @@ module default_base_shape()
 }
 
 module img() //Note values regarding this rather botched, tbh!
-{   rotate([0,90]) scale([6,-6,16]) 
+{   rotate([0,90]) scale([4,-6,16]) 
         translate([-54,-7]) surface(file = "surface.dat", center = false, convexity = 5); 
 }
 module base_shape()
@@ -88,9 +88,10 @@ module bottom()
                 cylinder(r=pr/2, h = 3.5*pr);
                 translate([0,0,pr]) scale([1,1,(pr-t)/br]) sphere(br);
                 translate([0,0,2.5*pr]) scale([1,1,(pr-t)/br]) sphere(br);
+                translate([0,0,4*pr]) scale([1,1,(pr-t)/br]) sphere(br);
             }
         }
-        cylinder(r1=pr,r2=0.8*pr, h =2*bl);
+        cylinder(r1=pr,r2=0.8*pr, h =bl+4*pr+br);
     }
 }
 
@@ -105,6 +106,7 @@ module top()
         translate([0,0,pr/4]) cut_torus();
         translate([0,0,1.5*pr + pr/4]) cut_torus();
         translate([0,0,3*pr + pr/4]) cut_torus();
+        translate([0,0,4.5*pr + pr/4]) cut_torus();
         inficube([0,0,-inf]);
     }    
 }
@@ -119,6 +121,6 @@ module as_print()
 {   top();
     translate([4*pr,0]) bottom();
 }
-//as_print();
+as_print();
 //as_assembled();
 bottom();
