@@ -55,32 +55,39 @@ module holder_profile()
     }
 }
 
-module hook() //hook itself.
-{
-    difference()
-    {   union()
-        {   linear_extrude(height=t) holder_profile();
-            difference()
-            {   union()
-                {   cylinder(r1=t,r2=t/2,h=w-t/2);
-                    translate([0,0,w-t/2]) sphere(t/2);
-                }
-                translate([0,inf]) inficube();
-            }
-        }
-        cylinder(r1=t/2,r2=t/8, h=w-1.5*t);
-    }
-}
-
 module pin() //Pin so you can also support the other direction.
 {
     difference()
     {   rotate([90,0])
         {   cylinder(r1=t,r2=t/2,h=w-t/2);
             translate([0,0,w-t/2]) sphere(t/2);
+            translate([0,0,1.5*t-w+t]) cylinder(r2=2*t/3,r1=t/3, h=t/4); //'Catch' it.
             translate([0,0,1.5*t-w]) cylinder(r2=t/2,r1=t/8, h=w-1.5*t);
         }
         inficube([0,0,-inf]);
+    }
+}
+
+module hook() //hook itself.
+{
+    if( w<0 )
+    {
+        linear_extrude(height=t) holder_profile();
+    }
+    else
+    {   difference()
+        {   union()
+            {   linear_extrude(height=t) holder_profile();
+                difference()
+                {   union()
+                    {   cylinder(r1=t,r2=t/2,h=w-t/2);
+                        translate([0,0,w-t/2]) sphere(t/2);
+                    }
+                    translate([0,inf]) inficube();
+                }
+            }
+            rotate([90,0]) pin();
+        }
     }
 }
 
