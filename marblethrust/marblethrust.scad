@@ -23,7 +23,15 @@ md = mr/2; //Depth marble track into thing.
 rl = mr/sqrt(2)+2*t;
 mz = t+rl/2 + (mr-md)/sqrt(2);
 
-mR = ri+rl/2 + (mr-md)/sqrt(2);
+mR = ri+rl/2 + (mr-md)/sqrt(2); //Radius the marbles run at.
+
+nh = 8; //hole count(zero for none)
+bridge = true; //Bride to tie stuff to.
+
+module holes()
+{   if( nh>0 ) translate([0,0,t]) for( i = [1:nh] )
+    {   rotate(i*360/nh) rotate([90,0]) cylinder(r=t/2,h=inf); }
+}
 
 //On other side of spool.
 module bottom()
@@ -33,14 +41,14 @@ module bottom()
     {   union()
         {   cylinder(r1=ri, r2=ro, h=h-t/2);
             translate([0,0,h-t/2]) cylinder(r=ro, h=t/2);
-            cylinder(r=ri,h=h+t);
+            cylinder(r=ri,h=h+1.5*t);
         }
         cylinder(r1=ri-t/2,r2=ri-t, h=h);
         cylinder(r=ri-t, h=inf);
+        translate([0,0,h]) holes();
     }
-    translate([0,0,(h+t)/2])  difference()
-    {   cube([t,ri+3*t,h+t],center=true);
-    }
+    if(bridge) translate([0,0,(h+t)/2])  difference()
+    {   cube([t,ri+3*t,h+t],center=true); }
 }
 
 module marble_torus()
@@ -53,15 +61,16 @@ module top()
     difference()
     {   union()
         {   cylinder(r1=ri+rl-t,r2=ri+rl,h=t);
-            translate([0,0,t]) cylinder(r1=ri+rl,r2=ri,h=rl);
-            translate([0,0,t+rl]) cylinder(r=ri+t, h=1.5*t);
-            translate([0,0,t+rl]) cylinder(r=ri, h=2.5*t);
+            translate([0,0,t]) cylinder(r1=ri+rl,r2=ri+rl,h=rl);
+            translate([0,0,t+rl]) cylinder(r=ri+t, h=t);
+            translate([0,0,t+rl]) cylinder(r=ri, h=2*t);
         }
-        cylinder(r2=ri-t/2,r1=ri+t, h=2*t+rl-h);
+        cylinder(r2=ri-2*t,r1=ri+t/2, h=2*t+rl-h);
         cylinder(r=ri-t/2, h=inf);
         marble_torus();
+        translate([0,0,2*t+rl]) holes();
     }
-    translate([0,0,rl+2*t-(h+t)/2])  difference()
+    if(bridge) translate([0,0,rl+2*t-(h+t)/2])  difference()
     {   cube([t,ri+t,h+t],center=true);
         translate([0,0,-(h+t)/2]) translate([inf,0]) rotate([0,-90]) 
             cylinder(r=ri, h=3*inf);
