@@ -23,7 +23,7 @@ lr = 20;   //radius of lead.
 ll = 1050; //length of lead.
 //slr = 15;  //small radius of lead(not used)
 
-pl= ll + pr; //length of pen.
+pl= ll; //length of pen.
 
 rc = 4*pr/3-0.8*lr; //Cut radius of lead holder.
 
@@ -72,7 +72,8 @@ module bottom_cut()
 d = pr/4;
 module bottom()
 {
-    intersection()
+    br = pr-3*d/4-t; //'Bulbous' areas for clicking.
+    rotate(90) intersection() //Rotation avoids damage due to travelling away a bit.
     {   union()
         {
             difference()
@@ -83,10 +84,10 @@ module bottom()
             }
             translate([0,0,bl])
             {
-                cylinder(r1=pr, h=1.5*pr);
-                translate([0,0,pr]) sphere(pr-t-d);
-                translate([0,0,2.5*pr]) sphere(pr-t-d);
+                cylinder(r1=pr, h=pr);
                 cylinder(r=pr/2, h = 3.5*pr);
+                translate([0,0,pr]) scale([1,1,(pr-t)/br]) sphere(br);
+                translate([0,0,2.5*pr]) scale([1,1,(pr-t)/br]) sphere(br);
             }
         }
         cylinder(r1=pr,r2=0.8*pr, h =2*bl);
@@ -118,5 +119,6 @@ module as_print()
 {   top();
     translate([4*pr,0]) bottom();
 }
-as_print();
+//as_print();
 //as_assembled();
+bottom();
