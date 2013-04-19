@@ -20,6 +20,8 @@ gr = 0.6*t;
 
 inf = 3*ssw;
 
+gcw = 3; //Width of cut to get wire to guide.(equal to gw, but recommend not.
+
 module round_stepper_profile()
 {   d = (sw-ssw)/2;
     difference() 
@@ -34,10 +36,16 @@ module x_stepper_filguide()
 {
     
     linear_extrude(height=ssl) difference()
-    {   round_stepper_profile();
+    {   union()
+        {   round_stepper_profile();
+            translate([sw/2,sw/2]) rotate(135) translate([-gw/2,(sw+gw)/2]) scale([1,2])
+            {   circle((gw-gcw)/2);
+                translate([gw,0]) circle((gw-gcw)/2);
+            }
+        }
         translate([t+sw/2,1.5*sw]) square([t,inf], center=true);
         translate([sw/2,sw/2]) rotate(135) translate([0,sw]) 
-            square([gw,inf], center=true);
+            square([gcw,2*sw], center=true);
     }
     difference()
     {   translate([1.5*t,1.5*t,ssl/2]) rotate(-45) rotate([90,0]) scale([1,4*ssl/(7*gr)])
