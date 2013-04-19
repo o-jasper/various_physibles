@@ -1,4 +1,5 @@
-myprints/
+objs/
+runs/
 */*.stl
 */*.gcode
 */*/*.stl
@@ -11,5 +12,4 @@ myprints/
 */old/
 # Possibly add these later
 cooler/
-reprap/
 old/

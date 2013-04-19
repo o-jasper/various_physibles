@@ -16,7 +16,7 @@ inf=3*ro;
 
 n_attach = 4;  //Number of attachment points.
 
-mr= 13.4; //Radius of marbles.
+mr= 15/2; //Radius of marbles.
 md = mr/2; //Depth marble track into thing.
 
 
@@ -41,7 +41,7 @@ module bottom()
     {   union()
         {   cylinder(r1=ri, r2=ro, h=h-t/2);
             translate([0,0,h-t/2]) cylinder(r=ro, h=t/2);
-            cylinder(r=ri,h=h+1.5*t);
+            cylinder(r=ri,h=h+2*t);
         }
         cylinder(r1=ri-t/2,r2=ri-t, h=h);
         cylinder(r=ri-t, h=inf);
@@ -60,15 +60,15 @@ module top()
     h = 2*t;
     difference()
     {   union()
-        {   cylinder(r1=ri+rl-t,r2=ri+rl,h=t);
-            translate([0,0,t]) cylinder(r1=ri+rl,r2=ri+rl,h=rl);
-            translate([0,0,t+rl]) cylinder(r=ri+t, h=t);
-            translate([0,0,t+rl]) cylinder(r=ri, h=2*t);
+        {   cylinder(r1=ri+rl-t/2,r2=ri+rl,h=t);
+            translate([0,0,t]) cylinder(r1=ri+rl,r2=ri+t,h=rl);
+            translate([0,0,t]) cylinder(r=ri+t,h=rl+t/4);
+            translate([0,0,1.25*t+rl]) cylinder(r=ri, h=t);
         }
         cylinder(r2=ri-2*t,r1=ri+t/2, h=2*t+rl-h);
         cylinder(r=ri-t/2, h=inf);
         marble_torus();
-        translate([0,0,2*t+rl]) holes();
+        translate([0,0,1.25*t+rl]) holes();
     }
     if(bridge) translate([0,0,rl+2*t-(h+t)/2])  difference()
     {   cube([t,ri+t,h+t],center=true);
