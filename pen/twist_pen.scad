@@ -15,6 +15,11 @@
 //(slic3r: --top-solid-layers 0 --bottom-solid-layers 0 --fill-density 0
 //         --perimeters 1)
 
+//TODO 
+//* make the pinch bits less steep; easier for the printer.
+//* an additional clicking system with a thing with a 'hat'
+//* images on the sides.
+
 pr=75; 
 
 lr = 20;   //radius of lead.
@@ -29,7 +34,7 @@ bl = pr + 2.2*rc; //Length of bottom of pen.
 tl = pl/2; //..top
 
 scr = 2*lr/3; //Cut radius of screw.
-scd = lr/3; //Extra room for screw.
+scd = lr/16; //Extra room for screw.
 scR = pr-lr -scd;
 sch = 300;
 
@@ -47,14 +52,18 @@ module bottom_cut()
     translate([-4*pr/3,pr,pr]) rotate([90,0])
     {   cylinder(r= rc, h=4*pr);
         translate([0, pr]) cylinder(r=rc, h=4*pr);
+        translate([-2.2*pr,rc/2]) scale([1,2,1]) cylinder(r=2.9*pr, h= 4*pr);
     }
 }
 
 module screws(R)
 {
     color([0,0,1]) for( i=[1:scn] )
-        rotate(360*i/(scn-0.5)) linear_extrude(height=sch, twist=sca) 
-            translate([R,0]) circle(scr);
+        rotate(360*i/(scn-0.5)) 
+        {   linear_extrude(height=sch, twist=sca) 
+                translate([R,0]) circle(scr);
+            rotate(sca) translate([R,0,sch-1]) cylinder(r1=scr,h=2*scr);
+        }
 }
 
 module bottom()
@@ -65,11 +74,19 @@ module bottom()
         {   cylinder(r=pr,h=bl);
             translate([0,0,bl]) cylinder(r1=pr,r2=scR, h= 2*(pr-scR));
             cylinder(r=scR, h= bl+sch);
-            translate([0,0,bl]) screws(scR);
+            translate([0,0,bl]) 
+            {   screws(scR);
+                translate([0,0,sch]) cylinder(r=scR, h= 2*scr);
+                translate([0,0,sch+2*scr]) 
+                {   cylinder(r1=scR, h= 2*scR);
+                    cylinder(r1=0, r2=scR, h= 2*scR);
+                }
+                translate([0,0,sch+2*(scr+scR)]) cylinder(r1=scR,r2=scR/2, h= scR);
+            }
         }
         translate([0,0,0.2*rc])
         {   bottom_cut();
-            scale(-1) bottom_cut();
+            rotate(180) bottom_cut();
         }
     } 
 }
@@ -85,9 +102,9 @@ module top()
         inficube([0,0,pl-bl+inf]);
         inficube([0,0,-inf]);
         screws(pr);
-    
-        for( i=[1:scn] )
-            rotate(sca + 360*i/(scn-0.5)) translate([pr,0,sch-1]) cylinder(r1=scr,h=2*scr);
+        
+        translate([0,0,sch+2*(scr+scR)-2*(pr-0.9*scR) - sch/3])
+            cylinder(r1=pr, r2=0.9*scR, h=2*(pr-scR));
     }
 }
 
@@ -97,4 +114,38 @@ module as_print()
     translate([3*pr,0]) top();
 }
 
-as_print();
+//translate([400,300])as_print();
+
+module cut_bottom()
+{
+    translate([0,0,4*pr/3]) rotate([-90,0]) difference()
+    {   cylinder(r=pr,h=bl);
+        bottom_cut();
+        rotate(180) bottom_cut();
+    }
+}
+
+module pen_plank_clamp(pt,d,ct)
+{
+    difference()
+    {   linear_extrude(height=1.5*pr) difference()
+        {   union()
+            {   minkowski()
+                {   circle(ct);
+                    translate([ct,ct]) square([pt,d]);
+                }
+                translate([pt+2*ct,0]) circle(ct);
+                translate([ct,0]) circle(ct);
+            }
+            translate([ct,ct]) square([pt,2*d]);
+        }
+        translate([0,ct]) rotate(225) cut_bottom();
+        translate([pt+ct,ct/2]) rotate(247.5) cut_bottom();
+        translate([pt+ct,d]) rotate(-90)  
+        {   cut_bottom();
+            translate([-pr,0]) cut_bottom();
+        }
+    }
+}
+
+pen_plank_clamp(160,160,80);
