@@ -9,15 +9,15 @@
 
 include <acceptor.scad> 
 
-h = 24.5; //TODO get these!
-pt = 5.8; 
+h = 24.5; 
+pt = 5.8; //Note the top one seems a littl less.
 
-td = 10;
+td = 10; //Length grabbed..
 bd = 20;
 
-t=3;
+t=3; //Thickness of springy bits.
 
-w = 40;
+w = 40; //Width.
 dev = 2; //Deviation for beding.
 
 module circle_spring(r,d,t)
