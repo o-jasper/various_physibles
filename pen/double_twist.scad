@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 19-04-2013 Jasper den Ouden.(ojasper.nl)
+//  Copyright (C) 22-04-2013 Jasper den Ouden.(ojasper.nl)
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -21,6 +21,7 @@
 //* images on the sides.
 
 pr=75; 
+er = 10;
 
 lr = 20;   //radius of lead.
 ll = 1050; //length of lead.
@@ -68,7 +69,7 @@ module screws(R)
 
 module bottom()
 {
-    sz = bl+ 2*(pr-scR)+ sch;
+//    sz = bl+ 2*(pr-scR)+ sch;
     difference()
     {   union()
         {   cylinder(r=pr,h=bl);
@@ -80,6 +81,7 @@ module bottom()
                 translate([0,0,sch+2*scr]) 
                 {   cylinder(r1=scR, h= 2*scR);
                     cylinder(r1=0, r2=scR, h= 2*scR);
+                    cylinder(r=3*scR/5, h=2*scR);
                 }
                 translate([0,0,sch+2*(scr+scR)]) cylinder(r1=scR,r2=scR/2, h= scR);
             }
@@ -91,22 +93,38 @@ module bottom()
     } 
 }
 
-module top()
+module top_cut()
 {
+    pz = 2*scr + scR;
+    rh = (pr+scR)/2;
     difference()
     {   union()
-        {   cylinder(r=pr, h=pl-bl-tl);
+        {   cylinder(r=pr, h=sch);
+            translate([0,0,sch]) 
+            {   cylinder(r1=pr,r2=rh, h=pz-pr/2);
+                translate([0,0,pz-pr/2]) cylinder(r1=rh,r2=0.8*scR, h=pr/2);
+                translate([0,0,pz]) cylinder(r1=0.8*scR,r2=rh, h=pr/2);
+                translate([0,0,pz+pr/2]) cylinder(r=rh, h=pr/2);
+            }
+        }
+        screws(pr);
+    }
+}
+
+module top()
+{
+    tr = pr+er; //Total radius.
+    difference()
+    {   
+        union()
+        {   cylinder(r=tr, h=pl-bl-tl);
             translate([0,0,pl-bl-tl]) 
-                scale([1,1,(tl+pr/3)/pr]) sphere(pr);
+                scale([1,1,(tl+tr/3)/tr]) sphere(tr);
         }
         inficube([0,0,pl-bl+inf]);
         inficube([0,0,-inf]);
-        screws(pr);
         
-        rotate_extrude()
-        {   translate([pr,sch+2*(scr+scR)-0.2*scR - sch/3])
-                rotate(45) square(2*(pr-0.9*scR)*[1,1], center=true);
-        }
+        top_cut();
     }
 }
 
