@@ -15,14 +15,14 @@ module attach_methods(sr, nscrew,nplate) //The stuff extra on the component.
 {
     linear_extrude(height=hl)
     {   if(nplate>0) for( i=[0:nplate-1] ) rotate(i*360/nplate) 
-                translate([hw/4+hl/2,0]) square([hw/2+hl,2*hl], center=true); 
+                translate([hw/4+hl/2,0]) square([hw/2+3*hl/2,2*hl], center=true); 
         if(nscrew>0) for( j=[0:nscrew-1] )
         {   rotate(180+j*360/nscrew) difference()
             {   union()
-                {   translate([hw/4,0]) square([hw/2,2*hl], center=true); 
-                    translate([hw/2,0]) circle(hl);
+                {   translate([hw/4+hl/2,0]) square([hw/2+hl,2*hl], center=true); 
+                    translate([hw/2+hl,0]) circle(hl);
                 }
-                translate([hw/2,0]) circle(sr);
+                translate([hw/2+hl,0]) circle(sr);
             }
         }
     }

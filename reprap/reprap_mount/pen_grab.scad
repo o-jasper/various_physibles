@@ -58,11 +58,15 @@ module pen_grab()
     }
 }
 
+include<attachable.scad>
+
 module pen_grab_component()
 {
     pen_grab();
-    for( i=[0:3] )
-        rotate(i*90) translate([hw/2+hl/2,0,hl/2]) cube([hl,hw/4,hl], center=true);
+    difference()
+    {   attach_methods(1.2, 1,1);
+        cube([hw,hw, 10*hl], center=true);
+    }
 }
 
 pen_grab_component();

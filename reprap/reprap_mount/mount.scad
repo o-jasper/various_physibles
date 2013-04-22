@@ -7,6 +7,7 @@
 //  (at your option) any later version.
 //
 
+include <rounded_box.scad> 
 include <acceptor.scad> 
 
 h = 24.5; 
@@ -15,9 +16,9 @@ pt = 5.8; //Note the top one seems a littl less.
 td = 10; //Length grabbed..
 bd = 20;
 
-t=3; //Thickness of springy bits.
+t=1; //Thickness of springy bits.
 
-w = 40; //Width.
+w = 30; //Width.
 dev = 2; //Deviation for beding.
 
 module circle_spring(r,d,t)
@@ -33,7 +34,7 @@ module circle_spring(r,d,t)
 
 }
 
-module clamp()
+module mount()
 {
     linear_extrude(height=w)
     {   translate([0,h-dev]) scale([1,-1]) circle_spring(bd,td,t); //top
@@ -47,9 +48,42 @@ module clamp()
     }
 }
 
-clamp();
+sr= 1.2;
 
-color([0,0,1])
-{   square([pt,pt]);
-    translate([0,h-pt]) square([pt,pt]);
+include<attachable.scad>
+
+module mount_component()
+{
+    difference()
+    {   union()
+        {   mount();
+            translate([bd+pt + hw/2+t,h/2, w/2]) 
+                rotate([90,0,0]) rotate(180) difference()
+            {   
+                linear_extrude(height=hl) difference()
+                {   scale([1,1.2]) circle(w/2);
+                    translate([-hw/2-hl,0]) 
+                    {   circle(sr);
+                        translate([hl/2,+hl+sr]) circle(sr);
+                        translate([hl/2,-hl-sr]) circle(sr);
+                    }
+                    translate([0,+w]) square([w,w],center=true);
+                    translate([0,-w]) square([w,w],center=true);
+                }
+                cube([hw,hw, 10*hl], center=true);
+            }
+        }
+        translate([bd+pt + hw/2+t,h/2-hl, w/2]) 
+            rotate([90,0,0]) rotate(180) attach_methods(1.2,1,1);
+        
+        translate([bd+pt + hw/2+t,h/2+hl, w/2])
+            rotate([90,0,0]) rotate(180) attach_methods(1.2,1,1);
+    }
 }
+  
+mount_component();
+  
+//color([0,0,1])
+//{   square([pt,pt]);
+//    translate([0,h-pt]) square([pt,pt]);
+//}
