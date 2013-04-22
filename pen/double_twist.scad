@@ -111,7 +111,7 @@ module top_cut()
     }
 }
 
-module top()
+module double_top()
 {
     tr = pr+er; //Total radius.
     difference()
@@ -128,13 +128,36 @@ module top()
     }
 }
 
-module as_print()
+module single_top()
 {
-    rotate(90) bottom();
-    translate([3*pr,0]) top();
+    rh = (pr+scR)/2;
+    top_cut();
+    difference()
+    {   intersection()
+        {   union()
+            {   cylinder(r=pr, h=pl-bl-tl);
+                translate([0,0,pl-bl-tl]) scale([1,1,(tl+pr/3)/pr]) sphere(pr);
+                
+            }
+            translate([0,0,sch+scr+2*scR]) cylinder(r1=scR,r2=scR+pl, h=2*pl);
+        }
+        inficube([0,0,pl-bl+inf]);
+        inficube([0,0,sch+3*scr+2*scR-inf]);
+    }
 }
 
-translate([400,300])as_print();
+module as_print_double()
+{
+    rotate(90) bottom();
+    translate([3*pr,0]) double_top();
+}
+module as_print_single()
+{
+    rotate(90) bottom();
+    translate([3*pr,0]) single_top();
+}
+
+translate([400,300])as_print_single();
 
 module cut_bottom()
 {
