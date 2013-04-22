@@ -114,7 +114,7 @@ module as_print()
     translate([3*pr,0]) top();
 }
 
-//translate([400,300])as_print();
+translate([400,300])as_print();
 
 module cut_bottom()
 {
@@ -148,4 +148,4 @@ module pen_plank_clamp(pt,d,ct)
     }
 }
 
-pen_plank_clamp(160,160,80);
+//pen_plank_clamp(165,160,80);
