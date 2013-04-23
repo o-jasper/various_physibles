@@ -13,18 +13,23 @@ hl = 80; //Length of handle.
 l = 20; //Length of mirror reinforced.
 mt = 2; //thickness of mirror.
 t=3*mt;
-r=t; //Rounding.
+r=t/4; //Rounding.
 s=t/2; //'Level of enclosing'
+
+a = 45; //Angle the mirror is at. (easier to print closer to 90)
 
 //sr= 1.2; 
 
 module _mirror_corner()
 {
-    difference()
-    {   linear_extrude(height=t) rounded_square(l,l,t, r);
-        translate([s,s,mt]) cube([l,l,mt]);
-        translate([2*s,2*s,mt]) cube([mw-2*s,ml-2*s,3*t]);
-        translate([l,l]) cylinder(r=l/2, h=t);
+    intersection()
+    {   difference()
+        {   cube([l,l,t]); 
+            translate([s,s,mt]) cube([l,l,mt]);
+            translate([2*s,2*s,mt]) cube([mw-2*s,ml-2*s,3*t]);
+            translate([l,l]) cylinder(r=l/2, h=t);
+        }
+        translate([l,l])  cylinder(r=sqrt(2)*l-r, h=t);
     }
 }
 
@@ -53,7 +58,7 @@ module mirror_stick_corner()
 {   
     difference()
     {   union() 
-        {   mirror_corner();
+        {   rotate([a,-a,0]/sqrt(2)) mirror_corner();
             difference()
             {   translate([r,r,t/2]) rotate(-45)
                 {   rotate([90,0,0]) cylinder(r=2*t/3,h=2*hl/3);
@@ -69,9 +74,12 @@ module mirror_stick_corner()
             }
             linear_extrude(height=t) polygon([[-hl/8,-hl/8],[0,l/2],[l/2,0]]);
         }
-        cylinder(r=t/3,h=t);
-        translate([s,s]) linear_extrude(height=t) polygon([[0,0],[0,l/2],[l/2,0]]);
+        rotate([45,-45,0]/sqrt(2)) 
+        {   translate([0,0,-2*hl])  cube(hl*[4,4,4], center=true);
+//        cylinder(r=t/3,h=t);
+//            translate([s,s]) linear_extrude(height=t) polygon([[0,0],[0,l/2],[l/2,0]]);
+        }
     }
 }
-mirror_stick_corner();
-//rotate([0,-90,0]) mirror_corner();
+//mirror_stick_corner();
+rotate([0,-90,0]) mirror_corner();
