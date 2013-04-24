@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 18-04-2012 Jasper den Ouden. (ojasper.nl)
+//  Copyright (C) 18-04-2013 Jasper den Ouden. (ojasper.nl)
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -7,16 +7,9 @@
 //  (at your option) any later version.
 //
 
-use <marblethrust.scad>
-
-mr= 15/2; //Radius of marbles.
-ri = 5; //Radius of pole.
-et = 1;  //Thickness of edge.
-uz = 5; //Height of bottom plate.
-ur = 0; //Radius at bottom
+include <marblethrust.scad>
 
 male_n = 2; //Connecting holes on plate ontop.
-tz= 2*et + 2*ri*male_n; //Height thing.(overridden here)
 
 female_b_n = 0; //Connecting holes on bottom.(choose 4 if you use it.)
 female_t_n = 4; //Connecting holes on top.
@@ -33,6 +26,7 @@ module infisquare(pos)
 module marble_male_c()
 {
     h= uz+2*mr+3*et;
+    tz= 2*et + 2*ri*male_n; //Height thing.(overridden here)
     intersection()
     {   marble_male(ri,mr, uz,ur,tz,et);
         union()

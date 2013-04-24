@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 18-04-2012 Jasper den Ouden. (ojasper.nl)
+//  Copyright (C) 18-04-2013 Jasper den Ouden. (ojasper.nl)
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -45,5 +45,5 @@ module marble_female(ri, mr,uz,ur,et)
 }
 
 //Just examples! For standalones use marblethrust_component.
-marble_male(ri, mr,uz,ur,tz,et);
-translate([50,50]) marble_female(ri, mr,uz,ur,et);
+//marble_male(ri, mr,uz,ur,tz,et);
+//translate([50,50]) marble_female(ri, mr,uz,ur,et);
