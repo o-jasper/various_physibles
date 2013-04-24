@@ -1,7 +1,7 @@
 
 # Various designs
-
-Note that i dont have a 3d printer so *none* of it is tested. 
+Some of them tested some not at all. There are some releases on thingiverse.
+(releases usually contain `.stl`s with default parameters)
 
 Feedback is welcome.
 
