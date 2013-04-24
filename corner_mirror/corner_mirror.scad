@@ -12,50 +12,45 @@ l = 20; //Length of mirror reinforced.
 mt = 2; //thickness of mirror.
 t=3*mt;
 r=t/4; //Rounding.
-s=t/2; //'Level of enclosing'
+st=t/3; //walls round mirror.
+s = t/2; //Length of space round mirror.
 
 a = 45; //Angle the mirror is at. (easier to print closer to 90)
+
+sr= 1.2; //Wire width.
 
 module _mirror_corner()
 {
     intersection()
     {   difference()
         {   cube([l,l,t]); 
-            translate([s,s,mt]) cube([l,l,mt]);
-            translate([2*s,2*s,mt]) cube([mw-2*s,ml-2*s,3*t]);
-            translate([l,l]) cylinder(r=l/2, h=t);
+            translate([st,st,mt]) cube([l,l,mt]);
+            translate([2*st,2*st,mt]) cube([ml-2*st,ml-2*st,3*t]);
+            translate([l,l]) cylinder(r=l-2*s, h=t);
         }
-        translate([l,l])  cylinder(r=sqrt(2)*l-r, h=t);
-    }
-}
-
-module attacher()
-{
-    rotate([90,0,0]) translate([l/2,0,-t/3]) linear_extrude( height=t/3 ) difference()
-    {   union() 
-        {   square([l/2+t/2,t]);
-            translate([l/2+t/2,t/2]) circle(2*t/3);
-        }
-        translate([0,t/4]) square([l/2+t/2,t/2]);
-        translate([l/2+t/2,t/2]) circle(t/4);
-        translate([0,-2*l]) square(4*[l,l], center=true);
-        translate([0,t+2*l]) square(4*[l,l], center=true);
+        translate([l,l])  cylinder(r=sqrt(2)*l, h=t);
     }
 }
 
 module mirror_corner()
 {
     _mirror_corner();
-    attacher();
-    translate([t/3,0]) rotate([0,0,90]) attacher();
+    difference()
+    {   translate([t,t,2*t/3]) sphere(t);
+        translate([0,0,2*t/3 - hl]) cube(2*[hl,hl,hl],center=true);
+        translate([t,t,t+sr]) rotate(45) 
+        {   translate([0,hl]) rotate([90,0,0]) cylinder(r=sr,h=2*hl);
+            translate([hl,0]) rotate([0,-90,0]) cylinder(r=sr,h=2*hl);
+        }
+    }
 }
 
 module mirror_stick_corner()
 {   
+    rotate([a,-a,0]/sqrt(2)) translate([0,0,t]) scale([1,1,-1]) mirror_corner();
     difference()
     {   union() 
-        {   rotate([a,-a,0]/sqrt(2)) mirror_corner();
-            difference()
+        {   difference()
             {   translate([r,r,t/2]) rotate([0,0,-45])
                 {   rotate([90,0,0]) cylinder(r=2*t/3,h=2*hl/3);
                     translate([0,-hl/2]) scale([1,(hl-t)/(2*t),1]) sphere(t);
