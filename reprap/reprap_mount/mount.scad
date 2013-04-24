@@ -7,10 +7,6 @@
 //  (at your option) any later version.
 //
 
-//include <attachable.scad>
-
-al = 5;
-
 h = 24.5; 
 pt = 5.8; //Note the top one seems a littl less.
 
@@ -26,6 +22,7 @@ t=2; //Thickness of springy bits.
 w = al; //Width.
 dev = 0.5; //Deviation for beding.
 
+include <attachable.scad>
 
 module springy(l,gy,dir)
 {
@@ -55,10 +52,7 @@ module clamp()
 
 module clamp_component()
 {   linear_extrude(height = 3*al) clamp_profile();
-    for( y = [0 : 2*al :h] ) 
-        translate([bd-t+al,y,al]) 
-            linear_extrude(height=al) difference()
-        {  square([al,al]); translate(al*[1,1]/2) circle(al/4); }
+    translate([bd,0]) attach_place(h);
 }
 
 clamp_component();

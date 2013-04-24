@@ -60,6 +60,8 @@ module pen_grab()
 
 include<attachable.scad>
 
+
+
 module pen_grab_component()
 {
     difference()
@@ -67,13 +69,26 @@ module pen_grab_component()
         {   pen_grab();
             translate([hw/2-r,-hl,0]) linear_extrude(height=h)
                 rounded_square(hl,2*hl, hl/2);
-        }
-        for ( z= [r:2*hl:h] ) 
-            translate([hw/2-r,-hl/2,z]) 
-            {   cube([hl,hl,hl]);
-                translate([hl/2,-w,hl/2]) rotate([-90,0]) cylinder(r=hl/4,h=4*w);
+            translate([hw/2-r,r-hw/2+al/2,0]) 
+            {   translate([0,-al/8]) cube([1.5*al+r,hw-2*r-7*al/8,h]);
+                translate([al,-al/2,al]) rotate([0,90,0]) linear_extrude(height=al)
+                    difference()
+                {   union()
+                    {   circle(al/2);
+                        translate([0,al/2]) square([al,al],center=true);
+                        translate([-2*al,-al/2]) square([3*al,al]);
+                        translate([-2*al,0]) circle(al/2);
+                        translate([-2*al,al/2]) square([al,al], center=true);
+                    }
+                    circle(al/4);
+                    translate([-2*al,0]) circle(al/4);
+                }
             }
+        }
+        translate([hw/2+2*al+r,hw/2,al/2]) scale([-1,1,1]) rotate([90,0,0]) 
+            attach_place(h); 
     }
 }
 
 pen_grab_component();
+

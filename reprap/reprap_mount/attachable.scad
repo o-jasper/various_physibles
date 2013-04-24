@@ -7,25 +7,23 @@
 //  (at your option) any later version.
 //
 
-//These three variables are supposed to be somewhat standard.
-hw = 20; //Holding size.(must stay in rectangle centered here.
-hl = 5; //Holding bar length.
+al=5;
+//attach_methods(1.2,1,1);
 
-module attach_methods(sr, nscrew,nplate) //The stuff extra on the component.
-{
-    linear_extrude(height=hl)
-    {   if(nplate>0) for( i=[0:nplate-1] ) rotate(i*360/nplate) 
-                translate([hw/4+hl/2,0]) square([hw/2+3*hl/2,2*hl], center=true); 
-        if(nscrew>0) for( j=[0:nscrew-1] )
-        {   rotate(180+j*360/nscrew) difference()
-            {   union()
-                {   translate([hw/4+hl/2,0]) square([hw/2+hl,2*hl], center=true); 
-                    translate([hw/2+hl,0]) circle(hl);
-                }
-                translate([hw/2+hl,0]) circle(sr);
+module attach_place(h)
+{   for( y = [0 : 2*al :h] ) translate([0,y])
+    {
+        rotate([0,90,0]) linear_extrude(height = al) translate([-3.5*al,0]) difference()
+        {   union()
+            {   square([3.5*al,al]);
+                translate([0,al/2]) circle(al/2);
             }
+            translate([0,al/2]) circle(al/4);
+        }
+
+        translate([+al,0,0]) 
+        {   cube([1.5*al,al,al]); 
+            translate(al*[1.5,1/2]) cylinder(r=al/2, h=3*al); 
         }
     }
 }
-
-//attach_methods(1.2,1,1);

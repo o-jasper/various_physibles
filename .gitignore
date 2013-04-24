@@ -4,7 +4,10 @@ runs/
 */*.gcode
 */*/*.stl
 */*/*.gcode
-*/pics/
+
+#'Raw' image
+*/pics/*.JPG
+*/*/pics/*.JPG
 .#*
 */.#*
 */*/.#*
