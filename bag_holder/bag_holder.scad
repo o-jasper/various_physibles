@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 14-04-2012 Jasper den Ouden.
+//  Copyright (C) 14-04-2013 Jasper den Ouden.(ojasper.nl)
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -19,7 +19,7 @@ echo(2*r);
 fd = 25; //Distance between 'feature-adding holes'
 fr = 2;
 
-t= 6;   //Thickness of walls.
+t= 5;   //Thickness of walls.
 
 //Negative radius for no magnets.
 mr = -9;   //Radius of embedded magnets.(Get it right!)
@@ -29,7 +29,7 @@ worry_stickiness = true; //Turn this on/off if you worry about the stickiness of
                          // the surface.
 
 //Negative thickness for no clamp.
-ct = -15; //clamped thickness. 
+ct = 15; //clamped thickness. 
 cd = 3; //Clamp distance
 ch  = 50; //Clamp height.
 

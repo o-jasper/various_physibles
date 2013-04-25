@@ -18,7 +18,10 @@ rr = 9.1/2; //Rod radius.
 
 //tw = 8; //tweezers width.
 
-t = 3; //Thicknesses
+sr = 3.8/2;
+sh=4.9;
+
+t = 2.5; //Thicknesses
 
 module tweezersnknife()
 {
@@ -34,7 +37,7 @@ module tweezersnknife()
             translate([0,0,rr+2*t]) rotate([0,-90,0]) cylinder(r=mr+t, h=rr+t+mh);
             translate([-rr-mh-t,-rs]) cube([mh+2*rr+2*t,2*rs,bw+t]);
         }
-        translate([-rr/2,0]) cube([rr,4*rr,2*(bw+t)]);
+        translate([-rr/2,0]) cube([rr,mr+t,2*(bw+t)]);
         
         translate([rr+t/2,-bl-rr,t]) cube([bt,2*bl,bw]);
         cylinder(r=rr,h=2*(bw+t));

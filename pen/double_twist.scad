@@ -35,7 +35,7 @@ bl = pr + 2.2*rc; //Length of bottom of pen.
 tl = pl/2; //..top
 
 scr = 2*lr/3; //Cut radius of screw.
-scd = lr/16; //Extra room for screw.
+scd = lr/8; //Extra room for screw.
 scR = pr-lr -scd;
 sch = 300;
 
@@ -47,14 +47,19 @@ inf = 2*pl;
 module inficube(pos)
 {   translate(pos) cube(2*[inf,inf,inf], center=true); }
 
+module bottom_cut_bigcyl()
+{
+    translate([-4*pr/3,pr,pr]) rotate([90,0])
+        translate([-2.2*pr,rc/2]) scale([1,2,1]) cylinder(r=2.9*pr, h= 4*pr);
+}
 
 module bottom_cut()
 {
     translate([-4*pr/3,pr,pr]) rotate([90,0])
     {   cylinder(r= rc, h=4*pr);
         translate([0, pr]) cylinder(r=rc, h=4*pr);
-        translate([-2.2*pr,rc/2]) scale([1,2,1]) cylinder(r=2.9*pr, h= 4*pr);
     }
+    bottom_cut_bigcyl();
 }
 
 module screws(R)
@@ -77,13 +82,14 @@ module bottom()
             cylinder(r=scR, h= bl+sch);
             translate([0,0,bl]) 
             {   screws(scR);
-                translate([0,0,sch]) cylinder(r=scR, h= 2*scr);
-                translate([0,0,sch+2*scr]) 
+                translate([0,0,sch]) cylinder(r=scR, h= 2*scR);
+                translate([0,0,sch+2*scR]) 
                 {   cylinder(r1=scR, h= 2*scR);
                     cylinder(r1=0, r2=scR, h= 2*scR);
                     cylinder(r=3*scR/5, h=2*scR);
+                    
+                    translate([0,0,2*scR]) cylinder(r1=scR,r2=scR/2, h= scR);
                 }
-                translate([0,0,sch+2*(scr+scR)]) cylinder(r1=scR,r2=scR/2, h= scR);
             }
         }
         translate([0,0,0.2*rc])
@@ -91,6 +97,26 @@ module bottom()
             rotate(180) bottom_cut();
         }
     } 
+}
+module double_bottom()
+{
+    difference()
+    {   cylinder(r=pr+er, h=bl);
+        bottom();
+    }
+}
+module single_bottom()
+{   
+    intersection()
+    {   bottom();
+        translate([0,0,bl]) cylinder(r=pr, h=pl);
+    }
+    difference()
+    {   cylinder(r=pr, h=bl);
+        bottom();
+        bottom_cut_bigcyl();
+        scale([-1,-1,1])bottom_cut_bigcyl();
+    }
 }
 
 module top_cut()
@@ -102,8 +128,8 @@ module top_cut()
         {   cylinder(r=pr, h=sch);
             translate([0,0,sch]) 
             {   cylinder(r1=pr,r2=rh, h=pz-pr/2);
-                translate([0,0,pz-pr/2]) cylinder(r1=rh,r2=0.8*scR, h=pr/2);
-                translate([0,0,pz]) cylinder(r1=0.8*scR,r2=rh, h=pr/2);
+                translate([0,0,pz-pr/2]) cylinder(r1=rh,r2=scR, h=pr/2);
+                translate([0,0,pz]) cylinder(r1=scR,r2=rh, h=pr/2);
                 translate([0,0,pz+pr/2]) cylinder(r=rh, h=pr/2);
             }
         }
@@ -148,21 +174,22 @@ module single_top()
 
 module as_print_double()
 {
-    rotate(90) bottom();
+    rotate(90) double_bottom();
     translate([3*pr,0]) double_top();
 }
+//as_print_double();
 module as_print_single()
 {
-    rotate(90) bottom();
+    rotate(90) single_bottom();
     translate([3*pr,0]) single_top();
 }
 
-translate([400,300])as_print_single();
+as_print_single();
 
 module cut_bottom()
 {
     translate([0,0,4*pr/3]) rotate([-90,0]) difference()
-    {   cylinder(r=pr,h=bl);
+    {   translate([0,0,-pr]) cylinder(r=pr, h=bl+pr);
         bottom_cut();
         rotate(180) bottom_cut();
     }

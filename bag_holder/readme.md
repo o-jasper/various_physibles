@@ -8,6 +8,11 @@ Unfortunately due to extrusion difficults i havent been able to test anything
 other than what is effectively the 'vanilla' thing. I have no need for any more,
 so wont be testing myself.
 
+### Caveits
+If the magnets are too strong, friction not large enough it will annoyingly keep
+sliding down. Also you have to get the clamping action of the bag right. It is
+*not* good enough imo.
+
 ### Features
 
 * Indicate the circumference with `cl`, it'll calcuate the radius.
