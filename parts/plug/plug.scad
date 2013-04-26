@@ -11,6 +11,9 @@ ot = 10;
 t  = 10;
 
 l=3*t;
+holing_fil = true;
+male_holding_fil = holing_fil;
+female_holding_fil = holing_fil;
 
 module profile()
 {
@@ -48,8 +51,10 @@ module male_wire_holes()
 }
 //Bonding filaments.
 module male_fil()
-{   translate([-l,2*t,t/2])     rotate([0,90,0]) cylinder(r=t/6,h=3*l);
-    translate([-l,-1.25*t,t/2]) rotate([0,90,0]) cylinder(r=t/6,h=3*l);
+{   if( male_holding_fil )
+    {   translate([-l,2*t,t/2])     rotate([0,90,0]) cylinder(r=t/6,h=3*l);
+        translate([-l,-1.25*t,t/2]) rotate([0,90,0]) cylinder(r=t/6,h=3*l);
+    }
 }
 
 module male()
@@ -126,11 +131,14 @@ module female_wire_cut()
 }
 module _female_fil()
 {   translate([1.5*t,2*t,2*t/3]) 
-        rotate(45) rotate([90,0,0]) translate([0,0,-l]) cylinder(r=t/5,h=3*l);
+        rotate(45) rotate([90,0,0]) translate([0,0,-l]) cylinder(r=t/6,h=3*l);
 }
 module female_fil()
-{   _female_fil();
-    scale([-1,1]) female_fil();
+{   if( female_holding_fil )
+    {   _female_fil();
+        scale([-1,1]) _female_fil();
+        translate([-l,-5*t/3,2*t/3]) rotate([0,90,0]) cylinder(r=t/6, h=3*l);
+    }
 }
 
 module female()
