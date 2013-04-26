@@ -163,4 +163,4 @@ module pool_table()
     }
 }
 
-pool_table();
+rotate([180,0,0]) pool_table();
