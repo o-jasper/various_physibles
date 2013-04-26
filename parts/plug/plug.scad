@@ -46,6 +46,11 @@ module male_wire_holes()
         circle(t/4);
     }
 }
+//Bonding filaments.
+module male_fil()
+{   translate([-l,2*t,t/2])     rotate([0,90,0]) cylinder(r=t/6,h=3*l);
+    translate([-l,-1.25*t,t/2]) rotate([0,90,0]) cylinder(r=t/6,h=3*l);
+}
 
 module male()
 {
@@ -55,7 +60,10 @@ module male()
             {   male_profile(); }
             translate([0,0,l-t/2]) male_wire_holes();
             male_wire_holes();
-            translate([0,0,l]) cylinder(r=t, h=l);
+            translate([0,0,l]) 
+            {   cylinder(r=t, h=l);
+                male_fil();
+            }
         }
         translate([0,0,-l]) scale([1.2,1.1,0.9]) 
         {   cylinder(r1=0,r2=4*t, h=4*l);
@@ -88,6 +96,7 @@ module male_back()
             translate([0,0,t]) for( a= [0,90,180,270] )
                 rotate(a) translate([t,0]) rotate([0,-60,0]) 
                     translate([0,0,-t/2]) cylinder(r=t/8,h=4*t);
+            male_fil();            
         }
     }
 }
@@ -115,10 +124,17 @@ module female_wire_cut()
     translate([3*t/2,t/2,-t/2]) rotate([45,0,0]) cylinder(r=t/5,h=5*t);
     translate([3*t/4,t/2,-t/2]) rotate([45,0,0]) cylinder(r=t/5,h=5*t);
 }
+module _female_fil()
+{   translate([1.5*t,2*t,2*t/3]) 
+        rotate(45) rotate([90,0,0]) translate([0,0,-l]) cylinder(r=t/5,h=3*l);
+}
+module female_fil()
+{   _female_fil();
+    scale([-1,1]) female_fil();
+}
 
 module female()
-{
-    
+{    
     difference()
     {   linear_extrude(height=l/2) female_profile();
         female_wire_cut();
@@ -126,12 +142,14 @@ module female()
         scale([-1,-1,1]) female_wire_cut();
         scale([1,-1,1])  female_wire_cut();
     }
-    
-    difference()
-    {   linear_extrude(height=l) female_profile();
-        translate([0,t/2,l]) cube([3*t,5*t,l], center=true);
+    translate([0,0,l/2]) difference()
+    {   linear_extrude(height=l/2) female_profile();
+        translate([0,t/2,l/2]) cube([3*t,5*t,l], center=true);
+        female_fil();
     }
 }
+
+//translate([0,10,0]) female_wire_cut();
 
 module female_back_wire_cut()
 {   //translate([+t,+t]) cylinder(r=t/5, h=l);
@@ -139,12 +157,19 @@ module female_back_wire_cut()
 }
 
 module female_back()
-{   
+{       
     difference()
     {   union()
-        {   translate([0,0,ot]) linear_extrude(height=l/2) intersection()
-            {   female_profile();
-                translate([0,t/2]) square([3*t,5*t], center=true);
+        {   difference()
+            {   translate([0,0,ot]) linear_extrude(height=l/2) intersection()
+                {   female_profile();
+                    translate([0,t/2]) square([3*t,5*t], center=true);
+                }
+                female_back_wire_cut();
+                scale([-1,1,1])  female_back_wire_cut();
+                scale([-1,-1,1]) female_back_wire_cut();
+                scale([1,-1,1])  female_back_wire_cut();
+                translate([0,0,t]) female_fil();
             }
             linear_extrude(height=ot) difference()
             {   profile();
@@ -153,11 +178,6 @@ module female_back()
         }
         rotate(+45) translate([0,0,l/4]) cube([t/4,sqrt(8)*t,l/4], center=true);
         rotate(-45) translate([0,0,l/4]) cube([t/4,sqrt(8)*t,l/4], center=true);
-        
-        female_back_wire_cut();
-        scale([-1,1,1])  female_back_wire_cut();
-        scale([-1,-1,1]) female_back_wire_cut();
-        scale([1,-1,1])  female_back_wire_cut();
     }
 }
 
@@ -165,3 +185,4 @@ translate([-8*t,0]) female();
 translate([-2.5*t,0]) female_back();
 translate([2.5*t,0]) male();
 translate([7.5*t,0]) male_back();
+
