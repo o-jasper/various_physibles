@@ -9,80 +9,85 @@
 
 t=5;
 
-rr = 9.6; //Z-rod radius.
+rr = 9.6/2; //Z-rod radius.
 rb = 10; //Horizontal rod radius.
-hd = 20; //Horizonal rod distance
-d = rr+rb+2*t;//Distance between rods. TODO
-z=20;
+nw = 13.2; // Nut width
+
+dx = 11.1; //Horizonal rod distance
+d = 11.1;//rr+rb+2*t;//Distance between rods. TODO
+dz=30; //Vertical distance.
 
 al=5;
 sr=1.2;
 
-//Slide-on and clamp.
-module _bottom()
+pair_enough=false; //Wether to just have two or as many as wanted half-feature holes.
+
+module z_rod_associated()
 {
-    tz = z+3*t;
-    w=3*(rb+t)/2;
-    translate([hd,d]) rotate([0,90,0]) linear_extrude(height=5*t) difference()
+    hx = dx+2.5*t; 
+    x = rr+t+al+t;
+    difference()
     {   union()
-        {   circle(rb+t);
-            translate([-tz/2,0]) square([tz,w], center=true);
+        {   circle(rr+t); //Round smooth rod.
+            translate([0,x]) circle(rr/2+t); //Springy circle
+            translate([0,x/2]) square([2*t,x],center=true); //And slot leading to it.
+
+            translate([dx-al,d]) circle(al+t); //Feature hold plate.
+            translate([dx+al+5*t,d]) circle(al+t);
+            translate([hx,d]) square([2*al+5*t,2*(al+t)],center=true);
         }
-        circle(rb);
+        translate([0,x]) circle(rr/2); //hole in springy
+
+        translate([dx-al,d]) circle(al);  //Feature holes.
+        translate([dx+2.5*t,d]) circle(al);  //Feature holes.
+        translate([dx+al+5*t,d]) circle(al);
+        circle(rr); //Hole for smooth rod.
+        square([rr/2,2*x], center=true); //Slot for clicking on.
+        translate([0,-rr-t]) scale([1/2,1]) rotate(45) //Easier opening.
+            square(2*[t,t],center=true); 
     }
-    hx = hd+2.5*t; hl= 2*rb+t+3*sr; //Plate for screws.
-    translate([hx,d,tz-t]) linear_extrude(height=t) difference()
+}
+
+module screws_plate()
+{   hl= 2*rb+t+3*sr; //Plate for screws.
+    difference()
     {   union()
         {   square([3*sr+t,hl],center=true);
             translate([0,+hl/2]) circle(3*sr/2+t/2);
             translate([0,-hl/2]) circle(3*sr/2+t/2);
         }
+        square(2*[al,al],center=true);
         translate([0,+hl/2]) circle(sr);
         translate([0,-hl/2]) circle(sr);
     }
-
-    translate([0,0,z]) linear_extrude(height=3*t) difference()
-    {   union()
-        {   circle(rr+t);
-            translate([0,d-rr]) circle(rr);
-            translate([0,d]) circle(rr/2);
-            translate([3*rr/2,d]) square([3*rr,rr], center=true);
-            translate([hd-al,d]) circle(al+t);
-            translate([hd+al+5*t,d]) circle(al+t);
-            translate([hx,d]) square([2*al+5*t,2*(al+t)],center=true);
-        }
-        translate([hd-al,d]) circle(al);
-        translate([hd+al+5*t,d]) circle(al);
-        circle(rr);
-        translate([0,d-rr]) circle(rr-t);
-        square([rr/2,rr+d], center=true);
-        translate([0,-rr-t]) scale([1/2,1]) rotate(45) square(2*[t,t],center=true);
-    }
 }
 
-module clamper()  
-{   y = t+2*rb;
-    r = sqrt(4*rb*rb + y*y)/2;
-    translate([hd+3.5*t,d+t,-rb-t]) rotate([0,-90,0]) 
-        linear_extrude(height=2*t) difference()
-    {   union()
-        {   polygon([[0,0],[2*y,0], [2*y,y],[0,y]]);//square([2*y,y]);
-            translate([2*y/3,y]) circle(2*y/3);
-        }
-        translate([1.25*y,0]) scale([1,1/2]) circle(y/2);
-        translate([2*y,y]) scale([2/3,(y-rb+t)/y]) circle(y);
-        translate([2*y/3,y]) circle(2*y/3-t);
-    }
-}
+//Slide-on and clamp.
 module bottom()
 {
-    difference()
-    {   _bottom();
-        translate([hd+t,d,-rb-t]) cube([3*t,3*t, z+rb+3*t]);
+    tz = dz+3*t;
+    w=2*(rr+t);//3*(rb+t)/2;
+    translate([dx,d]) rotate([0,90,0]) linear_extrude(height=5*t) difference()
+    {   union()
+        {   circle(nw/2+t);
+            translate([-dz/2,0]) square([dz,w], center=true);
+        }
+        difference()
+        {   circle(nw);
+            for( a= [0:60:360] ) rotate(a) translate([nw,0]) square([nw,nw],center=true);
+        }
+        if( pair_enough )
+        {   for( y=[-al,al] ) translate([al-dz,y])  circle(al/2); }
+        else
+        {   for( z=[al:2*al:dz-nw/2] )
+                for( y=[-al,al] ) translate([z-dz,y])  circle(al/2);
+        }        
     }
-    clamper();
-}
+    hx = dx+2.5*t; 
+    translate([hx,d,tz-t]) linear_extrude(height=t) screws_plate();
 
+    translate([0,0,dz]) linear_extrude(height=3*t) z_rod_associated();
+}
 
 module as_print()
 {   rotate([0,180,0]) bottom(); }
