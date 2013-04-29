@@ -12,6 +12,7 @@
 t= 4;
 sr=1;
 inf = 100*t;
+sf = 1.1; //Factor to make it smaller so it fits.
 
 $fs =0.1;
 
@@ -35,14 +36,11 @@ module h_male()
             }
         }
         for( a = [0,180] ) rotate(a)
-            {   translate([0,t/2,3.5*t]) rotate(45)
-                    rotate([135,0,0]) cylinder(r=sr,h=inf);
-                translate([t,-t,0]) rotate([0,22,0]) 
-                    translate([0,0,-inf]) cylinder(r=sr,h=3*inf); 
-/*                translate([t,-t/2,3.6*t])
-                {   translate([0,0,-inf]) cylinder(r=sr,h=3*inf); 
-                    rotate(45) translate([0,-inf/2,t/2]) cube([t/2,inf,t],center=true);
-                    }*/
+            {   translate([t/2,0]) rotate(45)
+                {   translate([0,0,-inf])  cylinder(r=sr,h=3*inf);
+                    translate([-sr,0,3.5*t]) cube([2*sr,sqrt(t*t/4+sr*sr),t]);
+                    translate([-sr,0]) cube([2*sr,sqrt(t*t/4+sr*sr),t/2]);
+                }
             }
     }
 }
@@ -51,17 +49,23 @@ module h_female()
     
     difference()
     {   union()
-        {   linear_extrude(height=t) square(4*[t,t],center=true);
+        {   linear_extrude(height=t) square(t*[4,5],center=true);
             linear_extrude(height=4*t) 
             {   difference()
-                {   square(4*[t,t],center=true);
-                    h_profile(1.05,2*sr);
+                {   square(t*[4,5],center=true);
+                    h_profile(sf,2*sr);
                 }
             }
         }
-        for( s=[[1,1],[-1,1]] ) scale(s) for( z = [3*t/2:t:5*t] )
-            rotate([90,0,0]) translate([t/2,z,-inf]) cylinder(r=sr, h=3*inf);
-    }        
+        for( s=[1,-1] )
+        {   scale([s,1]) for( z = [3*t/2:t:5*t] )
+                rotate([90,0,0]) translate([t/2,z,-inf]) cylinder(r=sr, h=3*inf);
+            scale([1,s]) translate(t*[-0.5,2]) cube([t,t/2,3.5*t]);
+        }
+        rotate([90,0,0]) translate([0,t/2,-inf]) cylinder(r=sr, h=3*inf);
+        cylinder(r=2*sr,h=t/2);
+    }
+    translate([-t/2,-sr/2]) cube([t,sr,t]);
 }
 
 h_female();
