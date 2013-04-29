@@ -7,13 +7,17 @@
 //  (at your option) any later version.
 //
 
-ot = 10;
-t  = 10;
+$fs = 0.1;
+
+ot = 4;
+t  = 4;
 
 l=3*t;
-holing_fil = true;
+holing_fil = false;//true;
 male_holding_fil = holing_fil;
 female_holding_fil = holing_fil;
+
+sr=0.5;
 
 module profile()
 {
@@ -46,7 +50,7 @@ module male_wire_holes()
         {   square([t/4,8*t],center=true);
             square([8*t,t/4],center=true);
         }
-        circle(t/4);
+        circle(sr);
     }
 }
 //Bonding filaments.
@@ -64,7 +68,7 @@ module male()
         {   linear_extrude(height=l+t)
             {   male_profile(); }
             translate([0,0,l-t/2]) male_wire_holes();
-            male_wire_holes();
+            translate([0,0,t/2]) male_wire_holes();
             translate([0,0,l]) 
             {   cylinder(r=t, h=l);
                 male_fil();
@@ -126,8 +130,8 @@ module female_profile()
 
 module female_wire_cut()
 {
-    translate([3*t/2,t/2,-t/2]) rotate([45,0,0]) cylinder(r=t/5,h=5*t);
-    translate([3*t/4,t/2,-t/2]) rotate([45,0,0]) cylinder(r=t/5,h=5*t);
+    translate([3*t/2,t/2,-t/2]) rotate([45,0,0]) cylinder(r=sr,h=5*t);
+    translate([3*t/4,t/2,-t/2]) rotate([45,0,0]) cylinder(r=sr,h=5*t);
 }
 module _female_fil()
 {   translate([1.5*t,2*t,2*t/3]) 
