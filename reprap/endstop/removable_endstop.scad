@@ -21,9 +21,9 @@ dz=15; //Vertical distance.
 
 feature = false; //NOTE kindah broken for true.
 al=5; 
-sr=1.4;
-snw = 6.2;
-snh= 3.1;
+sr=1.4;    //Screw radius.
+snw = 6.2; //Screw hex head width.
+snh= 4;    //Actually bunch more than the hex head height.
 
 pair_enough=false; //Wether to just have two or as many as wanted half-feature holes.
 
@@ -100,6 +100,14 @@ module _bottom()
     translate([0,0,dz]) linear_extrude(height=zt) z_rod_associated();
 }
 
+module hex_hole(w)
+{
+    difference()//Where it goes on the big nuts.
+    {   circle(w); //Hex thing
+        for( a= [0:60:360] ) rotate(a) translate([w,0]) square([w,w],center=true);
+    }
+}
+
 module bottom()
 {
     bh = dz+zt+nw/2;
@@ -113,7 +121,7 @@ module bottom()
                     for( s=[1,-1] ) translate([s*(xl-al)/2,-al/2]) circle(al/2);
                 }
                 //More where the screw to clamp it down goes.
-                translate([dx+xl/2,-al,dz]) scale([1.5,1]) cylinder(r=al,h=3*al/2);
+                translate([dx+xl/2,-al,dz]) cylinder(r=1.5*al,h=3*al/2);
             }
                         
         }        
@@ -121,11 +129,7 @@ module bottom()
         translate([0,bw]) scale([1,-1]) 
             if( with_slide ) translate([dx+xl/2,0,dz+3*al/4]) rotate([90,0]) 
         {   cylinder(r=sr,h=inf);
-            linear_extrude(height=al+snh) difference()
-            {   circle(snw); //Small hex nut.
-                for( a= [0:60:360] ) 
-                    rotate(a) translate([snw,0]) square([snw,snw],center=true);
-            }
+            linear_extrude(height=al+snh) hex_hole(snw); //Small hex nut.
         }
 
         translate([0,bw]) scale([1,-1]) if( with_slide ) //Slide hole.
@@ -133,10 +137,7 @@ module bottom()
                 translate([0,-al/2]) slide_profile();
         
         translate([dx,d]) rotate([0,90,0]) linear_extrude(height=inf) 
-        {   difference()//Where it goes on the big nuts.
-            {   circle(nw); //Hex thing
-                for( a= [0:60:360] ) rotate(a) translate([nw,0]) square([nw,nw],center=true);
-            }
+        {   hex_hole(nw); //Where it goes on the big nuts.
             if( pair_enough ) //Half feature holes.
             {   for( y=[-al,al] ) translate([al-dz,y])  circle(al/2); }
             else
@@ -147,15 +148,16 @@ module bottom()
     }
 }
 
-module as_print()
+module bottom_as_print()
 {   rotate([0,180,0]) bottom(); }
-as_print();
 
 //Slider with small endstop.
 //I had ZMA00A080P00PC's 
 //http://nl.mouser.com/ProductDetail/CK-Components/ZMA00A080P00PC/?qs=sGAEpiMZZMumBvQ1hY%2ffBUTjWSsepfwlGeSSynpM5b4%3d
 sd = 6.51;//Distance between screws. 
-sl = 80; //Slider length.
+sdy = 4; //Height of microswitch from screws.(button has to stick out)
+
+sl = 120; //Slider length.
 
 module _slider_with_endstop()
 {
@@ -170,10 +172,43 @@ module _slider_with_endstop()
             for(s = [1,-1] ) scale([s,1]) translate([sd/2,0]) circle(sr+t);
         }
         for(s = [1,-1] ) scale([s,1]) translate([sd/2,0]) circle(sr);
+        translate([0,sdy+2*inf]) square(inf*[4,4],center=true);
     }
 }
 module slider_with_endstop()
 {   scale([1,1,-1]) _slider_with_endstop(); 
 }
 
-//slider_with_endstop();
+fr = 1.75/2; //Filament radius.
+tt=3;
+
+//Thumb wheel for it.
+module thumb_wheel()
+{
+    t=tt;
+    h=2.4*snh+2*t;
+    difference()
+    {   union()
+        {   cylinder(r=snw/2+t, h=h);
+            for( a=[0:60:360] ) rotate(a) translate([snw/2+t/2,0]) 
+                                {   cylinder(r=t, h=h-t);
+                                    translate([0,0,h-t]) sphere(t);
+                                }
+        }
+        translate([0,0,t]) 
+        {   linear_extrude(height=snh) hex_hole(snw);
+            cylinder(r=snw/2, h=2.4*snh);
+        }
+        cylinder(r=sr,h=2.4*snh);
+        //Hole to slide it in.
+        translate([0,inf/2])
+        {   cube([2*sr,inf,2*(2.4*snh+t)],center=true);
+            translate([0,0,t+1.2*snh]) cube([snw,inf,2.4*snh],center=true);
+        }
+        translate([-inf,snw/2,1.2*snh+t]) rotate([0,90,0]) cylinder(r=fr,h=3*inf);
+    }
+}
+
+//bottom_as_print();
+slider_with_endstop();
+//thumb_wheel();
