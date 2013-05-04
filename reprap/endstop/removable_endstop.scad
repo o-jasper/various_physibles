@@ -11,7 +11,7 @@ $fs=0.1;
 
 t=5;
 
-rr = 8.9; //9.6/2; //Z-rod radius.
+rr = 8.8/2; //Z-rod radius.
 rb = 10; //Horizontal rod radius.
 nw = 13.2; // Nut width
 
@@ -19,10 +19,10 @@ dx = 20; //11.1 //Horizonal rod distance
 d = 11.1;//rr+rb+2*t;//Distance between rods. TODO
 dz=15; //Vertical distance.
 
-feature = false;
+feature = false; //NOTE kindah broken for true.
 al=5; 
 sr=1.4;
-snw = 6.5/2;
+snw = 6.2;
 snh= 3.1;
 
 pair_enough=false; //Wether to just have two or as many as wanted half-feature holes.
@@ -31,7 +31,7 @@ zt = 1.5*t; //Height of z-rod assocated
 xl = 4*al; //Length of nut profile.
 
 hex_from_top=true;
-with_slide_profile=true;
+with_slide=true;
 
 inf = 3*(rr+rb+nw);
 
@@ -50,7 +50,7 @@ module z_rod_associated()
             if(feature)
             {   translate([dx+x/2-al,d]) square([2*(x-al),2*(al+t)],center=true); }
             else
-            {   translate([dx+x/2-2*al,d]) square([2*(x-al),2*(al+t)],center=true);
+            {   translate([xl/2+dx/2,d]) square([xl+dx,2*(al+t)],center=true);
             }
         }
         translate([0,x]) circle(rr/2); //hole in springy
@@ -81,24 +81,18 @@ module slide_profile()
     translate([0,3*al/4]) square(al*[3,1/2],center=true);
 }
 
-
+bw=2*(al+t);//3*(rb+t)/2;
 //Slide-on and clamp.
 module _bottom()
 {
+    w=bw;
     tz = dz+3*t;
-    w=2*(al+t);//3*(rb+t)/2;
     translate([dx,d]) rotate([0,90,0]) linear_extrude(height=xl) difference()
     {   union()
         {   circle(nw/2+t);
             translate([-dz/2,0]) square([dz,w], center=true);
         }
         if( hex_from_top ) translate([nw/2+inf,0]) square(inf*[2,2],center=true);
-        if( pair_enough )
-        {   for( y=[-al,al] ) translate([al-dz,y])  circle(al/2); }
-        else
-        {   for( z=[al:2*al:dz-nw/2] )
-                for( y=[-al,al] ) translate([z-dz,y])  circle(al/2);
-        }
     }
     hx = dx+2.5*t; 
     if(feature)translate([dx+2*al,d,tz-zt-t]) linear_extrude(height=t) screws_plate();
@@ -111,32 +105,44 @@ module bottom()
     bh = dz+zt+nw/2;
     difference()
     {   union()
-        {   if( with_slide_profile ) //Block it slides in.
-                translate([dx+xl/2,-0.2*al,-nw/2]) linear_extrude(height=bh)
+        {   _bottom();
+            translate([0,bw]) scale([1,-1]) if( with_slide ) //Block it slides in.
+            {   translate([dx+xl/2,-0.2*al,-nw/2]) linear_extrude(height=bh)
                 {   square([xl-al,2*al],center=true);
                     square([xl,al],center=true);
                     for( s=[1,-1] ) translate([s*(xl-al)/2,-al/2]) circle(al/2);
                 }
-            _bottom();
-            //Screw to clamp down slider.
-            translate([dx+xl/2,-al,dz]) scale([1.5,1]) cylinder(r=al,h=3*al/2);
+                //More where the screw to clamp it down goes.
+                translate([dx+xl/2,-al,dz]) scale([1.5,1]) cylinder(r=al,h=3*al/2);
+            }
+                        
         }        
         //hex nut space and screw space.
-        translate([dx+xl/2,0,dz+3*al/4]) rotate([90,0]) 
+        translate([0,bw]) scale([1,-1]) 
+            if( with_slide ) translate([dx+xl/2,0,dz+3*al/4]) rotate([90,0]) 
         {   cylinder(r=sr,h=inf);
             linear_extrude(height=al+snh) difference()
-            {   circle(snw); //Hex thing
+            {   circle(snw); //Small hex nut.
                 for( a= [0:60:360] ) 
                     rotate(a) translate([snw,0]) square([snw,snw],center=true);
             }
         }
 
-        if( with_slide_profile ) //Slide hole.
+        translate([0,bw]) scale([1,-1]) if( with_slide ) //Slide hole.
             translate([dx+xl/2,-al/2,-nw/2]) linear_extrude(height=3*bh)
                 translate([0,-al/2]) slide_profile();
-        translate([dx,d]) rotate([0,90,0]) linear_extrude(height=inf) difference()
-        {   circle(nw); //Hex thing
-            for( a= [0:60:360] ) rotate(a) translate([nw,0]) square([nw,nw],center=true);
+        
+        translate([dx,d]) rotate([0,90,0]) linear_extrude(height=inf) 
+        {   difference()//Where it goes on the big nuts.
+            {   circle(nw); //Hex thing
+                for( a= [0:60:360] ) rotate(a) translate([nw,0]) square([nw,nw],center=true);
+            }
+            if( pair_enough ) //Half feature holes.
+            {   for( y=[-al,al] ) translate([al-dz,y])  circle(al/2); }
+            else
+            {   for( z=[al:2*al:dz-nw/2] )
+                    for( y=[-al,al] ) translate([z-dz,y])  circle(al/2);
+            }
         }
     }
 }
@@ -144,3 +150,30 @@ module bottom()
 module as_print()
 {   rotate([0,180,0]) bottom(); }
 as_print();
+
+//Slider with small endstop.
+//I had ZMA00A080P00PC's 
+//http://nl.mouser.com/ProductDetail/CK-Components/ZMA00A080P00PC/?qs=sGAEpiMZZMumBvQ1hY%2ffBUTjWSsepfwlGeSSynpM5b4%3d
+sd = 6.51;//Distance between screws. 
+sl = 80; //Slider length.
+
+module _slider_with_endstop()
+{
+    f= 0.91;
+    bh = dz+zt+nw/2;
+    rotate([90,0]) translate([0,-f*al]) linear_extrude(height=sl+t) scale(f) slide_profile();
+    
+    w= 2*(sr+t);
+    translate([0,sr,-t]) linear_extrude(height=t) difference()
+    {   union()
+        {   square([sd, w],center=true);
+            for(s = [1,-1] ) scale([s,1]) translate([sd/2,0]) circle(sr+t);
+        }
+        for(s = [1,-1] ) scale([s,1]) translate([sd/2,0]) circle(sr);
+    }
+}
+module slider_with_endstop()
+{   scale([1,1,-1]) _slider_with_endstop(); 
+}
+
+//slider_with_endstop();
