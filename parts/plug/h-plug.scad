@@ -10,22 +10,22 @@
 //Idea: try separate the two sides of the male.
 
 t= 4;
-sr=0.75;
+sr=0.77;
 inf = 100*t;
-sf = 1.15; //Factor to make it smaller so it fits.
+sf = 1.2; //Factor to make it smaller so it fits.
 
 $fs =0.1;
 
 hat_h=t/2; //If it gets all the way in it might get too stuck.
 
 bottom_cut = false; //So small otherwise
-
-module h_profile(s,he)
+//s makes it more fittable, he and hi make room for wires at different places.
+module h_profile(s,he,hi)
 {
     difference()
     {   union()
         {   scale(s) square([3*t,t+he],center=true);
-            for(x=[-t,t]) translate([x,0]) scale(s) square([t,3*t],center=true);
+            for(x=[-t-hi,t+hi]) translate([x,0]) scale(s) square([t-2*hi,3*t],center=true);
         }
         translate([1.5*t,0]) scale(1/s)circle(t/2);
     }
@@ -43,28 +43,27 @@ module h_male()
     el = 5*t*sin(10);
     difference()
     {   union()
-        {   linear_extrude(height=t) difference()
-            {   square(3*[t,t],center=true);
-                for( y=[-t/2,t/2] ) translate([0,y]) circle(sr);
-            }
-            linear_extrude(height=4*t) difference()
-            {   h_profile(1,0);
-                for( y=[-t/2,t/2] ) translate([0,y]) circle(sr);
-            }
+        {   linear_extrude(height=t) square(3*[t,t],center=true);
+            linear_extrude(height=4*t) h_profile(1,0,sr);
         }
+        //Vertical wire tubes.
+        for( y=[-t/2,t/2] ) translate([0,y]) cylinder(r=sr, h=inf);
+
         for( a = [0,180] ) rotate(a)
             {   translate([t/2,0]) rotate(45)
-                {   translate([0,0,3.5*t]) rotate([-10,0,0]) 
-                        translate([0,0,-2*inf])  cylinder(r=sr,h=6*inf);
-                    translate([-sr,0,3.5*t]) cube([2*sr,sqrt(t*t/4+sr*sr),t]);
+                {   translate([0,0,3.5*t]) rotate([-10,0,0]) //Angled wire tubes.
+                        translate([0,0,-2*inf]) cylinder(r=sr,h=6*inf);
+                    //Resp. top and bottom channels.
+                    translate([-sr,0,3.5*t]) cube([2*sr,sqrt(t*t/2+sr*sr),t]);
                     translate([-sr,sr-el]) cube([2*sr,l + el,t/2]);
                 }
             }
         if(bottom_cut){ _h_male_bottom_cut(); }
     }
-    if( hat_h>0 )
-        for( a = [0,90,180,270] ) rotate(a) translate([t,t,4*t]) 
-                                      cylinder(r1=t/2,r2=t/4,h=hat_h);
+    if( hat_h>0 ) //Hat so you cant stick it in too far.
+        for( s = [[1,1],[1,-1],[-1,1],[-1,-1]] )
+            scale(s) translate([t+sr,t,4*t]) scale([(t/2-sr)/t,1/2])
+                cylinder(r1=t,r2=t/2,h=hat_h);
 }
 
 module _h_female_bottom_cut()
@@ -87,31 +86,31 @@ module h_female()
             {   difference()
                 {   //Basically this is minus t/2 the size of the thing in the racks
                     square(t*[4,5],center=true); 
-                    h_profile(sf,2*sr);
+                    h_profile(sf,2*sr,0);
                 }
             }
         }
         for( s=[1,-1] )
-        {   scale([s,1]) for( z = [3*t/2:t:5*t] )
+        {   scale([s,1]) for( z = [3*t/2:t:5*t] ) //Horizontal wire touching tubes.
                 rotate([90,0,0]) translate([0.51*t,z,-inf]) cylinder(r=sr, h=3*inf);
+            //Vertical wire channel.
             scale([1,s]) translate(t*[-0.5,2]) cube([t,t/2,3.5*t]);
         }
+        //Wire tube on the bottom.
         rotate([90,0,0]) translate([0,t/2,-inf]) cylinder(r=min(2*sr,0.45*t), h=3*inf);
-        cylinder(r=t,h=t/2);
+        cylinder(r=t,h=t/2); //Hole the tubes collect.
         if(bottom_cut){ _h_female_bottom_cut(); }
     }
-    difference()
+    //Angled thingy that helps separate the wires in the bottom and 
+    // helps bringing them up.
+    difference() 
     {   translate([2*t,0]) rotate([0,-90,0]) linear_extrude(height=4*t) 
             polygon([[t,-3*sr],[0,-sr],[0,sr],[t,3*sr]]);
         if(bottom_cut){ _h_female_bottom_cut(); }
     }
 }
 
-//h_female();
-//translate([5*t,0]) h_male();
-
-//TODO male and female as sets mxn
-
+//Sets of multiple of the above.
 module h_male_rack(n,m)
 {
     for( i = [0:n-1] ) 
@@ -140,5 +139,4 @@ module h_female_bottom_cut(n,m)
 }
 
 h_male_rack(2,1);
-
 translate([0,-10*t]) h_female_rack(2,1);
