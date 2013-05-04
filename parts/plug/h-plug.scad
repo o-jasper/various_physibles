@@ -63,7 +63,7 @@ module h_male()
     {   union()
         {   linear_extrude(height=t) translate(-1.5*[t,t]) 
                 rounded_square(3*t,3*t, r);
-            linear_extrude(height=h) h_profile(sf,0,sr);
+            linear_extrude(height=h) h_profile(sf,0,sr/2);
         }
         //Vertical wire tubes.
         for( y=[-t/2,t/2] ) translate([0,y]) cylinder(r=sr, h=inf);
