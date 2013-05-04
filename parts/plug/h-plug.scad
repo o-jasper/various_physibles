@@ -104,14 +104,14 @@ module _h_female_bottom_cut()
 module h_female()
 {
     difference()
-    {   linear_extrude(height=4*t) translate(-t*[2,2]) rounded_square(4*t,4*t, r);
+    {   linear_extrude(height=4*t) translate(-t*[2,2.25]) rounded_square(4*t,4.5*t, r);
         translate([0,0,t]) linear_extrude(height=4*t) h_profile(1,2*sr,0);
 
         for( s=[1,-1] )
         {   scale([s,1]) for( z = [3*t/2:t:5*t] ) //Horizontal wire touching tubes.
                 rotate([90,0,0]) translate([0.51*t,z,-inf]) cylinder(r=sr, h=3*inf);
             //Vertical wire channel.
-            scale([1,s]) translate(t*[-0.5,1.6]) cube([t,t/2,3.5*t]);
+            scale([1,s]) translate(t*[-0.5,1.75]) cube([t,t/2,3.5*t]);
         }
         //Wire tube on the bottom.
         rotate([90,0,0]) translate([0,t/2,-inf]) cylinder(r=min(2*sr,0.45*t), h=3*inf);
