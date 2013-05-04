@@ -7,6 +7,8 @@
 //  (at your option) any later version.
 //
 
+$fs=0.1;
+
 t=5;
 
 rr = 8.9; //9.6/2; //Z-rod radius.
@@ -17,13 +19,21 @@ dx = 20; //11.1 //Horizonal rod distance
 d = 11.1;//rr+rb+2*t;//Distance between rods. TODO
 dz=15; //Vertical distance.
 
-al=5;
-sr=1.2;
+feature = false;
+al=5; 
+sr=1.4;
+snw = 6.5/2;
+snh= 3.1;
 
 pair_enough=false; //Wether to just have two or as many as wanted half-feature holes.
 
 zt = 1.5*t; //Height of z-rod assocated
 xl = 4*al; //Length of nut profile.
+
+hex_from_top=true;
+with_slide_profile=true;
+
+inf = 3*(rr+rb+nw);
 
 module z_rod_associated()
 {
@@ -36,9 +46,12 @@ module z_rod_associated()
             translate([0,x/2]) square([2*t,x],center=true); //And slot leading to it.
 
             translate([dx-al,d]) circle(al+t); //Feature hold plate.
-            translate([dx+x,d]) circle(al+t);
-            translate([dx+x/2-al,d]) square([2*(x-al),2*(al+t)],center=true);
-//            translate([hx,d]) square([2*al+5*t,2*(al+t)],center=true);
+            if(feature) translate([dx+x,d]) circle(al+t);
+            if(feature)
+            {   translate([dx+x/2-al,d]) square([2*(x-al),2*(al+t)],center=true); }
+            else
+            {   translate([dx+x/2-2*al,d]) square([2*(x-al),2*(al+t)],center=true);
+            }
         }
         translate([0,x]) circle(rr/2); //hole in springy
 
@@ -54,16 +67,23 @@ module screws_plate()
 {   hl= 2*rb+t+3*sr; //Plate for screws.
     difference()
     {   union()
-        {   square([3*sr+t,hl],center=true);
-            for(s=[1,-1]) scale(s) translate([0,+hl/2]) circle(3*sr/2+t/2);
+        {   translate([0,hl/4]) square([3*sr+t,hl/2],center=true);
+            translate([0,+hl/2]) circle(3*sr/2+t/2);
         }
         square(2*[al,al],center=true);
-        for(s=[1,-1]) scale(s) translate([0,+hl/2]) circle(sr);
+        translate([0,+hl/2]) circle(sr);
     }
 }
 
+module slide_profile()
+{
+    translate([0,al/2]) square(al*[2,1],center=true);
+    translate([0,3*al/4]) square(al*[3,1/2],center=true);
+}
+
+
 //Slide-on and clamp.
-module bottom()
+module _bottom()
 {
     tz = dz+3*t;
     w=2*(al+t);//3*(rb+t)/2;
@@ -72,67 +92,55 @@ module bottom()
         {   circle(nw/2+t);
             translate([-dz/2,0]) square([dz,w], center=true);
         }
-        difference()
-        {   circle(nw);
-            for( a= [0:60:360] ) rotate(a) translate([nw,0]) square([nw,nw],center=true);
-        }
+        if( hex_from_top ) translate([nw/2+inf,0]) square(inf*[2,2],center=true);
         if( pair_enough )
         {   for( y=[-al,al] ) translate([al-dz,y])  circle(al/2); }
         else
         {   for( z=[al:2*al:dz-nw/2] )
                 for( y=[-al,al] ) translate([z-dz,y])  circle(al/2);
-        }        
+        }
     }
     hx = dx+2.5*t; 
-    translate([dx+2*al,d,tz-zt-t]) linear_extrude(height=t) screws_plate();
-
+    if(feature)translate([dx+2*al,d,tz-zt-t]) linear_extrude(height=t) screws_plate();
+    
     translate([0,0,dz]) linear_extrude(height=zt) z_rod_associated();
+}
+
+module bottom()
+{
+    bh = dz+zt+nw/2;
+    difference()
+    {   union()
+        {   if( with_slide_profile ) //Block it slides in.
+                translate([dx+xl/2,-0.2*al,-nw/2]) linear_extrude(height=bh)
+                {   square([xl-al,2*al],center=true);
+                    square([xl,al],center=true);
+                    for( s=[1,-1] ) translate([s*(xl-al)/2,-al/2]) circle(al/2);
+                }
+            _bottom();
+            //Screw to clamp down slider.
+            translate([dx+xl/2,-al,dz]) scale([1.5,1]) cylinder(r=al,h=3*al/2);
+        }        
+        //hex nut space and screw space.
+        translate([dx+xl/2,0,dz+3*al/4]) rotate([90,0]) 
+        {   cylinder(r=sr,h=inf);
+            linear_extrude(height=al+snh) difference()
+            {   circle(snw); //Hex thing
+                for( a= [0:60:360] ) 
+                    rotate(a) translate([snw,0]) square([snw,snw],center=true);
+            }
+        }
+
+        if( with_slide_profile ) //Slide hole.
+            translate([dx+xl/2,-al/2,-nw/2]) linear_extrude(height=3*bh)
+                translate([0,-al/2]) slide_profile();
+        translate([dx,d]) rotate([0,90,0]) linear_extrude(height=inf) difference()
+        {   circle(nw); //Hex thing
+            for( a= [0:60:360] ) rotate(a) translate([nw,0]) square([nw,nw],center=true);
+        }
+    }
 }
 
 module as_print()
 {   rotate([0,180,0]) bottom(); }
 as_print();
-
-//Endstop portion.
-
-module _slide_part()
-{
-    polygon([[-3*al,0],[-1.5*al,2*al+t],[1.5*al,2*al+t],
-             [3*al,0], [1.5*al,-2*al-t],[-1.5*al,-2*al-t]]);
-}
-
-module slide_bottom()
-{  
-    bt= t;
-    hl= 2*rb+t+3*sr; //Plate for screws.
-    st = 3*t;
-    
-    difference()
-    {   union()
-        {   for( x=[-3*al,0,3*al] ) translate([x,0]) cylinder(r=0.95*al, h=st+zt);
-            linear_extrude(height=bt) difference()
-            {   union()
-                {   square([6*al,2*al], center=true);
-                    _slide_part();
-                    for(s=[[1,1],[1,-1],[-1,-1],[-1,1]]) 
-                        scale(s) translate([al+t/2,2*al+t]) circle(al+t/2);
-                }
-                for(s=[1,-1]) scale(s) translate([0,+hl/2]) circle(sr);
-            }
-            linear_extrude(height=st) difference()
-            {   _slide_part();
-                scale([0.9,0.6]) 
-                    polygon([[-3*al,0],[-1.5*al,2*al+t],[1.5*al,2*al+t],
-                             [3*al,0], [1.5*al,-2*al-t],[-1.5*al,-2*al-t]]);
-                for(s=[1,-1]) scale(s) translate([0,+hl/2]) circle(3*sr);
-            }
-            for(a=[0,60,120]) rotate(a) translate([0,0,st/2]) cube([6*al,t/2,st],center=true);
-        }
-        for(s=[[1,1],[1,-1],[-1,-1],[-1,1]]) 
-            scale(s) translate([al+t/2,2*al+t]) cylinder(r=al, h=10*bt);
-//        cylinder(r=2*al,h=st-t);
-    }
-}
-
-translate([10,0]) slide_bottom();    
-   
