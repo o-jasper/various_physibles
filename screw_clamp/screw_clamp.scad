@@ -32,7 +32,7 @@ fil = l + el - ehl - hcl + 2*px;
 
 w = fil/2;
 
-hi = fil/8;
+hi = fil/6;
 to = fil/6;
 ho = hi/3;
 ti = to/3;
@@ -69,6 +69,7 @@ module rodend()
     }
 }
 
+//Gah openscad fucking up again.
 module frame()
 {
     r_a = sqrt(hi*hi + (px+ti)*(px+ti));
@@ -134,7 +135,7 @@ module thumb_wheel()
 module as_print()
 {
     translate([w/2,0]) rodend();
-    translate([0,0,ur+ti-hi/2]) rotate([-pa,0]) frame();
+    translate([0,0,ur+ti-hi/2]) frame();
     translate([1.5*w,0]) thumb_wheel();
 }
 
