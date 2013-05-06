@@ -8,6 +8,9 @@ missing a bit, like pens and plugs.
 
 Feedback is very welcome.
 
+Since there is so much stuff here, the following indicates some stuff to maybe 
+look at:
+
 ## Highlight: released
 The released entries have readmes with links to release files and more info.
 
@@ -17,7 +20,8 @@ The released entries have readmes with links to release files and more info.
 * Plank stuff; simple hook `onplank/plank_hook.scad`, 
   hold rod under plank `onplank/spool_plank.scad`, hold power supply under plank
   `reprap/power_supply/power_supply_under_plank.scad`.
-* Pencil holder `reprap/pencil_holder/`
+* Pencil holder `reprap/pencil_holder/`(quickly tag the filament so you can see
+  its movement)
 
 ## Hightlight: not there yet
 Two of these have been held back largely by software issues which kindah sucks..

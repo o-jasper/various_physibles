@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 09-04-2013 Jasper den Ouden.
+//  Copyright (C) 05-05-2013 Jasper den Ouden.
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -13,7 +13,7 @@ t=5;
 
 rr = 8.8/2; //Z-rod radius.
 rb = 10; //Horizontal rod radius.
-nw = 13.2; // Nut width
+nw = 13.1; // Nut width
 
 dx = 20; //11.1 //Horizonal rod distance
 d = 11.1;//rr+rb+2*t;//Distance between rods. TODO

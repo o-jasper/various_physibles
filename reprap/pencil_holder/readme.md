@@ -7,6 +7,6 @@ Really helps that it is tiny, it is done printing very quickly.
 
 Hope the default sizes work out for you. I printed a version without the 
 circles and the end where you hold the clamp. Hopefully the circles give the
-user more grip.cc
+user more grip.
 
 [A release with .stls here](http://www.thingiverse.com/thing:74289).
