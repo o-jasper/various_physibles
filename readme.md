@@ -49,6 +49,12 @@ A 'back liner' instead of a corner cut might be good additional option.
 heat dissipation. Wrote it at a point when i didnt have a printer yet. May be
 something to look at again.
 
+### Endstop
+`reprap/endstop` the idea was a endstop of a higher different height that could
+be added/removed without affecting calibration much. However current design is 
+much too wobbly. I think a next attempt will just clamp to the smooth z-rod and
+be pushed down on whatever below it to keep the distance ~constant.
+
 # Author, License
 Jasper den Ouden currently, feel free to fork/cooperate, attribution is much
 appreciated.
