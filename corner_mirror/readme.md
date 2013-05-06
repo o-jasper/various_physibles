@@ -15,8 +15,8 @@ the stick on it.
 
 * Put the corners on the mirror completely. Careful not to break it/cut yourself.
 
-* Find some wire to hold it together, i used steel wire but maybe nylon on kite 
-wire is better.
+* Find some wire to hold it together, i used steel wire but maybe nylon, fishing
+or kite wire is better.
 
 * Wire it together. Do not try to force the corners onto mirror in this process,
 less force to just put those on by hand.
@@ -28,3 +28,8 @@ location.
 
 ## Publishes
 [At thingiverse](http://www.thingiverse.com/thing:79404?save=success).
+
+[Github](https://github.com/o-jasper/various_physibles).(development)
+
+# Author
+[Jasper den Ouden](http://www.ojasper.nl/).
