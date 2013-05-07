@@ -17,9 +17,9 @@ hh = 5; //Head height.
 
 hl = 30; //Handle length.(minimum of 1.1*hh+ti)
 
-//('advanced') params.
-d = 1; //Extra.
+t=5; //Thickneses.
 
+//('advanced') params.
 hcl = 4; //'Head capture' room.
 
 px = 3;
@@ -28,17 +28,12 @@ el = 10;
 ehl = 6; //Space for end to hang on to.
 fil = l + el - ehl - hcl + 2*px;
 
-echo(fil+2*to);
-
 w = fil/2;
 
-t=5;
 ti = t;
 to = max(fil/6, nw+t);
 
-pa = 7; //Angle to print it at. //TODO calculate it.
-
-$fs=0.4;
+$fs=0.4; //Fragment height for drawing.
 
 fh = 0.97;
 
