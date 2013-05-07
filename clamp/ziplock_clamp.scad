@@ -12,7 +12,7 @@
 $fs=0.4;
 
 t=2; //Thicknesses.
-l= 60; //Length of clamp.
+l= 50; //Length of clamp.
 a=22; //Angle of zigzag.
 h = 4*t;
 
@@ -81,7 +81,7 @@ module hanging_clamp_fan(ta,n,h)
                     {   circle(5*t);
                         circle(4*t);
                     }
-                    polygon([[1.5*t,t],[1.5*t,h], [-h*sin(ta),h*cos(ta+2*ta/n)]]);
+                    polygon([[-t,0],[t,0], [1.5*t,h], [-h*sin(ta),h*cos(ta+2*ta/n)]]);
                 }
                 rotate(ta/2) translate([0,5*t]) circle(2*t);
             }
@@ -90,6 +90,7 @@ module hanging_clamp_fan(ta,n,h)
         for( z = [4*t+al:2*al:h-al] )
             rotate(ta/2) rotate([90,0]) translate([0,z,-h]) cylinder(r=al/2,h=h);
     }
+    
 }
-hanging_clamp_fan(120,10,50);
+hanging_clamp_fan(40,4,50);
     
