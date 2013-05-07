@@ -17,7 +17,7 @@ hh = 5; //Head height.
 
 hl = 30; //Handle length.(minimum of 1.1*hh+ti)
 
-t=5; //Thickneses.
+t=5; //Thickneses of some walls,
 
 //('advanced') params.
 hcl = 4; //'Head capture' room.
@@ -35,7 +35,7 @@ to = max(fil/6, nw+t);
 
 $fs=0.4; //Fragment height for drawing.
 
-fh = 0.97;
+fh = 0.97; //Factor to tighten so the nut can be clicked in.
 
 inf = 10*fil;
 
@@ -62,14 +62,6 @@ module rodend()
 }
 
 f=0.65;
-module nutend()
-{
-    translate([-el/2,0]) rotate([0,90,0]) difference()
-    {   scale([1.2,1]) cylinder(r=to/2, h= 5*to);
-        //   translate([0,0,5*to]) sphere(0.9*to/2);
-    }
-}
-
 module frame()
 {
     difference()
@@ -82,11 +74,11 @@ module frame()
                 sphere(to);
                 translate([fil-px-el,0]) sphere(to);
             }
-            translate([fil-px,0]) scale([-1,1]) nutend();
-            nutend();
+            translate([fil-px-el/2,0]) rotate([0,-90,0]) scale([1.2,1]) 
+                cylinder(r=to/2, h= 5*to-el);
+            translate([-el/2,0]) rotate([0,90,0])
+                scale([1.2,1]) cylinder(r=to/2, h= 5*to);
         }
-        translate([5*to-el/2,0]) sphere(0.9*to/2);
-        translate([fil-5*to,0]) sphere(0.9*to/2);
         
         translate([0,0,-inf-to/2]) cube(inf*[2,2,2],center=true);
         translate([0,0,inf+to/2]) cube(inf*[2,2,2],center=true);
@@ -97,13 +89,10 @@ module frame()
             translate([t,0]) square([fil-px-el/2-2*t,inf]);
             translate([t,t]) circle(t);
             translate([fil-px-el/2-t,t]) circle(t);
-//            translate([t,t]) square([fil-px-el+t,inf+t]);
         }
 
         rotate([0,90,0]) 
-        {   translate([0,0,px-nh-hcl/2]) linear_extrude(height= nh) hex_hole(nw);
-            translate([0,0,px-nh-hcl/2]) linear_extrude(height= to+nh) hex_hole(fh*nw);
-            
+        {   translate([0,0,px-nh-hcl/2]) linear_extrude(height= to+nh) hex_hole(nw);
             translate([0,0,-w]) cylinder(r=br,h=2*w);
         }
         

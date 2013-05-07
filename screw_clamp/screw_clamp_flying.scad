@@ -106,8 +106,7 @@ module frame()
         
         translate([fil-px-to,0,0]) cube(to*[2,2,2],center=true);
         translate([0,0,hi/2]) rotate([0,90,0]) 
-        {   translate([0,0,px-nh-hcl/2]) linear_extrude(height= nh) hex_hole(nw);
-            translate([0,0,px-nh-hcl/2]) linear_extrude(height= to+nh) hex_hole(f*nw);
+        {   translate([0,0,px-nh-hcl/2]) linear_extrude(height= nh+nh) hex_hole(nw);
             
             translate([0,0,-w]) cylinder(r=br,h=2*w);
         }
