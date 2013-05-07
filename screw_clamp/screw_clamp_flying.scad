@@ -32,17 +32,29 @@ echo(fil+2*to);
 
 w = fil/2;
 
-t=5;
-ti = t;
-to = max(fil/6, nw+t);
+hi = fil/5;
+to = fil/6;
+ho = hi/3;
+ti = to/2;
 
 pa = 7; //Angle to print it at. //TODO calculate it.
 
 $fs=0.4;
 
-fh = 0.97;
+f = 0.97;
 
-inf = 10*fil;
+module _screw_frame(t,h)
+{
+    difference()
+    {   union()
+        {   translate([-t,0]) cube([fil+2*t,w,h]);
+            cube([fil,w+t,h]);
+            translate([0,w]) cylinder(r=t,h=h);
+            translate([fil,w]) cylinder(r=t,h=h);
+        }
+        translate([0,-w,-hi]) cube([fil,2*w,3*hi]);
+    }
+}
 
 module hex_hole(w)
 {
@@ -56,7 +68,7 @@ ur = nw/2; //Radius near nut.
 
 module rodend()
 {
-    r2=ur+t;
+    r2=ur+ti; //br+to;
     difference()
     {   intersection()
         {   cylinder(r=r2, h=el);
@@ -66,48 +78,36 @@ module rodend()
     }
 }
 
-f=0.65;
-module nutend()
-{
-    translate([-el/2,0]) rotate([0,90,0]) difference()
-    {   cylinder(r=to/2, h= 5*to);
-        //   translate([0,0,5*to]) sphere(0.9*to/2);
-    }
-}
-
+//Gah openscad fucking up again.
 module frame()
 {
+    r_a = sqrt(hi*hi + (px+ti)*(px+ti));
     difference()
     {   union()
         {   
-            translate([el/2,0]) rotate([90,0,0]) scale([1,f]) cylinder(r=to,h=w);
-            translate([fil-px-el/2,0]) rotate([90,0,0]) scale([1,f]) cylinder(r=to,h=w);
-            translate([el/2,-w]) scale([1,f,f]) 
-            {   rotate([0,90,0]) cylinder(r=to,h=fil-px-el);
-                sphere(to);
-                translate([fil-px-el,0]) sphere(to);
+            _screw_frame(ti,hi);
+            translate([0,0,(hi-ho)/2]) _screw_frame(to,ho);
+            
+            translate([fil-px,0,hi/2]) rotate([0,90,0]) scale([1,2])
+            {   intersection()
+                {   cylinder(r=hi,h=px+ti);
+                    translate([0,0,px+ti]) sphere(r_a-to/8);
+                }
+                translate([0,0,px+ti]) scale([2,2,(to-ti)/ho]) sphere(ho);
+                cylinder(r=ho/2, h=px+to);
             }
-            translate([fil-px,0]) scale([-1,1]) nutend();
-            nutend();
-        }
-        translate([5*to-el/2,0]) sphere(0.9*to/2);
-        translate([fil-5*to,0]) sphere(0.9*to/2);
-        
-        translate([0,0,-inf-to/2]) cube(inf*[2,2,2],center=true);
-        translate([0,0,inf+to/2]) cube(inf*[2,2,2],center=true);
-        
-        //Cuts for moving bits and space for it.
-        translate([el/4,-w,-inf]) linear_extrude(height=2*inf)
-        {   translate([0,t]) square([fil-px-el/2,inf]);
-            translate([t,0]) square([fil-px-el/2-2*t,inf]);
-            translate([t,t]) circle(t);
-            translate([fil-px-el/2-t,t]) circle(t);
-//            translate([t,t]) square([fil-px-el+t,inf+t]);
-        }
 
-        rotate([0,90,0]) 
+            translate([0,0,hi/2]) rotate([0,90,0])  //Nut end.
+            {   translate([0,0,-ti]) cylinder(r=ur + ti, h= ti+px);
+                translate([0,0,-to]) cylinder(r1 = ur+ho, r2 = ur+ti, h= to-ti);
+                translate([0,0,-to]) scale([1,1,1/2]) sphere(ur+ho/2);
+            }
+        }
+        
+        translate([fil-px-to,0,0]) cube(to*[2,2,2],center=true);
+        translate([0,0,hi/2]) rotate([0,90,0]) 
         {   translate([0,0,px-nh-hcl/2]) linear_extrude(height= nh) hex_hole(nw);
-            translate([0,0,px-nh-hcl/2]) linear_extrude(height= to+nh) hex_hole(fh*nw);
+            translate([0,0,px-nh-hcl/2]) linear_extrude(height= to+nh) hex_hole(f*nw);
             
             translate([0,0,-w]) cylinder(r=br,h=2*w);
         }
@@ -118,6 +118,7 @@ module frame()
 //Thumb wheel for it.
 module thumb_wheel()
  {
+    t=ti;
     h=max(hl, t+1.1*hh);
     mr = nw/2+t;
     difference()
@@ -132,15 +133,15 @@ module thumb_wheel()
                                 }
         }
         translate([0,0,0.1*hh]) linear_extrude(height=nh) hex_hole(nw);
-        linear_extrude(height=nh) hex_hole(fh*nw);
+        linear_extrude(height=nh) hex_hole(f*nw);
     }
 }
 
 module as_print()
 {
-//    translate([w/2,0]) rodend();
-    frame();
-//    translate([1.4*w,0]) thumb_wheel();
+    translate([w/2,0]) rodend();
+    translate([0,0,ur+ti-hi/2]) frame();
+    translate([1.5*w,0]) thumb_wheel();
 }
 
 as_print();
