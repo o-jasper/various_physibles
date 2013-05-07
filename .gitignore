@@ -16,3 +16,7 @@ runs/
 # Possibly add these later
 cooler/
 old/
+
+*/readme.html
+*/*/readme.html
+*/*/*/readme.html

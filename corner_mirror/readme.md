@@ -8,10 +8,10 @@ forces.
 
 * Print one stick and three corners.
 
-* Clear out where the glass goes.(down to the corners) Especially the one with
-the stick on it.
+* Clear the plastic out where the glass goes.(down to the corners) Especially 
+the one with the stick on it.
 
-* Clear out the holes in the bulbous things. (So putting the wire in.
+* Clear out the holes in the bulbous things. (So putting the wire in is easy.)
 
 * Put the corners on the mirror completely. Careful not to break it/cut yourself.
 

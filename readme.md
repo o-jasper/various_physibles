@@ -1,6 +1,6 @@
 
 # Various designs
-Some of them tested some not at all. There are some releases on thingiverse.
+Some of them tested, some not at all. There are some releases on thingiverse.
 (releases usually contain `.stl`s with default parameters)
 
 I dont do much or any 'artistic' stuff, often focus on stuff that seems 
@@ -42,7 +42,8 @@ make decent gcode for it.
 ### Platenect
 `platenect/` Connects plates, which is pretty easy when you think about it. Idea is
 optional cutting off a corner, but otherwise leaving the plates untouched.
-A 'back liner' instead of a corner cut might be good additional option.
+A 'back liner' instead of a corner cut might be good additional option. 
+There is no particular problem, i havent tried it yet.
 
 ### Soldering iron holder
 `solder/` idea for a soldering iron that uses a tin can(like 500ml beer) for
@@ -54,6 +55,17 @@ something to look at again.
 be added/removed without affecting calibration much. However current design is 
 much too wobbly. I think a next attempt will just clamp to the smooth z-rod and
 be pushed down on whatever below it to keep the distance ~constant.
+
+
+## Hightlight: didnt do anything about it but want
+Why not say it.
+
+* Very general drill bit holder, i dont like the existing one, what about a
+  bunch of prongs that are pushed together with a thread and a rotating thingy 
+  for it. Could even open the back so 'jewellers' screwdrivers(those tiny ones)
+  can fit.
+  
+* Geared hand drill?
 
 # Author, License
 Jasper den Ouden currently, feel free to fork/cooperate, attribution is much

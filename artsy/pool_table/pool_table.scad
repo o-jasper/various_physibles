@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 26-04-2013 Jasper den Ouden.(ojasper.nl)
+//  Copyright (C) 05-05-2013 Jasper den Ouden.(ojasper.nl)
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -18,6 +18,8 @@ bd = 3*ed;
 h = 200;
 
 pr = br;
+
+inf = 3*pl;
 
 module _top_cut_profile(w,l)
 {
@@ -163,4 +165,30 @@ module pool_table()
     }
 }
 
-rotate([180,0,0]) pool_table();
+module splitter()
+{
+    translate([0,0,inf-h/2.1]) cube(inf*[2,2,2],center=true);
+    for( s=[[1,1],[1,-1],[-1,1],[-1,-1]] ) 
+        scale(s) translate([3*pw/7,pw/2,-2*br-h/2.1]) 
+        {   cylinder(r2=2*br,r1=br/2,h=4*br);
+            translate([0,pw/4]) cylinder(r2=2*br,r1=br/2,h=4*br);
+        }
+}
+module bottom_split()
+{   difference()
+    {   pool_table();
+        splitter();
+    }
+}
+
+module top_split()
+{   intersection()
+    {   pool_table();
+        splitter();
+    }
+}
+
+rotate([180,0]) bottom_split();
+//rotate([180,0]) top_split();
+//pool_table();
+
