@@ -137,13 +137,4 @@ module thumb_wheel()
     }
 }
 
-module as_print()
-{
-    translate([w/2,0]) rodend();
-    translate([0,0,ur+ti-hi/2]) frame();
-    translate([1.5*w,0]) thumb_wheel();
-}
-
-as_print();
-
-//frame();
+frame();

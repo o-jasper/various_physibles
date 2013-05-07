@@ -70,7 +70,7 @@ f=0.65;
 module nutend()
 {
     translate([-el/2,0]) rotate([0,90,0]) difference()
-    {   cylinder(r=to/2, h= 5*to);
+    {   scale([1.2,1]) cylinder(r=to/2, h= 5*to);
         //   translate([0,0,5*to]) sphere(0.9*to/2);
     }
 }
@@ -138,11 +138,12 @@ module thumb_wheel()
 
 module as_print()
 {
-//    translate([w/2,0]) rodend();
-    frame();
-//    translate([1.4*w,0]) thumb_wheel();
+    translate([0,3*nw]) rodend();
+    translate([0,0,to/2]) frame();
+    translate([4*nw,3*nw]) thumb_wheel();
 }
 
-as_print();
-
-//frame();
+//as_print();
+frame();
+//rodend();
+//thumb_wheel();
