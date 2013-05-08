@@ -21,8 +21,8 @@ file, defaultly:(all values in millimeters)
     br = 6/2; //Radius of bolt.
     
     nw = 10.8; // Nut width
-    nh = 6; //Nut height.
-    hh = 5; //Head height.
+    nh = 6; //Nut height. It can be increased to use multiple nuts.
+    hh = 5; //Head height.(idem)
 
     hl = 30; //Handle length.(minimum of 1.1*hh+ti)
         

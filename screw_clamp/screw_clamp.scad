@@ -12,10 +12,10 @@ l = 60; //Length of bolt
 br = 6/2; //Radius of bolt
 
 nw = 10.8; // Nut width
-nh = 6; //Nut height.
-hh = 5; //Head height.
+nh = 60; //Nut height. It can be increased to use multiple nuts.
+hh = 5; //Head height.(increase for adding nuts)
 
-hl = 30; //Handle length.(minimum of 1.5*hh+ti)
+hl = 20; //Handle length.(minimum of 1.1*hh+ti)
 
 t=5; //Thickneses of some walls,
 
@@ -35,9 +35,9 @@ to = max(fil/6, nw+t);
 
 $fs=0.4; //Fragment height for drawing.
 
-fh = 0.97; //Factor to tighten so the nut can be clicked in.
+fh = 0.8; //Factor to tighten so the nut can be clicked in.
 
-inf = 10*fil;
+inf = 10*fil+nh;
 
 module hex_hole(w)
 {
@@ -75,7 +75,7 @@ module frame()
                 translate([fil-px-el,0]) sphere(to);
             }
             translate([fil-px-el/2,0]) rotate([0,-90,0]) scale([1.2,1]) 
-                cylinder(r=to/2, h= 5*to-el);
+                cylinder(r=to/2, h= nh+ 4.6*to-el);
             translate([-el/2,0]) rotate([0,90,0])
                 scale([1.2,1]) cylinder(r=to/2, h= 5*to);
         }
@@ -90,12 +90,11 @@ module frame()
             translate([t,t]) circle(t);
             translate([fil-px-el/2-t,t]) circle(t);
         }
-
+        
         rotate([0,90,0]) 
         {   translate([0,0,px-nh-hcl/2]) linear_extrude(height= to+nh) hex_hole(nw);
-            translate([0,0,-w]) cylinder(r=br,h=2*w);
+            translate([0,0,fil/2-inf]) cylinder(r=br,h=inf);
         }
-        
     }
 }
 
@@ -104,8 +103,9 @@ sr=1.2;
 //Thumb wheel for it.
 module thumb_wheel()
  {
-    h=max(hl, t+1.1*hh);
-    mr = nw/2+t;
+    s = 0.05*nw;
+    h=max(hl, t+hh+s*sqrt(2));
+    mr = nw/2+t/2;
     difference()
     {   union()
         {   cylinder(r=mr, h=h-t/2);
@@ -113,14 +113,15 @@ module thumb_wheel()
             translate([0,0,h-t/2]) rotate_extrude() 
                 translate([mr-t,0]) scale([1,1/2]) circle(t);
             for( a=[0:60:360] ) rotate(a) translate([nw/2+t/2,0]) 
-                                {   cylinder(r=t, h=h-2*t);
-                                    translate([0,0,h-2*t]) sphere(t);
+                                {   cylinder(r=t/2, h=h-2*t);
+                                    translate([0,0,h-2*t]) sphere(t/2);
                                 }
         }
-        linear_extrude(height=1.5*nh) hex_hole(nw);
-        translate([inf,0,nh/2-sr]) rotate([0,-90,0]) cylinder(r=sr,h=3*inf);
+        linear_extrude(height=hh) hex_hole(nw);
+//        translate([inf,0,hh/2-sr]) rotate([0,-90,0]) cylinder(r=sr,h=3*inf);
     }
-    
+    for( a=[0:60:360] ) rotate(a) translate([0,nw/2,s/sqrt(2)]) 
+                            rotate([45,0]) cube([nw,s,s],center=true);
 }
 
 module as_print()
@@ -130,7 +131,7 @@ module as_print()
     translate([4*nw,3*nw]) thumb_wheel();
 }
 
-as_print();
+//as_print();
 //frame();
-//rodend();
+rodend();
 //thumb_wheel();
