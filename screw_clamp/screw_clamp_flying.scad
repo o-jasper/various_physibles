@@ -15,7 +15,7 @@ nw = 10.8; // Nut width
 nh = 6; //Nut height.
 hh = 5; //Head height.
 
-hl = 30; //Handle length.(minimum of 1.1*hh+ti)
+hl = 30; //Handle length.(minimum of 1.5*hh+ti)
 
 //('advanced') params.
 d = 1; //Extra.
@@ -38,6 +38,7 @@ ho = hi/3;
 ti = to/2;
 
 pa = 7; //Angle to print it at. //TODO calculate it.
+sr=1.2;
 
 $fs=0.4;
 
@@ -111,28 +112,6 @@ module frame()
             translate([0,0,-w]) cylinder(r=br,h=2*w);
         }
         
-    }
-}
-
-//Thumb wheel for it.
-module thumb_wheel()
- {
-    t=ti;
-    h=max(hl, t+1.1*hh);
-    mr = nw/2+t;
-    difference()
-    {   union()
-        {   cylinder(r=mr, h=h-t/2);
-            cylinder(r=mr/2, h=h-t/4);
-            translate([0,0,h-t/2]) rotate_extrude() 
-                translate([mr-t,0]) scale([1,1/2]) circle(t);
-            for( a=[0:60:360] ) rotate(a) translate([nw/2+t/2,0]) 
-                                {   cylinder(r=t, h=h-2*t);
-                                    translate([0,0,h-2*t]) sphere(t);
-                                }
-        }
-        translate([0,0,0.1*hh]) linear_extrude(height=nh) hex_hole(nw);
-        linear_extrude(height=nh) hex_hole(f*nw);
     }
 }
 

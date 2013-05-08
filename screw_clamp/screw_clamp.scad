@@ -15,7 +15,7 @@ nw = 10.8; // Nut width
 nh = 6; //Nut height.
 hh = 5; //Head height.
 
-hl = 30; //Handle length.(minimum of 1.1*hh+ti)
+hl = 30; //Handle length.(minimum of 1.5*hh+ti)
 
 t=5; //Thickneses of some walls,
 
@@ -99,6 +99,8 @@ module frame()
     }
 }
 
+sr=1.2;
+
 //Thumb wheel for it.
 module thumb_wheel()
  {
@@ -115,9 +117,10 @@ module thumb_wheel()
                                     translate([0,0,h-2*t]) sphere(t);
                                 }
         }
-        translate([0,0,0.1*hh]) linear_extrude(height=nh) hex_hole(nw);
-        linear_extrude(height=nh) hex_hole(fh*nw);
+        linear_extrude(height=1.5*nh) hex_hole(nw);
+        translate([inf,0,nh/2-sr]) rotate([0,-90,0]) cylinder(r=sr,h=3*inf);
     }
+    
 }
 
 module as_print()
@@ -127,7 +130,7 @@ module as_print()
     translate([4*nw,3*nw]) thumb_wheel();
 }
 
-//as_print();
-frame();
+as_print();
+//frame();
 //rodend();
 //thumb_wheel();
