@@ -1,0 +1,25 @@
+//
+//  Copyright (C) 09-05-2013 Jasper den Ouden.(ojasper.nl)
+//
+//  This is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published
+//  by the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+
+t = 10;
+
+sw = 10;
+
+w=20;
+l=20; //Is grab length too.
+
+module wedge(et) //et is extra thickness needed.
+{
+    union() 
+    {   linear_extrude(et) square([l,w], r=t/4, center=true);
+        translate([l/2-sw,0,(et+t)/2]) cube([sw,sw,et+t], center=true);
+    }
+}
+
+wedge(10);

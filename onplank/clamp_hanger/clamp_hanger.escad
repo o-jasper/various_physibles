@@ -1,4 +1,10 @@
 //
+//  Copyright (C) 09-05-2013 Jasper den Ouden.(ojasper.nl)
+//
+//  This is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published
+//  by the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.//
 //  Copyright (C) 08-05-2013 Jasper den Ouden.(ojasper.nl)
 //
 //  This is free software: you can redistribute it and/or modify
@@ -7,42 +13,43 @@
 //  (at your option) any later version.
 //
 
+//
+
 // Parameters for better speed: teeth_p=false, logo_p=false.($quality of course)
 
-//$quality = 256.0;
+$quality = 256.0;
 
-$quality=20;
+pt  = 20; //..thickness of plank.
+gl = 20; //Length it grabs plank.
 
-pt  = 20.2; //..thickness of plank.
+t = 10; //Thicknesses.
+w=2*t;
 
-gl = 20;
-t = 10;
-
-sw = t;
+sw = t; //Wedge hole size.
 
 r=t/2;
 
-dz = 30;
+dz = pt; //TODO not robust against this one at least.
 dx = 1.5;
 
 hll = 20; //Handle lip length.
 
-teeth_p= false;
-logo_p = false;
+teeth_p= true;
+logo_p = true;
 
 rbw = 8; //Rubber band width.(over)
 rbt = 2; //... thickness.(over)
 
 //For convenience.
-w = pt + t; h= gl + t;
+l = gl + t; h= pt + t;
 
 module main_profile()
 {   
     difference()
     {   union()
-        {   square(size=[w,h], r=r, center=true);
-            translate([w/2,h/2 + dz/2]) square([2*t,dz+t], r=r, center=true);
-            translate([w/2,h/2+dz/2]) union()
+        {   square(size=[l,h], r=r, center=true);
+            translate([l/2,h/2 + dz/2]) square([2*t,dz+t], r=r, center=true);
+            translate([l/2,h/2+dz/2]) union()
             {   difference()
                 {   circle(dz);
                     difference()
@@ -59,12 +66,13 @@ module main_profile()
                     circle(dz/2-t/4);
                 }
             }
-            translate([w/2+t+dx, h/2+dx]) square([t/2, dz-dx],r=r/2);
-            translate([w/2+t+dx+hll/sqrt(8)+t/4, h/2+dz-dx-t/2+hll/sqrt(8)]) 
+            translate([l/2+t+dx, h/2+dx]) square([t/2, dz-dx],r=r/2);
+            translate([l/2+t+dx+hll/sqrt(8)+t/4, h/2+dz-dx-t/2+hll/sqrt(8)]) 
                 rotate(45) square([hll, t/2],center=true, r=r/2);
         }
-        translate([-2*t,0]) square(size=[pt+4*t,gl], center=true);
-        translate([0,h/2 + dz]) square([w+t,2*dz], r=r, center=true);
+        translate([-2*t,0]) 
+            square([gl+4*t,pt], center=true);
+        translate([0,h/2 + dz]) square([l+t,2*dz], r=r, center=true);
     }   
 }
 
@@ -84,21 +92,22 @@ module hanger()
 {
     union()
     {   difference()
-        {   linear_extrude(2*t) union()
+        {   linear_extrude(w) union()
             {   main_profile();
-                if( rbw>0 )translate([w/2-t/4,h/2]) circle(t/4);
+                if( rbw>0 )translate([l/2-t/4,h/2]) circle(t/4);
             }
-            translate([0,0,t]) rotate([-90,0]) cube([sw,sw,3*h],center=true);
+            if( sw>0 ) translate([l/2-sw-t/2,0,w/2])
+                           cube([sw,4*(l+w),sw],center=true);
         
             if( rbw>0 )
-            {   for( z= [0 : 2*rbw : t] ) translate([w/2,h/2]) union()
+            {   for( z= [0 : 2*rbw : w/2] ) translate([l/2,h/2]) union()
                     {
-                        translate([0,0,t+z]) union()
+                        translate([0,0,w/2+z]) union()
                         {   cube([rbt,2*t,rbw],center=true);
                             translate([0,dz+t/2])
                                 cube([2*t,2*rbt,rbw],center=true);                            
                         }
-                        translate([0,0,t-z]) union()
+                        translate([0,0,w/2-z]) union()
                         {   cube([rbt,2*t,rbw],center=true);
                             translate([0,dz+t/2])
                                 cube([2*t,2*rbt,rbw],center=true);
@@ -107,13 +116,13 @@ module hanger()
             }
         }
         if( teeth_p ) union()
-            {   translate([w/2+t-0.1*dx,h/2,0]) //Near plank side
-                rotate([0,90]) teeth(2*t, dz-0*sqrt(8)*t, t/5,0.4*dx);
-            translate([w/2+t+0.9*dx, //Moving side
-                       h/2+t/2,2*t]) rotate([0,-90]) teeth(2*t, dz-dx-t/2, t/5,0.4*dx);
-        }
+            {   translate([l/2+t-0.1*dx,h/2,0]) //Near plank side
+                    rotate([0,90]) teeth(w, dz-0*sqrt(8)*t, t/5,0.4*dx);
+                translate([l/2+t+0.9*dx, h/2+t/2,w]) //Moving side
+                           rotate([0,-90]) teeth(w, dz-dx-t/2, t/5,0.4*dx);
+            }
         if( logo_p )
-            translate([w/2-t/2,-h/2+5*t/6,t]) rotate([0,90]) linear_extrude(height=9*t/16) 
+            translate([l/2-t/2,-h/2+5*t/6,w/2]) rotate([0,90]) linear_extrude(height=9*t/16) 
                 scale([1,-1]) oshw_logo_2d(t);
     }
 }

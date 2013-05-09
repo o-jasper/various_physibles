@@ -7,8 +7,8 @@
 * `clamp_hanger/` puts a clamp under a plank, i use it to hold stuff i can 
   read without taking space on the table.
 
-* TODO is a wedge so you can overdo the thickess and only need another wedge if
-  you have another plank.
+* `wedge/` thing that you put between the plan and the slide-on-plank to close
+  the distance.
 
 ## Parameters
 In order of importance:
@@ -26,6 +26,3 @@ In order of importance:
 
 `sw` is a square hole vertically through the clamp. It is there so wedges can
 have an pin so they cant move. Currently only `clamp_hanger/` has one.
-
-## TODO
-Makefiles, how do you change the defaults temporarily easily??
