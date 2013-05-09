@@ -5,4 +5,4 @@
 * `plank_hook/` plain hook-kindah thing for under plank.
 
 * `clamp_hanger/` puts a clamp under a plank, i use it to hold stuff i can 
-  read so it doesnt bother my arms.
+  read without taking space on the table.
