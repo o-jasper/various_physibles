@@ -7,6 +7,9 @@
 * `clamp_hanger/` puts a clamp under a plank, i use it to hold stuff i can 
   read without taking space on the table.
 
+* TODO is a wedge so you can overdo the thickess and only need another wedge if
+  you have another plank.
+
 ## Parameters
 In order of importance:
 
@@ -14,18 +17,15 @@ In order of importance:
 
 `pl` is the plank length.
 
-`wd` is the distance from the wall.
+`wd` is the distance from the wall.(some may go between the wall and plank)
 
 `gl` is how far it slides onto the plank.
 
 `t` is typically the thickness around the plank. Other thicknesses may relate to
  it.
 
-## TODO
-Wedges to slide between the plank and the clamp, so the clamp thickness
-matters less. People can make overly high clamps and put these wedges in to make
-it fit.
+`sw` is a square hole vertically through the clamp. It is there so wedges can
+have an pin so they cant move. Currently only `clamp_hanger/` has one.
 
-Maybe it should have a hole so these slides cant really move.
-I put a hole `clamp_hanger` for this reason. 
-TODO it is round, should be square so it cant rotate.
+## TODO
+Makefiles, how do you change the defaults temporarily easily??

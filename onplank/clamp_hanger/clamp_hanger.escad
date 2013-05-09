@@ -9,20 +9,29 @@
 
 // Parameters for better speed: teeth_p=false, logo_p=false.($quality of course)
 
-$quality = 256.0;
+//$quality = 256.0;
+
+$quality=20;
 
 pt  = 20.2; //..thickness of plank.
 
 gl = 20;
 t = 10;
 
+sw = t;
+
+r=t/2;
+
 dz = 30;
 dx = 1.5;
 
 hll = 20; //Handle lip length.
 
-teeth_p= true;
-logo_p = true;
+teeth_p= false;
+logo_p = false;
+
+rbw = 8; //Rubber band width.(over)
+rbt = 2; //... thickness.(over)
 
 //For convenience.
 w = pt + t; h= gl + t;
@@ -31,8 +40,8 @@ module main_profile()
 {   
     difference()
     {   union()
-        {   square(size=[w,h], r= t/2, center=true);
-            translate([w/2,h/2 + dz/2]) square([2*t,dz+t], r=t/2, center=true);
+        {   square(size=[w,h], r=r, center=true);
+            translate([w/2,h/2 + dz/2]) square([2*t,dz+t], r=r, center=true);
             translate([w/2,h/2+dz/2]) union()
             {   difference()
                 {   circle(dz);
@@ -50,12 +59,12 @@ module main_profile()
                     circle(dz/2-t/4);
                 }
             }
-            translate([w/2+t+dx, h/2+dx]) square([t/2, dz-dx],r=t/4);
+            translate([w/2+t+dx, h/2+dx]) square([t/2, dz-dx],r=r/2);
             translate([w/2+t+dx+hll/sqrt(8)+t/4, h/2+dz-dx-t/2+hll/sqrt(8)]) 
-                rotate(45) square([hll, t/2],center=true, r=t/4);
+                rotate(45) square([hll, t/2],center=true, r=r/2);
         }
         translate([-2*t,0]) square(size=[pt+4*t,gl], center=true);
-        translate([0,h/2 + dz]) square([w+t,2*dz], r=t/2, center=true);
+        translate([0,h/2 + dz]) square([w+t,2*dz], r=r, center=true);
     }   
 }
 
@@ -75,8 +84,27 @@ module hanger()
 {
     union()
     {   difference()
-        {   linear_extrude(2*t) main_profile();
-            translate([0,-h,t]) rotate([-90,0]) cylinder(r= t/2,h=3*h);
+        {   linear_extrude(2*t) union()
+            {   main_profile();
+                if( rbw>0 )translate([w/2-t/4,h/2]) circle(t/4);
+            }
+            translate([0,0,t]) rotate([-90,0]) cube([sw,sw,3*h],center=true);
+        
+            if( rbw>0 )
+            {   for( z= [0 : 2*rbw : t] ) translate([w/2,h/2]) union()
+                    {
+                        translate([0,0,t+z]) union()
+                        {   cube([rbt,2*t,rbw],center=true);
+                            translate([0,dz+t/2])
+                                cube([2*t,2*rbt,rbw],center=true);                            
+                        }
+                        translate([0,0,t-z]) union()
+                        {   cube([rbt,2*t,rbw],center=true);
+                            translate([0,dz+t/2])
+                                cube([2*t,2*rbt,rbw],center=true);
+                        }
+                    }
+            }
         }
         if( teeth_p ) union()
             {   translate([w/2+t-0.1*dx,h/2,0]) //Near plank side
