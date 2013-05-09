@@ -1,0 +1,93 @@
+//
+//  Copyright (C) 08-05-2013 Jasper den Ouden.(ojasper.nl)
+//
+//  This is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published
+//  by the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+
+// Parameters for better speed: teeth_p=false, logo_p=false.($quality of course)
+
+$quality = 256.0;
+
+pt  = 20.2; //..thickness of plank.
+
+gl = 20;
+t = 10;
+
+dz = 30;
+dx = 1.5;
+
+hll = 20; //Handle lip length.
+
+teeth_p= true;
+logo_p = true;
+
+//For convenience.
+w = pt + t; h= gl + t;
+
+module main_profile()
+{   
+    difference()
+    {   union()
+        {   square(size=[w,h], r= t/2, center=true);
+            translate([w/2,h/2 + dz/2]) square([2*t,dz+t], r=t/2, center=true);
+            translate([w/2,h/2+dz/2]) union()
+            {   difference()
+                {   circle(dz);
+                    difference()
+                    {   circle(dz-t/4);
+                        translate([0,-dz]) square([dz,t],center=true);
+                    }
+                    square(2*dz);
+                }
+                translate([dz/2,0]) difference()
+                {   intersection()
+                    {   circle(dz/2);
+                        square(2*dz);
+                    }
+                    circle(dz/2-t/4);
+                }
+            }
+            translate([w/2+t+dx, h/2+dx]) square([t/2, dz-dx],r=t/4);
+            translate([w/2+t+dx+hll/sqrt(8)+t/4, h/2+dz-dx-t/2+hll/sqrt(8)]) 
+                rotate(45) square([hll, t/2],center=true, r=t/4);
+        }
+        translate([-2*t,0]) square(size=[pt+4*t,gl], center=true);
+        translate([0,h/2 + dz]) square([w+t,2*dz], r=t/2, center=true);
+    }   
+}
+
+module teeth(w,h, s,sh) //TODO linear_extrude?
+{
+    for( x = [s : 4*s : w-s] )
+        for( y = [s : 2*s : h-s] )
+            translate([-x,y]) cylinder(r1=s,r2=0, h=sh);
+    for( x = [3*s : 4*s : w-s] )
+        for( y = [2*s : 2*s : h-s] )
+            translate([-x,y]) cylinder(r1=s,r2=0, h=sh);
+}
+
+include<openhw.escad>;
+
+module hanger()
+{
+    union()
+    {   difference()
+        {   linear_extrude(2*t) main_profile();
+            translate([0,-h,t]) rotate([-90,0]) cylinder(r= t/2,h=3*h);
+        }
+        if( teeth_p ) union()
+            {   translate([w/2+t-0.1*dx,h/2,0]) //Near plank side
+                rotate([0,90]) teeth(2*t, dz-0*sqrt(8)*t, t/5,0.4*dx);
+            translate([w/2+t+0.9*dx, //Moving side
+                       h/2+t/2,2*t]) rotate([0,-90]) teeth(2*t, dz-dx-t/2, t/5,0.4*dx);
+        }
+        if( logo_p )
+            translate([w/2-t/2,-h/2+5*t/6,t]) rotate([0,90]) linear_extrude(height=9*t/16) 
+                scale([1,-1]) oshw_logo_2d(t);
+    }
+}
+
+hanger();
