@@ -1,7 +1,5 @@
 # Horizontal rod holding thing
 
-<img src="pics/plank_rod.jpg" alt="image of the thing">
-
 Cares about plank thickness and minimum distance from the wall. 
 You have to provide a sufficiently long rod to stick underneath.
 (as usual  you can use tape/file a bit)
