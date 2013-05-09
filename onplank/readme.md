@@ -11,7 +11,7 @@ longer than `pl-2*dx = pl - 23mm`. The 'safety pin' isnt included either.
 
 [A release is here](http://www.thingiverse.com/thing:79389/).
 
-## Parameteric ook-kindah thing you slide on plank
+## Parameteric hook-kindah thing you slide on plank
 
 The thickness of plank it is made for is 18.5mm, this has to fit the 
 plank you're using. If your plank is a little thinner you can use
