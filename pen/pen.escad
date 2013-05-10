@@ -1,0 +1,114 @@
+//
+//  Copyright (C) 10-05-2013 Jasper den Ouden.(ojasper.nl)
+//
+//  This is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published
+//  by the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+
+$quality = 32;
+
+pr = 7;
+
+lr = 1.2;   //radius of lead.
+ll = 105; //length of lead.
+
+bl = ll/4;  //Bottom length below screw.
+tl = ll-bl; //Top length.
+mr = 1.5*lr; //Mouth opening radius.
+
+scr = 2*lr/3; //Cut radius of screw.
+scd = 2; //Extra room for screw.
+scR = pr - lr -scd;
+sch = 30;
+
+sca = 360; //Screw total angle.
+scn = floor(pr/scr);
+
+cd = 1; //Catch distance.
+//cR = pr - lr - cd; //Catch radius.
+
+dr= 4; //Dimple radius.
+
+module twist_section(R,h, rd)
+{
+    linear_extrude(height(x,y) = h+rd*(1-sqrt(x*x+y*y)/R), twist=sca) union()
+    {   for( a = [0: 360/scn :360] ) rotate(a) translate([R,0]) circle(scr);
+        circle(R);
+    }
+}
+
+module bottom_handle()
+{
+    translate([0,0,-bl]) intersection()
+    {   union()
+        {   cylinder(r1=0, r2=scR+scr,h=bl); //Gets transitions nice.
+            //Cross shape on bottom
+            for( a = [0,90] ) rotate(a) difference()
+            {   translate([0,0,bl/2]) cube([ll,2*lr,bl],center=true);
+                for( s = [1,-1])  //Dimples for stuff.
+                    for( z= [1.5*dr : 3*dr : bl-1.5*dr] ) 
+                    {   translate([s*(scR+2*scr),pr,z]) rotate([90,0])
+                            cylinder(r=2*scr, h=3*pr);
+                    }
+            }
+        }
+        cylinder(r=scR+scr,h=bl); //Inside the bottom radius.
+    }
+}
+
+module bottom()
+{   union()
+    {   
+    //Bottom bit.
+        bottom_handle();
+    //Hold-bottom interface.
+        cylinder(r1=scR+scr,r2=scR, h = scr);
+    //The twist it rotates on.
+        twist_section(scR,sch+2*scr,scR);
+     //Pole to the catcher.
+        translate([0,0,sch]) cylinder(r1=scR,r2=scR/3, h = scr+sch/2);
+     //Catcher itself.
+        rotate_extrude() translate([0,1.5*sch+scr]) scale([1,1.4]) difference() 
+        {   rotate(45) square(sqrt(2)*scR,center=true);
+            translate([0, 5.5*scR]) square(10*scR,center=true);
+        }
+    }
+}
+
+module top()
+{   cz = 1.5*(pr-scR-scd);
+    z = tl-sch-cz;
+    cd = pr-scR;
+    union()
+    {//Starts with twist section
+        twist_section(scR+scd, sch+scr,0);
+      //The body.
+        rotate_extrude() translate([0,sch+cz]) intersection()
+        {   scale([1,z/sqrt(pr*pr - mr*mr)]) circle(pr); //Generally rounded shape.
+            difference()
+            {//Cuts off the top and bottom, and transition between twist and rest.
+                polygon([[0,-2*pr], [pr,0],[pr,z],[0,z]]); 
+             //And the catch.
+                translate([pr,cd]) rotate(45) square(sqrt(2)*[cd,cd],center=true);
+                
+            }
+        }
+    }
+}
+
+module show(bz=0)
+{   union()
+    {   top();
+        translate([3*pr,0,bz]) bottom();
+    }
+}
+
+module as_print() //Just one option of course.
+{   show(bl); }
+
+//as_print();
+
+top();
+
