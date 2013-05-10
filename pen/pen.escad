@@ -14,19 +14,19 @@ pr = 7;
 lr = 1.2;   //radius of lead.
 ll = 105; //length of lead.
 
-bl = ll/4;  //Bottom length below screw.
+bl = ll/3;  //Bottom length below screw.
 tl = ll-bl; //Top length.
 mr = 1.5*lr; //Mouth opening radius.
 
 scr = 2*lr/3; //Cut radius of screw.
-scd = 2; //Extra room for screw.
+scd = 0.5; //Extra room for screw.
 scR = pr - lr -scd;
 sch = 30;
 
 sca = 360; //Screw total angle.
 scn = floor(pr/scr);
 
-cd = 1; //Catch distance.
+cd = 0.2; //Catch distance.
 //cR = pr - lr - cd; //Catch radius.
 
 dr= 4; //Dimple radius.
@@ -91,7 +91,8 @@ module top()
             {//Cuts off the top and bottom, and transition between twist and rest.
                 polygon([[0,-2*pr], [pr,0],[pr,z],[0,z]]); 
              //And the catch.
-                translate([pr,cd]) rotate(45) square(sqrt(2)*[cd,cd],center=true);
+                translate([pr,cd]) scale([1,2]) 
+                    rotate(45) square(sqrt(2)*[cd,cd],center=true);
                 
             }
         }
@@ -108,7 +109,6 @@ module show(bz=0)
 module as_print() //Just one option of course.
 {   show(bl); }
 
-//as_print();
-
-top();
+as_print();
+//top();
 
