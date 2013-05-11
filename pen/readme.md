@@ -1,8 +1,5 @@
 
-Makes a pen, defaultly with [ojasper.nl](http://www.ojasper.nl/) on it.
-
-Would be nice to have arbitrary images and a script to deal with it, or
-convert text to images for use. 
-(The way it works right now, only 1-bit images possible)
-
-Also be nice to have optional extensions.
+# Pen
+**Very much** a work in progress, ImplicitCAD does not seem to output
+`.stl`/`.obj` files that slic3r likes. Also I dont think the pen would grab the
+lead well.
