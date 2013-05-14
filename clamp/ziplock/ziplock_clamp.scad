@@ -108,8 +108,8 @@ module clamp_attach(n,ta,l=l,ca=3)
             translate([0,0,3*t]) cylinder(r1=mr, r2=mr/2, h=l/2);
 
             if( with_logo) intersection()
-            {   union() for(a=[-90,90]) rotate(ta/2+a) rotate([70,0]) 
-                    translate([0,3*t+7]) linear_extrude(height=l) oshw_logo_2d(7);
+            {   rotate(ta/2+a) rotate([90,0]) 
+                    translate([0,3*t+7,-l]) linear_extrude(height=2*l) oshw_logo_2d(7);
                 translate([0,0,3*t]) cylinder(r1=mr+t/4, r2=mr/2+t/4, h=l/2);
             }
         }
