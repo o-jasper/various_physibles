@@ -7,7 +7,7 @@
 //  (at your option) any later version.
 //
 
-include <../onplank/spool_plank.scad>
+include <../../onplank/spool_plank/spool_plank.scad>
 
 gl=20;dl=20;pt=22.8;
 split_spool_plankpart();
