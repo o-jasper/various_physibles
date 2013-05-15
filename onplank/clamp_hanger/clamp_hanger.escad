@@ -17,6 +17,8 @@
 
 // Parameters for better speed: teeth_p=false, logo_p=false.($quality of course)
 
+$quality=160;
+
 pt  = 20; //..thickness of plank.
 gl = 20; //Length it grabs plank.
 
