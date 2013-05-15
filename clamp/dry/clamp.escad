@@ -9,20 +9,20 @@
 
 // Clamp profile and application with 5mm pole system.
 
-$quality=80;
+$quality=120;
 $fs=0.4;
 
 t=4; //Thicknesses.
-l= 80; //Length of clamp.
-h = 4*t;
+l= 50; //Length of clamp.
+h = 1.5*t;
 
-zl = 2*t; //Single zigzag length.
-zw = t/1.3;
+zl = t; //Single zigzag length.
+zw = zl/1.3;
 
 tab=true;
 logo=true;
 
-module teeth_profile(l=l)
+module teeth_profile(oz,l=l)
 {   difference()
     {   union()
         {   square([1.5*t,l-1.5*t]);
@@ -32,50 +32,67 @@ module teeth_profile(l=l)
             }
         }
         //Zigzag motion.
-        for( y = [zl/2 : zl : l] ) 
+        for( y = [oz : zl : l] ) 
             translate([0,y]) scale([zw/zl,1]) rotate(45) square([zl,zl]/sqrt(2), center=true);
         //Entry at top.
         translate([0,l]) rotate(45) square(t*[2,2], center=true);
     }
 }
-//Peg bit inspired Richard Gains lockbrick; http://www.thingiverse.com/thing:27695
-module peg(s,h)
-{   linear_extrude(height=h) polygon(s*[[-1,-1],[-1,+1],[+1,-1]]/2); }
 
-//Note/todo: intersecting with a profile the other way would be nice.
-module _half_clamp()
-{   
-    union()
-    {   linear_extrude(height=2*h) translate([-0.7*t,1.5*t]) union()
-        {   teeth_profile();
-            if( tab ) translate([0,-t]) difference(r=t/2)
-            {   circle(5*t);
-                circle(4*t);
-                translate([-8,-8]*t) square([8.5,16]*t);
-                translate([-8,-8]*t) square([16,6]*t);
-            }
-        }
-        linear_extrude(height=h) union()
-        {   
+//linear_extrude(height=h) intersection(){ teeth_profile(l/3); square([t,l/3-t],r=t/3); }
+
+module clamp_profile(oz)
+{   union()
+    {   difference()
+        {   scale([1/2,2]/4) circle(l); //Arc.
             difference()
-            {   circle(2.2*t); circle(1.5*t); 
-                translate(-t*[4,4]) square(t*[4,8]);
+            {   scale([1/2-2*t/l,2-2*t/l]/4) circle(l); //Hole and reinforcement.
+                for( y=[10*t-4*l/3,+l/2] ) 
+                    translate([0,y]) square([10*l,l/3],center=true);
             }
-            translate(t*[0,-2.5]) square(t*[2,2],r=t/2, center=true);
+            translate([-l,-l]) square([l,2*l]); //Half it.
+        }
+        //Pad.
+        translate([-t,t+l/6]) 
+            intersection(){ teeth_profile(oz,l/3); square([t,l/3-t],r=t/3); }
+    }
+}
+
+module peg_profile()
+{   polygon([[+1,-1],[-1,+1],[+1,+1]]*t/2); }
+
+module half_clamp(oz)
+{
+    union()
+    {   intersection()
+        {   linear_extrude(height=h) difference()
+            {   clamp_profile(oz);
+                for( y=[0,1.6*t] ) translate([0,y-l/2+t]) rotate(45) 
+                    square(sqrt(2)*t,r=t/4,center=true);
+                translate([0, -l/2]) square(2*[t,t],center=true);
+            }
+            rotate([0,90]) translate([0,0,-l]) linear_extrude(height=3*l) 
+                translate([-h/2,l/2-h/1.5]) union()
+            {   circle(h/1.5);
+                translate([0,-l]) square([2*h/1.5, 2*l],center=true);
+            }
+        }
+        for( y = [0,1.6*t] ) translate([0,y-l/2+t]) union()
+        {   linear_extrude(height=h/2) 
+                rotate(45) difference()
+            {   square(sqrt(2)*t,r=t/4,center=true);
+                rotate(-90) peg_profile();
+            }
+            rotate(135) linear_extrude(height=h) peg_profile();
         }
     }
 }
 
-module half_clamp()
-{   difference()
-    {   union()
-        {   _half_clamp();
-            translate([0,-2.5*t,h-2*t]) peg(t,4*t);
-            if( logo ) translate([t/2,l/2,h]) rotate([0,90]) 
-                           linear_extrude(height=0.55*t) oshw_logo_2d(1.5*h);
-        }
-        translate([0,-2.5*t,h-2*t]) scale([-1,-1,1]) peg(t,4*t);
+module clamp_pair()
+{   union()
+    {   half_clamp(0);
+        translate([l/2,0]) half_clamp(zl/2);
     }
 }
+clamp_pair();
 
-half_clamp();
