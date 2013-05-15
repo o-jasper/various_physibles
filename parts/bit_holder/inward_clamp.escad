@@ -1,0 +1,107 @@
+//
+//  Copyright (C) 15-05-2013 Jasper den Ouden.(ojasper.nl)
+//
+//  This is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published
+//  by the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+
+$quality=60;
+h=30;
+
+dr=10;
+
+t=5;
+ir = 30;
+scR = ir+t; //Screw twist.
+scr = scR/10;
+
+n = 3;
+
+twist_a=100; 
+
+mr = 3;
+
+ah = 2*t; //Height of finger arches.
+
+module rot_down_base()
+{   linear_extrude(height=h, twist=twist_a) difference()
+    {   union()
+        {   circle(scR);
+            for( a=[0:360/floor(3*scR/(2*scr)):360] )
+                rotate(a) translate([scR,0]) circle(scr);
+        }
+        circle(ir);
+    }
+}
+
+module rot_down()
+{
+    union()
+    {   rot_down_base();
+         //Something to hold on to when rotating it.
+        linear_extrude(height=h+2*t) difference()
+        {   circle(scR); circle(ir);
+            for( a = [0:45:180] ) rotate(a) square([t,4*scR], center=true);
+        }
+    }
+}
+
+//rot_down();
+
+module rot_into()
+{   linear_extrude(height=h, twist=twist_a) difference()
+    {   circle(scR+2*t);
+        union()
+        {   circle(scR);
+            for( a=[0:360/floor(3*scR/(2*scr)):360] )
+                rotate(a) translate([scR,0]) circle(scr);
+        }
+    }
+}
+//rot_into();
+
+module finger()
+{
+    difference()
+    {   intersection()
+        {   translate([-ir,0,h]) rotate([0,90]) //Wedge shape.
+                linear_extrude(height=2*ir) polygon([[0,mr/4],[h,mr/4], [h,ir/2],[0,ir]]);
+            linear_extrude(height=h) intersection() //Interect it to reach to the point.
+            {   difference()
+                {   polygon([[mr/2,mr/4], [ir,ir],[-ir,ir], [-mr/2,mr/4]]);
+                    circle(mr);
+                }
+                circle(ir); //Round to fit the hole.
+            }
+        } //Cut to make the center more bendy.
+        for( z=[0,h] ) translate([0,ir/4,z]) cube([scR,ir/6,h-t],center=true, r=ir/8);
+    }
+}
+
+module finger_with_arch()
+{
+    union()
+    {   finger();
+        translate([t/2,scR-t,h]) rotate([0,-90]) linear_extrude(height=t) difference()
+        {   union()
+            {   translate([0,-2*t]) square([ah-2*t,4*t]);
+                translate([ah-2*t,0]) circle(2*t); 
+            }
+            square([2*ah-4*t,3*t], center=true); 
+            translate([ah-2*t,0]) circle(1.5*t); 
+        }
+    }    
+}
+
+module part()
+{
+    union()
+    {   rot_into();
+        for( a = [0:360/n:360] ) rotate(a) finger_with_arch();
+    }
+}
+
+part();
+//finger_with_arch();
