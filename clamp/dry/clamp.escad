@@ -22,6 +22,10 @@ zw = zl/1.3;
 tab=true;
 logo=true;
 
+hl = 20; //Handle length.
+ha = 45; //.. angle
+ht = t;  //.. thickness
+
 module teeth_profile(oz,l=l)
 {   difference()
     {   union()
@@ -42,7 +46,16 @@ module teeth_profile(oz,l=l)
 module clamp_profile(oz)
 {   union()
     {   difference()
-        {   scale([1/2,2]/4) circle(l); //Arc.
+        {   union()
+            {   scale([1/2,2]/4) circle(l); //Arc.
+                if( hl > 0 ) translate([0,-l/4]) rotate(180+ha) union()//Handle
+                {   intersection() 
+                    {   square([ht,hl]);
+                        translate([ht,0]) scale([ht,hl]) circle(1);
+                    }
+                    translate([2*ht/3,hl-ht/4]) circle(ht/3);
+                }
+            }
             difference()
             {   scale([1/2-2*t/l,2-2*t/l]/4) circle(l); //Hole and reinforcement.
                 translate([5*l,l/2]) square([10*l,l/2],center=true);
