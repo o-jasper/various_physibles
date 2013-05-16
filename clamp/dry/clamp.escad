@@ -9,7 +9,7 @@
 
 // Clamp profile and application with 5mm pole system.
 
-$quality=120;
+$quality=30;//120;
 $fs=0.4;
 
 t=4; //Thicknesses.
@@ -39,25 +39,23 @@ module teeth_profile(oz,l=l)
     }
 }
 
-//linear_extrude(height=h) intersection(){ teeth_profile(l/3); square([t,l/3-t],r=t/3); }
-
 module clamp_profile(oz)
 {   union()
     {   difference()
         {   scale([1/2,2]/4) circle(l); //Arc.
             difference()
             {   scale([1/2-2*t/l,2-2*t/l]/4) circle(l); //Hole and reinforcement.
-                for( y=[10*t-4*l/3,+l/2] ) 
-                    translate([0,y]) square([10*l,l/3],center=true);
+                translate([5*l,l/2]) square([10*l,l/2],center=true);
             }
             translate([-l,-l]) square([l,2*l]); //Half it.
         }
         //Pad.
         translate([-t,t+l/6]) 
-            intersection(){ teeth_profile(oz,l/3); square([t,l/3-t],r=t/3); }
+            intersection(){ teeth_profile(oz,l/3); square([l,l/3-t],r=t/3); }
     }
 }
 
+peg_connect = false; //Old way of connecting the two parts.
 module peg_profile()
 {   polygon([[+1,-1],[-1,+1],[+1,+1]]*t/2); }
 
@@ -67,17 +65,20 @@ module half_clamp(oz)
     {   intersection()
         {   linear_extrude(height=h) difference()
             {   clamp_profile(oz);
-                for( y=[0,1.6*t] ) translate([0,y-l/2+t]) rotate(45) 
-                    square(sqrt(2)*t,r=t/4,center=true);
-                translate([0, -l/2]) square(2*[t,t],center=true);
+                if(peg_connect) union()
+                {   for( y=[0,1.6*t] ) translate([0,y-l/2+t]) rotate(45) 
+                                           square(sqrt(2)*t,r=t/4,center=true);
+                    translate([0,-l/2]) square([2*t,2*t],center=true);
+                }
             }
             rotate([0,90]) translate([0,0,-l]) linear_extrude(height=3*l) 
                 translate([-h/2,l/2-h/1.5]) union()
             {   circle(h/1.5);
                 translate([0,-l]) square([2*h/1.5, 2*l],center=true);
-            }
+             }
         }
-        for( y = [0,1.6*t] ) translate([0,y-l/2+t]) union()
+        //Old peg system to connect them.(pretty poor, at least at the scale i tried)
+        if(peg_connect) for( y = [0,1.6*t] ) translate([0,y-l/2+t]) union()
         {   linear_extrude(height=h/2) 
                 rotate(45) difference()
             {   square(sqrt(2)*t,r=t/4,center=true);
@@ -85,13 +86,29 @@ module half_clamp(oz)
             }
             rotate(135) linear_extrude(height=h) peg_profile();
         }
+        translate([0,(h+t)/2-l/2,h/2]) intersection() //Thing to hold the backside together.
+        {   scale([1/3,1,2]) rotate([0,45]) cube([h,h+t,h], center=true);
+            translate([h,0]) cube([2*h,4*h,h], center=true);
+        }
+    }
+}
+
+module wedge()
+{
+    translate([0,0,h/2]) difference()
+    {   translate([0,t]) intersection()
+        {   cube([h,h+t,h], center=true);
+            cube([h,h+t,h+t/2], center=true, r=t);
+        }
+        scale([1/3.6,2,2]) rotate([0,45]) cube([h,h,h], center=true);
     }
 }
 
 module clamp_pair()
 {   union()
     {   half_clamp(0);
-        translate([l/2,0]) half_clamp(zl/2);
+        translate([l/3,0]) half_clamp(zl/2);
+        translate([l/3,0]) wedge();
     }
 }
 clamp_pair();
