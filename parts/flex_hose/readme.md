@@ -22,8 +22,6 @@ positions sometimes.
 
 To save material per length, you can also add a pole in the middle, 
 `flex_hose_pole_20.stl`, `flex_hose_pole_40.stl` for 2cm and 4cm respectively. 
-However, these potentially have a weakness at the top and bottom of the neck.
-(though maybe i just set the retraction too high)
 
 # Author
 [Jasper den Ouden](http://www.ojasper.nl/), inspired very much to
