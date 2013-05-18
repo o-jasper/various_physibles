@@ -3,6 +3,8 @@
 //
 // Public domain
 
+// Note that is seems to work in implicidCAD too.
+
 $fs=0.1;
 
 t=0;
@@ -23,24 +25,30 @@ module female(t=t,r=r)
 
 module section(l=l,t=t,r=r,n=n, w_female=true)
 {
-    cylinder(r=r/2, h = l+2*r);
-    if( l>0 ) 
-    {   linear_extrude(height=l+r/2, twist= (l+r/2)*da_dl) 
-            for( a=[0:360/ln:360] ) rotate(a) translate([r/2,0]) circle(r/10);
-        linear_extrude(height=l+r/2, twist= -(l+r/2)*da_dl) 
-            for( a=[0:360/ln:360] ) rotate(a) translate([r/2,0]) circle(r/10);
-    }
-    difference()
-    {   union()
-        {   if( w_female ){ female(t,r); }
-            translate([0,0,l+f*r/sqrt(2)]) 
-            {   cylinder(r1=f*r/sqrt(2), r2=r/5, h=r);
-                translate([0,0,r/2]) sphere(r);
-            }
-        }            
-        for( a = [0:360/n:360] ) rotate(a) //Petals
-            {   translate([r,0,l+1.5*r]) scale([0.7,1/5,1]) sphere(r); }
-        translate([0,0,l+5*r]) cube(6*[r,r,r], center=true);
+    union()
+    {   cylinder(r=r/2, h = l+2*r);
+        if( l>0 ) //The pole.
+        {   linear_extrude(height=l+r/2, twist= (l+r/2)*da_dl) 
+                for( a=[0:360/ln:360] ) rotate(a) translate([r/2,0]) circle(r/10);
+            linear_extrude(height=l+r/2, twist= -(l+r/2)*da_dl) 
+                for( a=[0:360/ln:360] ) rotate(a) translate([r/2,0]) circle(r/10);
+            translate([0,0,l-0.4*r]) 
+                cylinder(r1=r/2, r2=0.65*r, h=r);
+            translate([0,0,0.5*r]) 
+                cylinder(r2=r/2, r1=0.65*r, h=r);
+        }
+        difference()
+        {   union()
+            {   if( w_female ){ female(t,r); }
+                translate([0,0,l+f*r/sqrt(2)]) 
+                {   cylinder(r1=f*r/sqrt(2), r2=r/5, h=r);
+                    translate([0,0,r/2]) sphere(r);
+                }
+            }            
+            for( a = [0:360/n:360] ) rotate(a) //Petals
+                {   translate([r,0,l+1.5*r]) scale([0.7,1/5,1]) sphere(r); }
+            translate([0,0,l+5*r]) cube(6*[r,r,r], center=true);
+        }
     }
 }
 

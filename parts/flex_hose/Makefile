@@ -3,7 +3,7 @@ default:scad
 
 all: scad
 
-scad: output/flex_hose.stl output/flex_hose_loose.stl flex_hose_pole_30.stl output/flex_hose_loose.stl flex_hose_pole_40.stl
+scad: output/flex_hose.stl output/flex_hose_loose.stl output/flex_hose_tight.stl output/flex_hose_pole_20.stl output/flex_hose_loose.stl output/flex_hose_pole_40.stl
 
 output/flex_hose.stl: flex_hose.scad
 	sh ../../bin/scad.sh 'use<'`pwd`'/flex_hose.scad>;section();'\
@@ -19,9 +19,13 @@ output/flex_hose_loose.stl: flex_hose.scad
 	sh ../../bin/scad.sh 'use<'`pwd`'/flex_hose.scad>;section(0,0.5);'\
 		output/flex_hose_loose.stl
 
+output/flex_hose_tight.stl: flex_hose.scad
+	sh ../../bin/scad.sh 'use<'`pwd`'/flex_hose.scad>;section(0,-0.5);'\
+		output/flex_hose_tight.stl
+
 output/flex_hose_pole_20.stl: flex_hose.scad
 	sh ../../bin/scad.sh 'use<'`pwd`'/flex_hose.scad>;section(20);'\
-		output/flex_hose_loose.stl
+		output/flex_hose_pole_20.stl
 output/flex_hose_pole_40.stl: flex_hose.scad
-	sh ../../bin/scad.sh 'use<'`pwd`'/flex_hose.scad>;section(20);'\
-		output/flex_hose_loose.stl
+	sh ../../bin/scad.sh 'use<'`pwd`'/flex_hose.scad>;section(40);'\
+		output/flex_hose_pole_40.stl
