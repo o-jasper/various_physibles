@@ -3,8 +3,7 @@ They're basically two hollow spheres, except with one has slots in the side so i
 flex to shrink, this makes them easier to fit together with larger allowed tolerances
 on size.(easier to print)
 
-Thanks very much to [this](http://www.thingiverse.com/thing:28255), due to
-[thingiverse user](http://www.thingiverse.com/Sal/) "Sal" Stefan Langemark
+They're not actually a hose like for water. There are plainly holes in it.
 
 ## Instructions
 These need to printed hollow(zero infill) with no top or bottom layers, with one perimeter
@@ -17,4 +16,16 @@ but probably best to try how two fit before printing many.
 
 Of course, to get tighter(more friction)/looser fits you can use the openscad file
 directly `t` controls the extra size for the bottom sphere. Using more perimeters 
-should make it tighter too.
+should make it tighter too. Note that slic3r has the annoying habit of unifying near
+positions sometimes.
+
+To save material getting length, you can also add a pole in the middle, 
+`flex_hose_pole_20.stl`, `flex_hose_pole_40.stl` for 2cm and 4cm respectively.
+
+# Author
+Jasper den Ouden, thanks very much to
+[this](http://www.thingiverse.com/thing:28255), by 
+[thingiverse user "Sal"](http://www.thingiverse.com/Sal/) Stefan Langemark.
+
+As usual, [the github](https://github.com/o-jasper/various_physibles) contains 
+development versions.
