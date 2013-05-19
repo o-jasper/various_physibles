@@ -14,9 +14,10 @@ look at:
 ## Highlight: released
 The released entries have readmes with links to release files and more info.
 
-* Corner mirror stick `corner_mirror/`
+* Flexible hose for setting things at postions `parts/flex_hose/`.
+* Corner mirror stick `tools/corner_mirror/`
 * Simple clothing hook `hooks/new_hook.scad`
-* Ziplock bag holder `bag_holder/bag_holder.scad`
+* Ziplock bag holder `bag_holbder/bag_holder.scad`
 * Plank stuff; simple hook `onplank/plank_hook.scad`, 
   hold rod under plank `onplank/spool_plank.scad`, hold power supply under plank
   `reprap/power_supply/power_supply_under_plank.scad`.

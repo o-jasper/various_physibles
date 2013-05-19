@@ -23,6 +23,17 @@ positions sometimes.
 To save material per length, you can also add a pole in the middle, 
 `flex_hose_pole_20.stl`, `flex_hose_pole_40.stl` for 2cm and 4cm respectively. 
 
+### Tips/tricks
+If some end up too loose anyway, you can add some masking tape to the sockets to
+make it tighter.
+
+It can still be improved, in my experience, first time popping it in, it still cracks
+now and then. These crack can be fixed by heating them up with the hot end, extruding
+on it, and finishing it up a bit by using pincers to pinch it a bit while
+still hot. Careful, the hot end might burn you! Ensure you dont have to 
+look at the computer to make it extrude.(for instance in pronterface by typing 
+extrude 2 in the bar and working with it selected, you only hitting return to extrude)
+
 # Author
 [Jasper den Ouden](http://www.ojasper.nl/), inspired very much to
 [this](http://www.thingiverse.com/thing:43272), by 
