@@ -39,7 +39,6 @@ extrude 2 in the bar and working with it selected, you only hitting return to ex
 [this](http://www.thingiverse.com/thing:43272), by 
 [thingiverse user "Sal"](http://www.thingiverse.com/Sal/) Stefan Langemark.
 
-As usual, [the github](https://github.com/o-jasper/various_physibles) contains 
-development versions.
-
-A release is [on thingiverse](http://www.thingiverse.com/thing:90830?save=success).
+Locations: [github](https://github.com/o-jasper/various_physibles), 
+[fabfabbers](http://www.fabfabbers.com/models/id/134/flex-hose-by-o-jasper) and
+[thingiverse](http://www.thingiverse.com/thing:90830?save=success).

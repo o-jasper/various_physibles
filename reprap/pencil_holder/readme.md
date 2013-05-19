@@ -9,4 +9,5 @@ Hope the default sizes work out for you. I printed a version without the
 circles and the end where you hold the clamp. Hopefully the circles give the
 user more grip.
 
-[A release with .stls here](http://www.thingiverse.com/thing:74289).
+Locations: [github](https://github.com/o-jasper/various_physibles),
+[thingiverse](http://www.thingiverse.com/thing:74289).
