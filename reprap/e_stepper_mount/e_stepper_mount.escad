@@ -7,21 +7,21 @@
 //  (at your option) any later version.
 //
 
-$quality=25;
+$quality=500; //Needs to be so damn high :/
 
 mt = 6; //Thickness of plate to hang on to.
 
-sw = 25.8; //Screw distance.
+sw = 27; //Screw distance.
 sd = 6.5/2;
 sr = 1.2;
 sh = 3;
 shr = 3;
 
-t=4;  //Side thickness.
+t=2;  //Side thickness.
 ft=6; //Front thickness. (must accommodate screws)
 
 w=36; //Width of stepper.
-l=60; //40 ; //Length of stepper.
+l=40 ; //Length of stepper.
 
 
 rf=12; //Front space for gear.
@@ -29,46 +29,50 @@ rf=12; //Front space for gear.
 inf = 2*(w+l);
 
 module _body()
-{   difference()
-    {   union()
-        {   linear_extrude(w+2*t) difference()
-            {   union()
-                {   square([w+2*t,l+2*ft], r=max(t,ft), center=true);
-                    translate([0,l/2-2*t]) scale([w/2,4*t]) circle(1);
-                }
-                square([w-2*t,l-2*t],center=true); //Main center hole.
-                translate([0,l/2-2*t]) scale([w/2-t,3*t]) circle(1); //Springy bit extension.
+{   
+    translate([0,0,w+t]) //corner triangles ontop
+        linear_extrude(height=t) for( s= [1,-1] ) 
+        scale([s,1]) polygon([[w/2,-l/2],[w/2-2*t,-l/2],[w/2,-l/2+2*t]]);
+
+    difference()
+    {   linear_extrude(height=w+2*t) difference()
+        {   union()
+            {   square([w+2*t,l+2*ft], r=max(t,ft), center=true);
+                translate([0,l/2-2*t]) scale([1/2,5*t/w]) circle(w);//Stringy bit extension.
             }
-            translate([0,0,w+t]) //corner triangles ontop
-                linear_extrude(t) for( s= [1,-1] ) 
-                scale([s,1]) polygon([[w/2,-l/2],[w/2-2*t,-l/2],[w/2,-l/2+2*t]]);
+            square([w-2*t,l-2*t],center=true); //Main center hole.
+            translate([0,l/2-2*t]) scale([1/2-t/w,4*t/w]) circle(w); //Springy bit space.
         }
         translate([0,0,w/2+t]) cube([w,l,w],center=true);
         translate([0,0,w+t]) cube([w,l,2*w],center=true);
         translate([0,0,w/2+t]) rotate([90,0]) cylinder(r=rf, h=3*l);
-        translate([-w,l/2,w+2*t]) rotate([0,90]) scale([w,l-2*t]) cylinder(r=1,h=3*l);
+        translate([-w,l/2,w+2*t]) rotate([0,90]) scale([1,(l-2*t)/w]) cylinder(r=w,h=3*l);
 
-        for( a = [0,90,180,270] ) 
-            translate([0,-l/2-ft,w/2+t])
+        for( a = [0,90,180,270] ) //Screw space.
+            translate([0,-l/2-ft-inf,w/2+t])
                 rotate([-90,0]) rotate(a) translate([sw,sw]/2) union()
-            {   cylinder(r=sr,h=w);
-                translate([0,0,sd]) cylinder(r=shr, h=w);
-            }                    
+            {   cylinder(r=sr,h=inf+w/2);
+                translate([0,0,inf+sd]) cylinder(r=shr, h=w);
+            }
     }
 }
 
 module springy_back()
 {   union()
     {
-        translate([-t,l/2,w/2+t]) rotate([0,90]) linear_extrude(2*t) difference()
-        {   union()
-            {   circle(w/2);
-                rotate(245) translate([-w/2,0]) square(w);
+        difference()
+        {   translate([-t,l/2,w/2+t]) rotate([0,90]) linear_extrude(height=2*t) difference()
+            {   union()
+                {   circle(w/2);
+                    rotate(245) translate([-w/2,0]) square(w);
+                }
+                circle(w/2-t/2);
+                translate([0,-w]) square(2*w, center=true);
+                translate([w,-w+t]) square(2*w, center=true);
+                translate([2*w,0]) square(2*w, center=true);
             }
-            circle(w/2-t/2);
-            translate([0,-w]) square(2*w, center=true);
-            translate([w,-w+t]) square(2*w, center=true);
-            translate([2*w,0]) square(2*w, center=true);
+            //Springy bit space.
+            translate([0,l/2-2*t]) scale([1/2-t/w,4*t/w,1]) cylinder(r=w,h=2*t);
         }
         translate([0,l/2-t/2,0]) difference()
         {   cylinder(r=t,h=w+t);
@@ -81,9 +85,13 @@ module springy_back()
 
 module springy_front()
 {
-    translate([w/2+1.5*t,-l/2-ft-1.5*t]) linear_extrude(3*t) difference()
-    {   circle(3*t);
+    translate([w/2+1.5*t,-l/2-ft-2*t]) linear_extrude(height=3*t) difference()
+    {   union()
+        {   circle(3*t);
+            translate([-4*t,t]) square([4*t,2*t],center=true,r=t);
+        }
         circle(2*t);
+        translate([-inf,t]) square([inf,0.6*mt]);
     }
 }
 
@@ -93,7 +101,7 @@ module thing()
     {   union()
         {   _body();
             springy_back();
-            springy_front();
+//            springy_front();
         }
         translate([0,0,-inf]) cube(inf*[2,2,2], center=true);
     }
