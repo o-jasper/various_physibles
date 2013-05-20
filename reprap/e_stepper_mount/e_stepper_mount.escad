@@ -38,9 +38,9 @@ module _body()
     {   linear_extrude(height=w+2*t) difference()
         {   union()
             {   square([w+2*t,l+2*ft], r=max(t,ft), center=true);
-                translate([0,l/2-2*t]) scale([1/2,5*t/w]) circle(w);//Stringy bit extension.
+                translate([0,l/2-2*t]) scale([1/2,5*t/w]) circle(w);//Springy bit extension.
             }
-            square([w-2*t,l-2*t],center=true); //Main center hole.
+            square([3*w/4,3*l/4],center=true); //Main center hole.
             translate([0,l/2-2*t]) scale([1/2-t/w,4*t/w]) circle(w); //Springy bit space.
         }
         translate([0,0,w/2+t]) cube([w,l,w],center=true);
@@ -63,23 +63,27 @@ module springy_back()
         difference()
         {   translate([-t,l/2,w/2+t]) rotate([0,90]) linear_extrude(height=2*t) difference()
             {   union()
-                {   circle(w/2);
-                    rotate(245) translate([-w/2,0]) square(w);
+                {   scale([1,1/2]) circle(w/2);
+                    translate([t,0]) square([w/2+t,w/4]);
                 }
-                difference()
-                {   circle(w/2-t);
-                    translate([-3*w/2+3*t,0]) square([w,w]);
+                scale([1,1/2]) difference()
+                {   circle(w/2-2*t);
+                    translate([-3*w/2+3*t,-t]) square([w,w]);
                 }
-                translate([0,-w]) square(2*w, center=true);
-                translate([w,-w+t]) square(2*w, center=true);
-                translate([2*w,0]) square(2*w, center=true);
+                translate([0,-t-w]) square(2*w, center=true);
             }
             //Springy bit space.
             translate([0,l/2-2*t]) scale([1/2-t/w,4*t/w,1]) cylinder(r=w,h=4*t);
         }
-        translate([0,l/2-t/2,0]) difference()
-        {   scale([1,1.2]) cylinder(r=t,h=w+t);
-            translate([-t,-2*t,t]) cube([2*t,2*t,inf]);
+        translate([0,l/2-t/2,0])
+        {   rotate([90,0]) linear_extrude(height=t)
+            {   for(x=[-1,1]*t) translate([x,0]) scale([4*t/(w+t),1]) circle(w+t);
+                translate([-t,0]) square([2*t,w+t]);
+            }
+            translate([0,-t]) linear_extrude(height=t) difference()
+            {   circle(5*t);
+                translate([0,10*t]) square(20*[t,t],center=true);
+            }
         }
         translate([0,l/2,w+3*t/4]) cube([2*t,t,t/2], center=true, r=t/4);
         translate([0,l/2-t,t/2]) cube([2*t,t,t], center=true);
