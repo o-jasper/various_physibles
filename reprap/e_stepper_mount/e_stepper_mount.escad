@@ -66,23 +66,26 @@ module springy_back()
                 {   circle(w/2);
                     rotate(245) translate([-w/2,0]) square(w);
                 }
-                circle(w/2-t/2);
+                difference()
+                {   circle(w/2-t);
+                    translate([-3*w/2+3*t,0]) square([w,w]);
+                }
                 translate([0,-w]) square(2*w, center=true);
                 translate([w,-w+t]) square(2*w, center=true);
                 translate([2*w,0]) square(2*w, center=true);
             }
             //Springy bit space.
-            translate([0,l/2-2*t]) scale([1/2-t/w,4*t/w,1]) cylinder(r=w,h=2*t);
+            translate([0,l/2-2*t]) scale([1/2-t/w,4*t/w,1]) cylinder(r=w,h=4*t);
         }
         translate([0,l/2-t/2,0]) difference()
-        {   cylinder(r=t,h=w+t);
-            translate([-t,-t,t]) cube([2*t,t,inf]);
+        {   scale([1,1.2]) cylinder(r=t,h=w+t);
+            translate([-t,-2*t,t]) cube([2*t,2*t,inf]);
         }
         translate([0,l/2,w+3*t/4]) cube([2*t,t,t/2], center=true, r=t/4);
         translate([0,l/2-t,t/2]) cube([2*t,t,t], center=true);
     }
 }
-
+//Not used currently.
 module springy_front()
 {
     translate([w/2+1.5*t,-l/2-ft-2*t]) linear_extrude(height=3*t) difference()
