@@ -1,6 +1,6 @@
 NOTE the status is: Probably it works, but i dont feel like testing or
 developing it further. If you try it please provide feedback for others.
-(be specific)
+(be specific) `clamp_` and `dry_` are more likely to work than `tiny_`.
 
 # Clamps
 Clamps inspired on [thingiverse user KidCrazy](http://www.thingiverse.com/KidCrazy/designs)'s
@@ -44,3 +44,9 @@ Many;
 * When the distance between the prongs is small relative to the length the
   handles collide, increasing their distance would help.
 * More defaults.
+
+## Author
+[Jasper den Ouden](http://www.ojasper.nl/), much inspired from
+[thingiverse user KidCrazy](http://www.thingiverse.com/KidCrazy/).
+
+As usual development versions [on github](https://github.com/o-jasper/various_physibles).
