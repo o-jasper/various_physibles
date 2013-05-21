@@ -3,9 +3,9 @@
 
 default: scad
 
-scad: output/clamp_set.stl output/clamp_pair.stl output/clamp_spring.stl\
+scad: output/clamp_set.stl output/clamp_pair.stl output/clamp_spring.stl \
 output/tiny_set.stl output/tiny_pair.stl output/tiny_spring.stl  \
-output/dry_set.stl output/dry_pair.stl output/dry_spring.stl 
+output/dry_set.stl output/dry_pair.stl output/dry_spring.stl
 
 output/clamp_set.stl: clamp.scad
 	sh ../../bin/scad.sh 'include<'`pwd`'/clamp.scad>; as_print(true);' \

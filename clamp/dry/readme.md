@@ -1,3 +1,7 @@
+NOTE the status is: Probably it works, but i dont feel like testing or
+developing it further. If you try it please provide feedback for others.
+(be specific)
+
 # Clamps
 Clamps inspired on [thingiverse user KidCrazy](http://www.thingiverse.com/KidCrazy/designs)'s
 ['KCS' clamp](http://www.thingiverse.com/thing:89457). Untested. Intended improvements are:
@@ -28,3 +32,15 @@ For regular springs there are probably multiple good strategies.
 
 * Risk using nothing. Spring has friction with the plastic. There are also cones
   where the spring can go.
+
+## Potential improvements
+Many; 
+
+* Springs are not properly parametric(actually left out the `dry_spring.stl` because
+  it didnt work well)
+* Assembly could be easier. (That might mean just turning the guides off)
+* Parameters based on what the user want, and that dont require fiddling to get
+  right.
+* When the distance between the prongs is small relative to the length the
+  handles collide, increasing their distance would help.
+* More defaults.

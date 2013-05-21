@@ -44,6 +44,8 @@ echo("Approx spring space: ", 2*yb);
 
 sl = 2.5*yb; //Spring length.
 
+rot_guide=true;
+
 //Adds a tube for the spring guide to go through. Probably a bad idea.
 //Incompatible with using the provided plastic spring.
 spring_guide=false;
@@ -84,14 +86,14 @@ module clamp_male_profile()
     {   union()
         {   clamp_base_profile(false);
             translate([hx,0]) difference()
-            {   circle(r); 
+            {   circle(r/1.1); 
                 polygon([[-t/4,0], [t/2,0], [t,r], [-2*r,r]]);
             }
         }
-        translate([hx,0]) 
-        {   circle(t/5);
-            translate([0,t/2]) square([t/3,t],center=true);
-            translate([0,t]) circle(t/6);
+        translate([hx,0]) rotate(45)
+        {   circle(r/4);
+            translate([0,t]) square([r/2,2*t],center=true);
+            translate([0,t]) circle(r/4);
         }
     }
 }
@@ -106,7 +108,7 @@ module clamp_female_profile()
     difference()
     {   union()
         {   clamp_base_profile(true);
-            translate([hx,0]) circle(r+t/3);
+            translate([hx,0]) circle(r+t/2);
         }
         translate([hx,0]) union()
         {   circle(r);
@@ -117,7 +119,7 @@ module clamp_female_profile()
 
 module hring(a)
 {
-    translate([hx,0]) rotate(a) difference()
+    if( rot_guide ) translate([hx,0]) rotate(a) difference()
     {   rotate_extrude() translate([r,h/2]) circle(r/4);
         translate([-2*r,0,-h]) cube([4*r,2*r,3*h]);
     }
@@ -129,7 +131,7 @@ module filament_holes()
 }
 module spring_cone()
 {   if(spring_cone_p) translate([(fb+fd)*l/2,(yb+yd)/2,h/2]) rotate([90,0]) 
-        cylinder(r1=t/2+fil_r,r2=fil_r/2, h=t/2);
+          cylinder(r1=min(h/2,t/2+fil_r),r2=fil_r/2, h=t/2);
 }
 module clamp_female()
 {
@@ -163,7 +165,7 @@ module clamp_male()
 //clamp_base_profile(true);
 module plastic_spring_profile(sw, sl, step,t)
 {   d= step;
-    t = (t<0 ? d/3 : t);
+    t = (t<0 ? 2 : t);
     s1 = [sw,  d+t]/(2*d);
     s2 = [sw-2*t,d-t]/(2*d);
     for( y= [d:2*d:sl+d] ) translate([0,y]) difference()
@@ -180,12 +182,12 @@ module plastic_spring_profile(sw, sl, step,t)
     {   square([sw/2,t]);
         translate([0,-t]) square([t,2*t]);
     }
-    translate([-sw/2,2*d*floor(sl/(2*d))+d+t]) 
+    translate([-sw/2,2*d*floor((d+sl)/(2*d))+3*d/2-t/2]) 
     {   square([sw/2,t]);
         square(t*[1,2]);
     }
 }
-module plastic_spring(sw=sw, sl=sl, step=sw/3,t=-1, h=h)
+module plastic_spring(sw=sw, sl=sl, step=sw/2,t=-1, h=h)
 {
     difference()
     {   linear_extrude(height=h) plastic_spring_profile(sw,sl,step,t,h);
@@ -194,7 +196,7 @@ module plastic_spring(sw=sw, sl=sl, step=sw/3,t=-1, h=h)
     }
 }
 
-module as_print(with_spring=true)
+module as_print(with_spring)
 {   w = 1.2*max(fw,bw);
     if(with_spring) translate([l,w]) rotate(90) plastic_spring();
     clamp_female();
