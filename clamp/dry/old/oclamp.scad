@@ -9,7 +9,7 @@
 
 // Clamp profile and application with 5mm pole system.
 
-$quality=30;//120;
+$quality=30;
 $fs=0.4;
 
 t=4; //Thicknesses.
@@ -64,7 +64,7 @@ module clamp_profile(oz)
         }
         //Pad.
         translate([-t,t+l/6]) 
-            intersection(){ teeth_profile(oz,l/3); square([l,l/3-t],r=t/3); }
+            rotate(10) intersection(){ teeth_profile(oz,l/3); square([l,l/3-t],r=t/3); }
     }
 }
 
@@ -99,21 +99,15 @@ module half_clamp(oz)
             }
             rotate(135) linear_extrude(height=h) peg_profile();
         }
-        translate([0,(h+t)/2-l/2,h/2]) intersection() //Thing to hold the backside together.
-        {   scale([1/3,1,2]) rotate([0,45]) cube([h,h+t,h], center=true);
-            translate([h,0]) cube([2*h,4*h,h], center=true);
-        }
+        translate([0,t/4-l/2]) cube([t/4,h+5*t/4,h]); //Thing to hold the backside together.
     }
 }
 
 module wedge()
 {
-    translate([0,0,h/2]) difference()
-    {   translate([0,t]) intersection()
-        {   cube([h,h+t,h], center=true);
-            cube([h,h+t,h+t/2], center=true, r=t);
-        }
-        scale([1/3.6,2,2]) rotate([0,45]) cube([h,h,h], center=true);
+    linear_extrude(height=h) difference()
+    {   translate([0,1.5*h+t/2]/2) square([t,1.5*h+t/2], center=true);
+        polygon([[+t/4,1.5*h], [-t/4,1.5*h], [-t/6,0], [+t/6,0]]);
     }
 }
 
