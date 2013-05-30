@@ -21,7 +21,7 @@ r= t/3;
 gl=3*w;
 //Guide height
 gh=w;
-gt = t/4;
+gt = w/4;
 twist_a=180;
 //Factor to make it slider better.
 pf=0.8;
@@ -56,7 +56,7 @@ module _pusher(f)
 module on_plank()
 {
     difference()
-    {   linear_extrude(height=w) on_plank_profile();
+    {   linear_extrude(height=w) on_plank_profile(gl=gl,t=t,max_pt=max_pt);
         translate([gl/2,-t,w/2]) rotate([-90,0]) cylinder(r=w/2-gt/4,h=max_pt+t);
     }
     translate([gl/2,t,w/2]) rotate([90,0]) difference()
@@ -64,7 +64,7 @@ module on_plank()
         {   scale([1,1.2]) cylinder(h=gh, r=w/2);
             cube([w,w,2*gh], center=true); 
         }
-        _pusher(1);
+        _pusher(1, w=w,gt=gt,gh=gh);
     }
 }
 
@@ -82,7 +82,6 @@ module plank_push()
     }
 }
 
-
 module as_print()
 {
     on_plank();
@@ -91,6 +90,6 @@ module as_print()
     
 }
 
-as_print();
+//as_print();
 
 //TODO would-be-nice to have as_show.
