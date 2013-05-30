@@ -9,61 +9,87 @@ $fs=0.1;
 
 t=0;
 r = 10;
-f = (r+t)/r;
 n = 6;
 
 l=0;
 da_dl = 5;
-ln = 6;
+ln = n;
 
 pk = 2; //Kind of pole.
 
-module female(t=t,r=r)
-{   intersection()
-    {   sphere(f*r); 
-        translate([0,0,r/3]) cube(f*r*[4,4,sqrt(2)],center=true);
+allow_rotate=false;
+
+module female()
+{   translate([0,0,r/1.3]) difference()
+    {   sphere(r+t); 
+        if( !allow_rotate ) translate([0,0,r*(1+1/1.4)]) cube(r*[2,2,2], center=true);
     }
 }
 
-module section(l=l,t=t,r=r,n=n, w_female=true)
+module male_petals_sub()
+{   for( a = [0:360/n:360] ) rotate(a) //Petals
+         {   translate([r,0,r/1.3]) scale([0.7,1/5,1]) sphere(r); }
+}
+module male()
 {
     difference()
-    {   union()
-        {   cylinder(r=r/2, h = l+2*r);
-            if( l>0 ) //The pole.
-            {   if( pk== 1)
-                {   linear_extrude(height=l+r/2, twist= (l+r/2)*da_dl)
-                        for( a=[0:360/ln:360] ) rotate(a) translate([r/2,0]) circle(r/10);
-                    linear_extrude(height=l+r/2, twist= -(l+r/2)*da_dl) 
-                        for( a=[0:360/ln:360] ) rotate(a) translate([r/2,0]) circle(r/10);
-                    translate([0,0,l-0.4*r]) 
-                        cylinder(r1=r/2, r2=0.65*r, h=r);
-                    translate([0,0,0.5*r]) 
-                        cylinder(r2=r/2, r1=0.65*r, h=r);
-                }
-                if( pk==2 )
-                {   linear_extrude(height= l +r) union()
-                    {   circle(r/6);
-                        for( a = [0:360/n:360] ) rotate(a+180/n) //Petals
-                                                 {   translate([r/2,0]) circle(r/3); }
-                    }
-                }
-            }
-            if( w_female ){ female(t,r); }
-            translate([0,0,l+f*r/sqrt(2)]) 
-            {   cylinder(r1=f*r/sqrt(2), r2=r/5, h=r);
-                translate([0,0,r/2]) sphere(r);
-            }
-        }
-        for( a = [0:360/n:360] ) rotate(a) //Petals
-            {   translate([r,0,l+1.5*r]) scale([0.7,1/5,1]) sphere(r); }
-        translate([0,0,l+5*r]) cube(6*[r,r,r], center=true);
+    {   translate([0,0,r/1.3]) sphere(r);
+        male_petals_sub(r=r,n=n);
+        translate([0,0,r*(1+1/1.4+1/1.3)]) cube(r*[2,2,2], center=true);
     }
 }
 
-module section_set(w,h)
-{
-    for( i=[1:w] ) for( j=[1:h] ) translate(2.5*f*r*[i,j]) section();
+//Pole between two sections.
+module pole()
+{   el = 0.2*r;
+    rl = l+2*el;
+    union() translate([0,0,-el]) if( l>0 ) 
+    {   if( pk== 1)
+        {   linear_extrude(height=rl, twist= (l+r/2)*da_dl)
+                for( a=[0:360/ln:360] ) rotate(a) translate([r/2,0]) circle(r/10);
+            linear_extrude(height=rl, twist= -(l+r/2)*da_dl) 
+                for( a=[0:360/ln:360] ) rotate(a) translate([r/2,0]) circle(r/10);
+            translate([0,0,l-0.4*r]) 
+                cylinder(r1=r/2, r2=0.65*r, h=r);
+            translate([0,0,0.5*r]) 
+                cylinder(r2=r/2, r1=0.65*r, h=r);
+        }
+        if( pk==2 )
+        {   linear_extrude(height= rl) union()
+            {   circle(r/6);
+                for( a = [0:360/ln:360] ) rotate(a+180/ln) //Petals
+                                         {   translate([r/2,0]) circle(r/3); }
+            }
+        }
+    }
+}
+//Male to female section.(For zero infill print)
+module f_m_flex()
+{   union()
+    {   difference()
+        {   pole(l=l, pk=pk, da_dl=da_dl, r=r, ln=ln);
+            translate([0,0,l]) male_petals_sub(r=r,n=n);
+        }
+        translate([0,0,l]) male(r=r,n=n);
+        rotate([180,0]) female(r=r,t=t, allow_rotate=false);
+    }
+}
+//Male male section.(For zero infill print)
+module m_m_flex()
+{   union()
+    {   difference()
+        {   pole(l=l, pk=pk, da_dl=da_dl, r=r, ln=ln);
+            rotate([0,180]) male_petals_sub(r=r,n=n);
+            translate([0,0,l]) male_petals_sub(r=r,n=n);
+        }
+        translate([0,0,l]) male(r=r,n=n);
+        rotate([180,0]) male(r=r,n=n);
+    }
 }
 
-section(30);
+module as_show()
+{   m_m_flex(l=20);
+    
+    translate([+2*r,0]) female();
+    translate([-2*r,0]) male();
+}

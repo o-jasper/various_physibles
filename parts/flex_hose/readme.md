@@ -7,6 +7,7 @@ They're not actually a hose like for water. There are plainly holes in it. I mad
 with the idea that it'd still move but hold a lightweight camera(/other things) in place.
 
 ## Instructions
+(see below for use as openscad)
 These need to printed hollow(zero infill) with no top or bottom layers, with one perimeter
 thickness. With slic3r i used the following:
 
@@ -33,6 +34,33 @@ on it, and finishing it up a bit by using pincers to pinch it a bit while
 still hot. Careful, the hot end might burn you! Ensure you dont have to 
 look at the computer to make it extrude.(for instance in pronterface by typing 
 extrude 2 in the bar and working with it selected, you only hitting return to extrude)
+
+### Reference
+These parameters should work everywhere:
+
+`r=10` is the radius of the buildous bit.
+
+`t=0` is the size difference between the male and female.
+
+`n=6` is the number of petals on the male.
+
+#### Modules
+`female()` is the female end. Substract it somewhere if you want to make a part connect
+using this system. Single-walled PLA females tended to crash, which limits how tight it
+can be. However, if your object is really solid, it probably wont have this problem so 
+soon, to get a good grip you might want to substract it smaller; `female(t=-1)`.
+
+`male()` is the male end.
+
+#### Sections
+Two kinds of sections female to male - `f_m_flex`, and male to male `m_m_flex`.
+
+`l=0` is the length of a section.
+
+`allow_rotate=false;` is whether to put a cap on the female, for the sections,
+this is where the male goes in, if it is on an object.
+
+`ln=6` is the number of sides to that. `pk=2` it the kind chosen. Just the one right now.
 
 # Author
 [Jasper den Ouden](http://www.ojasper.nl/), inspired very much to
