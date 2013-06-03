@@ -10,13 +10,13 @@
 //The size difference between the male and female.
 t=0;
 //Length.
-l = 20;
+l = 40;
 //Length of the top bit.
 lt = 5;
 //Radius.
-R = 5;
+R = 10;
 //Dip.
-d = 0.5;
+d = 1;
 //Number of petals.
 n = 2;
 
@@ -35,14 +35,23 @@ module pill_sub()
 }
 
 module pill_flower()
-{   difference()
+{   
+    difference()
     {   circle(R);
-        for( a=[0:360/n:360] ) rotate(a)union()
-        {   
-            translate([R,0]) rotate(22) 
-            {   square(R*[2.5,1/2], center=true);
-                translate([-1.25*R,0]) circle(R/4, $fn=12);
+        for( a=[0:360/n:360] ) rotate(a) difference()
+        {
+            union()
+            {   
+                translate([R,0]) difference()
+                {   square(R*[1,1/2], center=true);
+                    for( y=R*[1,-1]/4 ) translate([-R/4,y]) 
+                        scale([1,2/3]) circle(R/4, $fn=12);
+                }
+                translate([R/3,0]) square(R*[1/3,1], center=true);
+                for( y=R*[1,-1]/2 ) translate([R/3,y]) circle(R/5, $fn=12);
             }
+            scale([2/3,1]) circle(R/2, $fn=12);
+            scale([7/8,1/3]) circle(R/2, $fn=12);
         }
     }
 }
