@@ -7,12 +7,14 @@
 //  (at your option) any later version.
 //
 
+$fs=0.5;
+
 //The size difference between the male and female.
 t=0;
 //Length.
 l = 40;
 //Length of the top bit.
-lt = 5;
+lt = 3;
 //Radius.
 R = 10;
 //Dip.
@@ -25,10 +27,10 @@ module pill_sub()
     translate([0,0,lt]) difference()
     {   union()
         {   cylinder(r=R-t, h=l-2*lt);
-            scale([1,1,1.5*lt/R]) sphere(R-t);
-            translate([0,0,l-2*lt]) scale([1,1,1.5*lt/R]) sphere(R-t);
+            scale([1,1,2*lt/R]) sphere(R-t);
+            translate([0,0,l-2*lt]) scale([1,1,2*lt/R]) sphere(R-t);
         }
-        rotate_extrude() translate([R+d,l/2-lt]) circle(2*d+t, $fn=12);
+        rotate_extrude() translate([R+d,l/2-lt]) circle(2*d-t, $fn=12);
         translate([0,0,-l-lt]) cube(l*[2,2,2], center=true);
         translate([0,0,2*l-lt]) cube(l*[2,2,2], center=true);
     }
@@ -48,10 +50,10 @@ module pill_flower()
                         scale([1,2/3]) circle(R/4, $fn=12);
                 }
                 translate([R/3,0]) square(R*[1/3,1], center=true);
-                for( y=R*[1,-1]/2 ) translate([R/3,y]) circle(R/5, $fn=12);
+                for( y=R*[1,-1]*0.44 ) translate([0.3*R,y]) circle(R/5);
+                translate(0.15*[R,0]) scale([0.1,0.1]) scale([0.6,1]) circle(R);
             }
-            scale([2/3,1]) circle(R/2, $fn=12);
-            scale([7/8,1/3]) circle(R/2, $fn=12);
+            for( y=R*[1,-1]*0.2 ) translate([0.15*R,y]) scale([1/6,1/4]) circle(R/2, $fn=12);
         }
     }
 }
@@ -64,6 +66,15 @@ module pill()
     }
 }
 
-pill(); 
-//pill_flower();
-translate([3*R,0]) pill_sub(t=0.5);
+module as_show()
+{
+    if( $t>0 ) intersection()
+    {   translate([-3*R,0]) pill(); 
+        translate([0,0,-l+lt*$t]) cube(l*[2,2,2],center=true);
+    }    
+    translate([0,-3*R]) pill(); 
+    pill_flower();
+    translate([3*R,0]) pill_sub(t=0.5);
+}
+
+as_show();
