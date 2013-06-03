@@ -1,16 +1,18 @@
 
 default: scad
 
-scad: output/top_end.stl output/bottom_end.stl
-
-output/solder.stl: solder.scad
-	openscad solder.scad -o output/solder.stl
-
-output/top_end.stl: solder.scad
-	sh ../bin/scad.sh 'use<'`pwd`'/solder.scad>; top_end();' \
-		output/top_end.stl
+scad: output/bottom_end.stl output/ring.stl output/top.stl
 
 output/bottom_end.stl: solder.scad
 	sh ../bin/scad.sh 'use<'`pwd`'/solder.scad>; bottom_end();' \
 		output/bottom_end.stl
+
+output/ring.stl: solder.scad
+	sh ../bin/scad.sh 'use<'`pwd`'/solder.scad>; holding_ring();' \
+		output/ring.stl
+
+output/top.stl: solder.scad
+	sh ../bin/scad.sh 'use<'`pwd`'/solder.scad>; can_top();' \
+	   output/top.stl
+
 

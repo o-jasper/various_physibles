@@ -9,12 +9,15 @@
 
 include<can.scad> //NOTE preview doesnt show can() well.
 
+//$fs=0.1;
+//$fa=3;
+
 sa = 40; //Angle of soldering iron.
 
 //Bottom thickness.
 bt= 14; 
 //Radial thickness.
-rt=2;
+rt=3;
 //Number of times round.
 n= 6;
 //Sizeof pips.
@@ -22,9 +25,9 @@ pr=7;
 //Size of guides.
 sr=1;
 
-can_tty=15; //Top bevel height.
-
 sol = 10;
+
+pt=bt/2; //Plate thickness.
 
 module can_substract()
 {   union()
@@ -60,17 +63,35 @@ module can_end(wire_end=false)
     }
 }
 
+attachment_plate_rounded = false;
 module attachment_plate()
 {
-    difference()
-    {   linear_extrude(height=bt/2) union() for( a = [-60,60] ) rotate(a) difference()
-        {   union()
-            {   translate([-sol,0]) square([2*sol,can_r+rt+sol]);
-                translate([0,can_r+rt+sol]) circle(sol);
+    if( attachment_plate_rounded ) 
+    {   translate([0,0,pt/2]) intersection()
+        {   
+            union() for( a = [-60,60] ) rotate(a) 
+                {   rotate([-90,0]) scale([1,pt/sol]) cylinder(r=sol, h=can_r+rt+sol);
+                    translate([0,can_r+rt+sol]) scale([1,1,pt/sol]) sphere(sol);
+                }
+            difference()
+            {   cube([4*can_r,4*can_r,pt],center=true);
+                can_substract(); //Hole for can.
+                for( a = [-60,60] ) rotate(a) translate([0,can_r+rt+sol,-can_r]) 
+                                        cylinder(r=sol/2,h=3*can_r);
             }
-            translate([0,can_r+rt+sol]) circle(sol/2);
         }
-        can_substract(); //Hole for can.
+    }
+    else
+    {   difference()
+        {   linear_extrude(height=pt) union() for( a = [-60,60] ) rotate(a) difference()
+            {   union()
+                {   translate([-sol,0]) square([2*sol,can_r+rt+sol]);
+                    translate([0,can_r+rt+sol]) circle(sol);
+                }
+                translate([0,can_r+rt+sol]) circle(sol/2);
+            }
+            can_substract(); //Hole for can.
+        }
     }
 }
 
@@ -82,31 +103,143 @@ module bottom_end()
     }
 }
 
-/*module top_end()
-{
-    union()
-    {   can_end();
-        difference()
-        {   translate([0,can_r,bt]) rotate([-sa,0]) translate([0,0,-pr]) difference()
-            {   union()
-                {   cylinder(r=pr, h=3*pr);
-                    translate([0,0,3*pr]) sphere(pr);
-                }
-                translate([0,0,0]) cube([pr,6*pr,9*pr], center=true);
-                for( z=pr*[1.5,2,2] ) translate([-3*pr,0,z]) 
-                                            rotate([0,90,0]) cylinder(r=sr,h=6*pr);
-                translate([-3*pr,0,3*pr])
-                    rotate([0,90,0]) cylinder(r=pr/2,h=6*pr);
-            }
-            can();
-        }
-    }
-} */
-//top_end();
-bottom_end();
+//bottom_end();
 
-sbh = 3;
+sbh = 3; //Stang bottom height.
+
+module stand_profile(s)
+{
+    R=sol+rt;
+    bw= 2*(can_r+rt+sol)*sin(60)+2*R;
+    bl= can_h*cos(sa)*0.35;
+    union()
+    {   translate([-bw/2+s,s]) square([bw-2*s,bl-2*s]);
+        translate([R-bw/2+s,-R+s]) square([bw-2*R-2*s,bl-2*s]);
+        translate([0,bl]) circle(bw/2-s);
+        for(pos= [[R-bw/2,0], [bw/2-R,0]]) translate(pos) circle(R-s);
+    }
+}
 
 module stand()
 {
+    R=sol+rt;
+    bw= 2*(can_r+rt+sol)*sin(60)+2*R;
+    bl= can_h*cos(sa)*0.35;
+    union()
+    {   translate([0,0,sol*cos(sa)])
+            rotate([-sa,0,0]) translate([0,-(can_r+rt+sol)*cos(60)]) 
+            for( a = [30,150] ) rotate(a) translate([can_r+rt+sol,0])
+                                {   cylinder(r=sol/2, h= 2*pt);
+                                    sphere(sol/2);
+                                    translate([0,0,2*pt]) sphere(sol/2);
+                                }
+        intersection() //Beam up to can.
+        {   rotate([0,90]) rotate_extrude() translate([bl+bw/2-sol/2,0]) 
+                scale([1/2,2]) circle(sol);
+            translate([-bw,0]) cube((bl+bw)*[4,4,4]);
+            difference() 
+            {   rotate([-sa,0]) translate([-bw,0]) cube((bl+bw)*[4,4,4]);
+                translate([0,0,sol*cos(sa)]) rotate([-sa,0]) 
+                    translate([0,-(can_r+rt+sol)*cos(60)]) 
+                {   cylinder(r=can_r+sol,h=can_h); //Minus holding ring.
+                    translate([0,0,can_h/2]) cube([sol,2*can_r+4*sol,can_h],center=true);
+                    for(x=[-sol,-1.5*sol,sol,1.5*sol]) //Wire holes.
+                        translate([x,can_r+sol+sr]) cylinder(r=sr,h=can_h);
+                }
+            }
+        }
+        difference()
+        {   linear_extrude(height=1.5*sol) stand_profile(0);
+            //Hollow for putting stuff in.
+            translate([0,0,sbh]) linear_extrude(height=2*sol) difference() 
+            {   stand_profile(rt);
+                for(pos= [[R-bw/2,0], [bw/2-R,0]]) translate(pos) scale([1,2]) circle(R);
+            }
+            translate([0,0,sol*cos(sa)]) //Space for bottom_end
+                rotate([-sa,0,0]) translate([0,-(can_r+rt+sol)*cos(60)]) 
+                for( a = [30,150] ) rotate(a)  
+                    linear_extrude(height=can_r)
+                    {   translate([can_r+rt+sol,0]) circle(sol);
+                        square(2*[can_r+rt+sol,sol], center=true);
+                    }
+        }        
+    }
 }
+module holding_ring()
+{
+    h=1.2*sol;
+    difference()
+    {   union()
+        {   linear_extrude(height=h) difference()
+            {   union()
+                {   intersection()
+                    {   circle(can_r+sol);
+                        translate([0,can_r]) square([4*sol,2*can_r],center=true);
+                    }
+                    intersection() //Clamping bit.
+                    {   circle(can_r+2*sol);
+                        translate([0,2*can_r]) square([sol,4*can_r],center=true);
+                    }
+                }
+                
+            }
+            linear_extrude(height=h-sol) intersection() //Tab underneath
+            {   circle(can_r+2*sol);
+                difference()
+                {   translate([0,2*can_r]) square([4*sol,4*can_r],center=true);
+                    for(x=[-sol,-1.5*sol,sol,1.5*sol]) //Wire holes.
+                        translate([x,can_r+sol+sr]) circle(sr);
+                }
+            }
+                
+            intersection()
+            {   cylinder(r=can_r+sol/2,h=h);
+                translate([0,0,sol/2]) scale([1,1,1.5*h/(can_r+sol/2)]) sphere(can_r+sol/2);
+            }
+            translate([0,can_r-sol/2]) intersection()
+            {   scale([2,1.2,6]) sphere(sol);
+                translate([0,0,can_h]) cube(can_h*[2,2,2],center=true);
+            }
+        }
+        translate([0,0,-can_r]) cylinder(r=can_r,h=3*can_r);
+        translate([0,can_r]) cube([sol/2,2*can_r,4*can_r],center=true);
+        for( a=[0:30:360] ) rotate(a) //All the holes for wires.
+           translate([-4*can_r,can_r/3,h/2]) rotate([0,90,0]) cylinder(r=sr,h=8*can_r);
+    }
+
+}
+
+can_t_ir = can_r-can_tx-3;
+can_t_iir = can_t_ir-2;
+can_t_h=4;
+mid_hole_r=2*can_t_ir/3;
+mid_hole_t=3;
+module can_top()
+{
+    union()
+    {   difference()
+        {   cylinder(r=can_t_ir, h=can_t_h);
+            translate([0,0,can_t_h/2]) cylinder(r1=can_t_iir, r2=can_t_ir, h=can_t_h/2);
+            cylinder(r=mid_hole_r,h=2*can_t_h);
+        }
+        difference()
+        {   cylinder(r1=mid_hole_r+mid_hole_t,r2=mid_hole_r+1.5*mid_hole_t,h=2*can_t_h);
+            cylinder(r=mid_hole_r,h=2*can_t_h);
+        }
+    }
+}
+can_top();
+
+module as_assembled()
+{
+    stand();
+    translate([0,0,sol*cos(sa)]) rotate([-sa,0]) translate([0,-(can_r+rt+sol)*cos(60)]) 
+    {   color([0,0,1]) bottom_end();
+        color([1,0,0]) can();
+        translate([0,0,can_h+can_t_h]) color([0,0,1]) rotate([180,0]) can_top();
+        color([0,0,1]) translate([0,0,can_h/2-sol/2]) holding_ring();
+    }
+}
+//as_assembled();
+
+//holding_ring();
