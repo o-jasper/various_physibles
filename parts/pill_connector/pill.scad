@@ -11,12 +11,12 @@ $fs=0.5;
 
 //The size difference between the male and female.
 t=0;
-//Length.
-l = 40;
-//Length of the top bit.
-lt = 3;
 //Radius.
-R = 10;
+R = 7;
+//Length.
+l = 4*R;
+//Length of the top bit.
+lt = 0.3*R;
 //Dip.
 d = 1;
 //Number of petals.
