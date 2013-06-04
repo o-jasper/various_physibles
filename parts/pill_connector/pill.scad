@@ -30,7 +30,7 @@ module pill_sub()
             scale([1,1,2*lt/R]) sphere(R-t);
             translate([0,0,l-2*lt]) scale([1,1,2*lt/R]) sphere(R-t);
         }
-        rotate_extrude() translate([R+d,l/2-lt]) circle(2*d-t, $fn=12);
+        rotate_extrude() translate([R+d,l/2-lt]) circle(2*d+t/2, $fn=12);
         translate([0,0,-l-lt]) cube(l*[2,2,2], center=true);
         translate([0,0,2*l-lt]) cube(l*[2,2,2], center=true);
     }
@@ -45,15 +45,14 @@ module pill_flower()
             union()
             {   
                 translate([R,0]) difference()
-                {   square(R*[1,1/2], center=true);
-                    for( y=R*[1,-1]/4 ) translate([-R/4,y]) 
-                        scale([1,2/3]) circle(R/4, $fn=12);
+                {   square(R*[1.2,1/2], center=true);
+                    for( y=0.3*R*[1,-1] ) translate([-0.3*R,y]) 
+                        scale([1,2/3]) circle(0.3*R, $fn=12);
                 }
-                translate([R/3,0]) square(R*[1/3,1], center=true);
-                for( y=R*[1,-1]*0.44 ) translate([0.3*R,y]) circle(R/5);
-                translate(0.15*[R,0]) scale([0.1,0.1]) scale([0.6,1]) circle(R);
+                translate([0.3*R,0]) square(R*[1/4,1], center=true);
+                for( y=R*[1,-1]*0.45 ) translate([0.25*R,y]) scale([1,1.2]) circle(0.15*R);
             }
-            for( y=R*[1,-1]*0.2 ) translate([0.15*R,y]) scale([1/6,1/4]) circle(R/2, $fn=12);
+            translate(0.15*[R,0]) circle(0.2*R);
         }
     }
 }

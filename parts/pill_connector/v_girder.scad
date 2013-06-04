@@ -12,7 +12,7 @@ use<pill.scad>
 //$fs=0.5;
 
 r=2.4;
-w=20;
+w=4*7;
 
 module v_profile()
 {
@@ -33,7 +33,7 @@ module v_profile()
 }
 
 l=40;
-t=1;
+t=0.5;
 module pill_v_beam()
 {   s=w/sqrt(2)-r;
     rotate([-90,0,0]) difference()
@@ -55,8 +55,12 @@ module pill_v_beam()
     }
 }
 
+module as_show()
+{
+    pill_v_beam(l=35);
+    translate([0,10,0]) rotate([-90,0,0]) pill();
+}
 //pill_sub(t=t);
 
 //linear_extrude(height=20) v_profile();
-
-pill_v_beam(l=24);
+as_show();
