@@ -18,7 +18,9 @@ The beams are not intended to hold an angle by themselves. They're mostly an
 illustration on how to use them at the moment.
 
 ## Discussion
-It is inspired on my earlier `flex_hose`. As opposed to that, it
+It is inspired on my earlier 
+[flex_hose](http://www.fabfabbers.com/models/id/134/flex-hose-by-o-jasper). 
+As opposed to that, it
 rotates one way as to eliminate it popping out after rotating beyond the
 allowed range. Use two in sequence for more motion and two in parallel
 to hold something.
