@@ -6,7 +6,16 @@ in, and then pop the other part on that.
 
 This entry contains the pill and `pill_sub` as development aid.
 
-The beams are not intended to hold an angle by themselves.(anymore, see below)
+## Instructions
+The pills need to be printed with zero infill, zero bottom and top layers,
+and one perimeter.(at ~0.5mm, if you lay out a particularly small perimeter,
+you may want more)
+
+Pills are used on designs by substracting `pill_sub` halfway at places on 
+the two parts in such a way they line up the way you want them.
+
+The beams are not intended to hold an angle by themselves. They're mostly an
+illustration on how to use them at the moment.
 
 ## Discussion
 It is inspired on my earlier `flex_hose`. As opposed to that, it
