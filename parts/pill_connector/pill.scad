@@ -18,7 +18,7 @@ l = 4*R;
 //Length of the top bit.
 lt = 0.3*R;
 //Dip.
-d = 1;
+d = 0.5;
 //Number of petals.
 n = 2;
 

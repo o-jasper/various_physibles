@@ -33,10 +33,10 @@ module v_profile()
 }
 
 l=40;
-t=0.5;
+t=1;
 module pill_v_beam()
 {   s=w/sqrt(2)-r;
-    rotate([-90,0,0]) difference()
+    rotate([90,0,0]) difference()
     {   intersection()
         {   union()
             {   translate([0,-w/4,s-r]) rotate([0,90,0]) linear_extrude(height=l) 
@@ -46,9 +46,10 @@ module pill_v_beam()
             }
             translate([l/2,0,w/2]) cube([2*l,4*w/7,w], center=true);
         }
+        //Space for receiving v-beam and pill space.
         translate([0,0,-t]) pill_sub(t=t);
-        translate([0,0,w/2]) scale([1,20,1]) cylinder(r1=w/3,r2=2*w/3,h=w/2);
-        translate([l,0]) 
+        translate([0,0,w/2+t]) scale([1,20,1]) cylinder(r1=w/3,r2=2*w/3,h=w/2);
+        translate([l,0,-t]) 
         {   translate([0,0,t]) pill_sub(t=t);
             scale([1,20,1]) cylinder(r2=w/3,r1=2*w/3,h=w/2);
         }
