@@ -37,7 +37,7 @@ I tried to design the walls inside to take a path maximizing how far it can
 decrease in size and still have a decent force to expand itself, while not
 having the walls attach to each other too much during print. Since i want 
 to have the ring in the middle, and round the top and bottom the distance to the 
-outer wallsis more important than distances between inner walls.
+outer walls is more important than distances between inner walls.
 
 Formalizing these requirements more, i reckon this might be something to try
 optimize using a computer.
@@ -47,3 +47,6 @@ Jasper den Ouden, licensed under the GPLv3
 
 Place of development is currently
 [github](https://github.com/o-jasper/various_physibles).
+
+Released on [thingiverse](http://www.thingiverse.com/thing:98953) and
+[fabfabbers](http://www.fabfabbers.com/models/id/168/pill-connector-by-o-jasper).
