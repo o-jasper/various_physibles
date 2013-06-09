@@ -7,9 +7,14 @@
 //  (at your option) any later version.
 //
 
+//NOTE: probably not robust against size changes; in particular with regards to
+// the gear space.(Control gx,gz and  perhaps gear_thickness, and cone_distance.)
+
 use<parametric_involute_gear_v5.0.scad>
 
 include <nut.scad>
+
+$fs=0.6;
 
 //Radius of screw space. (oversized! Smaller things fit in to make it work better.
 r = 5;
@@ -24,7 +29,7 @@ module base_holder()
 {   difference()
     {
         linear_extrude(height=h) intersection()
-        {   square(2*[10*or,or+nh], center=true);
+        {   square(2*[10*or,or+nh+t], center=true);
             difference()
             {   union()
                 {   scale([1,1.6]) circle(or);
@@ -48,7 +53,8 @@ module bit_part()
 {   difference()
     {   union()
         {   bevel_gear(face_width=bgt, number_of_teeth=6, bore_diameter=2*r);
-            base_holder(h=bh);
+            translate([0,0,bgt]) base_holder(h=4*nt);
+            translate([0,0,bgt+4*nt]) cylinder(r=r+t, h=bh-(bgt+4*nt));
             translate([0,0,bh]) cylinder(r=r+t/2, h=or);
         }
         cylinder(r=r+t,h=t);
@@ -58,109 +64,147 @@ module bit_part()
 l=70;
 hl=l;
 
-n=20;
+n=16;
 oy= 15*n/6-3*t;
 
 module loose_gear()
 {
-    rotate([180,0]) bevel_gear(face_width=2*t, number_of_teeth=n, bore_diameter=2*t);
-    
+    rotate([180,0]) bevel_gear(face_width=2*t, number_of_teeth=n, bore_diameter=3*t+et);    
     difference() 
-    {   linear_extrude(height=4*t) union()
-        {   circle(2.5*t);
-            translate([0,oy/2]) square([2*t,oy],center=true);
+    {   union()
+        {   cylinder(r=2.5*t, h=2*t);
+            rotate([-90,0]) cylinder(r=1.8*t, h=oy);
+            for( a=[60,-60] ) rotate(a) 
+            {   rotate([90,0]) cylinder(r1=2*t, r2=t,h=oy-t);
+                translate([0,-oy+t]) scale([1,1.5,1]) sphere(t);
+            }
         }
         translate([8*t,0,3*t]) rotate([0,-90,0]) cylinder(r=sr, h=16*t);
-        cylinder(r=1.5*t,h=8*t);
+        translate([0,0,-4*t]) cylinder(r=1.5*t,h=9*t);
     }
-    translate([0,oy]) difference()
+    translate([0,oy]) difference() //Handle
     {   union()
         {   cylinder(r=2*t,h=hl-t);
             translate([0,0,hl-3*t]) cylinder(r1=2*t,r2=3*t,h=2*t); 
             translate([0,0,hl-t]) cylinder(r1=3*t,r2=1.1*t,h=t); 
         }
+        cylinder(r=t,h=hl-2*t);
         translate([0,0,hl]) sphere(t);
     }
 }
 
-//translate([l,0]) loose_gear();
+module gear_nob()
+{
+    difference()
+    {   union()
+        {   cylinder(r=2.5*t,h=3*t);
+            translate([0,0,3*t]) scale([1,1,0.2]) sphere(2.5*t);
+        }
+        cylinder(r=1.5*t+et/2,h=9*t);
+        translate([-l,0,1.5*t]) rotate([0,90]) 
+        {   cylinder(r=sr,h=2*l);
+        }
+    }
+}
 
-translate([l,0]) bit_part();
 l=max(bh+or+6*t, 70);
 
 et=0.5;
 
-oy2= 15*11/6-3*t;
+oy2= 15*11/6-1.1*t;
 
-//Space for toggle system that blocks rotation.
-module toggle_space()
-{   
-    linear_extrude(height=2*t) union()
-    {   translate([-oy-t,0]) square([2*(oy+t+et),2*t+et],center=true);
-        translate([-or,0]) circle(2*t+et);
-        translate([0]) circle(2*t+et);
-    }
-    translate([-oy/2,0,-4*t]) cube([oy/2,t+et,8*t+et],center=true);
-}
+hl=60;
 
-module toggle()
-{   
-    union()
-    {   translate([-or,0]) linear_extrude(height=2*t)
-        {   intersection()
-            {   translate([-oy/2,0]) square([oy,2*t],center=true);
-                translate([or,0]) circle(3*or+r+t);
-            }
-            translate([0]) circle(2*t);
-        }
-        translate([0,0,-8*t]) linear_extrude(height=5*t) difference()
-        {   translate([-or,0]) circle(3.5*t);
-            scale([1,1.6]) circle(or);
-            square([3*or,2*t],center=true);
-            translate([or,0]) circle(oy2+t);
-        }
-        
-        translate([-oy/4+t-or,0,-4*t]) cube([2*t,t,8*t],center=true);
-    }
-}
-
+gx = 2*r+3*t;
+gz = bh+2*et+7*t;
 
 module body()
 {
-    //bh+or
+    intersection() 
+    {   difference()
+        {  
+            union()
+            {   linear_extrude(height=l) intersection()
+                {   scale([(oy2+4*t)/or,1]) circle(or);
+                    translate([-3*or,0]) circle(3*or+r+t);
+                }
+            }
+            translate([0,0,2*t]) difference() //Space for gear and bit-associated.
+            {   cylinder(r=oy2+t/2, h=bh+2*et);
+                cylinder(r=r+t,h=t-et);
+            }
+            difference() //Round that bit properly.
+            {   translate([l,0]) cube([2*l,2*l,8*t],center=true);
+                cylinder(r=r+t,h=8*t);
+            }
+            cylinder(r=r,h=h+2*t); //Drill bit hole.
+            translate([0,0,bh+or+2*t]) cylinder(r=r+t/2+et,h=2*t+3*et); //Top fitting
+        }
+        //Cut of edge.
+        cylinder(r=oy2+3*t,h=l);
+        translate([0,l]) rotate([90,0,0]) scale([0.8,1]) cylinder(r=l,h=3*l);
+    }
+    translate([-oy2-t,0]) intersection()
+    {   translate([0,0,0.7*(r+t)]) union() 
+        {   rotate([0,-90,0]) scale([1,0.6]) cylinder(r=r+t, h=hl-r-t);
+            translate([-hl+r+t,0]) scale([0.9,0.8,1.2]) sphere(r+t);
+        }
+        translate([0,0,l]) cube(l*[2,2,2],center=true);
+    }
     difference()
-    {  
-        union()
-        {   linear_extrude(height=l) intersection()
-            {   scale([(oy2+4*t)/or,1]) circle(or);
-                translate([-3*or,0]) circle(3*or+r+t);
-            }
-            translate([0,0,oy+6*t]) rotate([0,90,0]) 
-            {   cylinder(r=1.5*t,h=r+5*t);
-                cylinder(r=or,h=r+t);
-            }
+    {   translate([0,0,gz]) rotate([0,90,0])  //Gear goes on this
+        {   cylinder(r=1.5*t,h=gx+5*t);
+            cylinder(r=or,h=gx);
         }
-        translate([0,0,2*t]) difference() //Space for gear and bit-associated.
-        {   cylinder(r=oy2+t, h=bh+or+2*et);
-            cylinder(r=r+t,h=t-et);
-        }
-        difference() //Round that bit properly.
-        {   translate([l,0]) cube([2*l,2*l,8*t],center=true);
-            cylinder(r=r+t,h=8*t);
-        }
-        cylinder(r=r,h=h+2*t); //Drill bit hole.
-        translate([0,0,bh+or+2*t]) cylinder(r=r+t/2+et,h=2*t+3*et); //Top fitting
-        translate([0,0,bh+or+5*t+et]) toggle_space();
+        translate([gx+3.5*t,0]) cylinder(r=sr,h=9*l);
     }
 }
 
 //body();
 //translate([0,3*or]) toggle();
 
-module as_assembled() //TODO
+module as_assembled()
 {
     body();
-    color([0,0,1]) translate([0,0,bh+or+5*t+et]) toggle();
+    translate([0,0,2*t+et]) rotate(90+60*$t) color([0,0,1]) bit_part();
+    translate([gx+et+9*t,0,gz]) rotate([0,90,0]) rotate(360*$t/16) color([0,0,1]) loose_gear();
+    translate([gx+2*et+11*t,0,gz]) rotate([0,90,0]) color([1,0,0]) gear_nob();
 }
 
-as_assembled();
+//as_assembled();
+
+module body_cutter(sub)
+{   union()
+    {   difference()
+        {   translate([0,0,bh+2*(t+et)]) cylinder(r=l,h=l);
+            translate([-oy2-t,0]) cube(2*[t,t,l],center=true);
+            if( sub )
+            {   translate([0,0,bh+2*et-t]) rotate([0,-45,0]) cylinder(r=sr,h=l);
+                translate([0,0,bh+2*et-3*t]) rotate([0,-45,0]) cylinder(r=sr,h=l);
+                translate([-4*t,0,bh+2*(et+t)]) cube([2*t,2*sr,2*t],center=true);
+            }
+        }
+        if( !sub )
+        {   translate([0,0,bh+2*et-t]) rotate([0,-45,0]) cylinder(r=sr,h=l);
+            translate([0,0,bh+2*et-3*t]) rotate([0,-45,0]) cylinder(r=sr,h=l);
+            translate([-oy2-1.8*t,0,bh+2*(t+et)+4*t]) cylinder(r=sr,h=l);
+        }
+    }
+}
+module upper_body() //TODO how to make this easily printable?
+{   intersection()
+    {   body();
+        body_cutter(true);
+    }
+}
+module lower_body()
+{   difference()
+    {   body();
+        body_cutter(false);
+    }
+}
+//upper_body();
+
+//as_assembled();
+//bit_part();
+loose_gear();
