@@ -78,6 +78,10 @@ module loose_gear()
             {   rotate([90,0]) cylinder(r1=2*t, r2=t,h=oy-t);
                 translate([0,-oy+t]) scale([1,1.5,1]) sphere(t);
             }
+            for( a=[-120,120,0] ) rotate(a) 
+            {   rotate([90,0]) cylinder(r1=1.5*t, r2=t/2,h=0.65*(oy-t));
+                translate([0,-0.65*(oy-t)]) scale([1,1.5,1]) sphere(t/2);
+            }
         }
         translate([8*t,0,3*t]) rotate([0,-90,0]) cylinder(r=sr, h=16*t);
         translate([0,0,-4*t]) cylinder(r=1.5*t,h=9*t);
@@ -167,8 +171,9 @@ module as_assembled()
 {
     body();
     translate([0,0,2*t+et]) rotate(90+60*$t) color([0,0,1]) bit_part();
-    translate([gx+et+9*t,0,gz]) rotate([0,90,0]) rotate(360*$t/16) color([0,0,1]) loose_gear();
-    translate([gx+2*et+11*t,0,gz]) rotate([0,90,0]) color([1,0,0]) gear_nob();
+    translate([gx+et+2.2*t,0,gz]) 
+        rotate([0,90,0]) rotate(360*$t/16) color([0,0,1]) loose_gear();
+    translate([gx+2*et+4.2*t,0,gz]) rotate([0,90,0]) color([1,0,0]) gear_nob();
 }
 
 //as_assembled();
@@ -205,6 +210,6 @@ module lower_body()
 }
 //upper_body();
 
-//as_assembled();
+as_assembled();
 //bit_part();
-loose_gear();
+//loose_gear();
