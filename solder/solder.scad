@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 25-05-2013 Jasper den Ouden.
+//  Copyright (C) 03-06-2013 Jasper den Ouden.
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -9,7 +9,7 @@
 
 include<can.scad> //NOTE preview doesnt show can() well.
 
-//$fs=0.1;
+$fs=0.1;
 //$fa=3;
 
 sa = 40; //Angle of soldering iron.
@@ -120,6 +120,9 @@ module stand_profile(s)
     }
 }
 
+//Optional holes in bottom to use screws to hold it down.(negative to disable.)
+bottom_sr = -2;
+
 module stand()
 {
     R=sol+rt;
@@ -149,7 +152,15 @@ module stand()
             }
         }
         difference()
-        {   linear_extrude(height=1.5*sol) stand_profile(0);
+        {   linear_extrude(height=1.5*sol) difference()
+            {   stand_profile(0);
+                if( bottom_sr>0 )
+                {   for(x= (bw/2-2*R-2*bottom_sr)*[1,0,-1]) 
+                        translate([x,0]) circle(bottom_sr);
+                    for(x= bw*[1/4,-1/4]) translate([x,(bl+sqrt(bl*bl-x*x))])
+                                            circle(bottom_sr);
+                }
+            }
             //Hollow for putting stuff in.
             translate([0,0,sbh]) linear_extrude(height=2*sol) difference() 
             {   stand_profile(rt);
@@ -162,7 +173,7 @@ module stand()
                     {   translate([can_r+rt+sol,0]) circle(sol);
                         square(2*[can_r+rt+sol,sol], center=true);
                     }
-        }        
+        }
     }
 }
 module holding_ring()
@@ -209,26 +220,32 @@ module holding_ring()
 
 }
 
-can_t_ir = can_r-can_tx-3;
-can_t_iir = can_t_ir-2;
+can_t_ir = 24;
+can_t_iir = can_t_ir-3;
 can_t_h=4;
 mid_hole_r=2*can_t_ir/3;
 mid_hole_t=3;
 module can_top()
 {
-    union()
-    {   difference()
-        {   cylinder(r=can_t_ir, h=can_t_h);
-            translate([0,0,can_t_h/2]) cylinder(r1=can_t_iir, r2=can_t_ir, h=can_t_h/2);
-            cylinder(r=mid_hole_r,h=2*can_t_h);
+    t = can_t_h/4;
+    difference()
+    {   union()
+        {   difference()
+            {   cylinder(r=can_t_ir, h=can_t_h);
+                translate([0,0,can_t_h/2]) cylinder(r1=can_t_iir, r2=can_t_ir, h=can_t_h/2);
+            }
+            difference()
+            {   union()
+                {   cylinder(r1=mid_hole_r+mid_hole_t,r2= can_t_ir,h=3*can_t_h);
+                    translate([0,0,3*can_t_h]) cylinder(r2=mid_hole_r+mid_hole_t,r1= can_t_ir,h=can_t_h);
+                }
+                translate([0,0,2*can_t_h]) cylinder(r1=mid_hole_r,r2=mid_hole_r+mid_hole_t/2, h=2*can_t_h);
+            }
         }
-        difference()
-        {   cylinder(r1=mid_hole_r+mid_hole_t,r2=mid_hole_r+1.5*mid_hole_t,h=2*can_t_h);
-            cylinder(r=mid_hole_r,h=2*can_t_h);
-        }
+        cylinder(r=mid_hole_r,h=10*can_t_h);
+        cylinder(r1=mid_hole_r+2*t,r2=mid_hole_r,h=can_t_h/2);
     }
 }
-can_top();
 
 module as_assembled()
 {
@@ -240,6 +257,10 @@ module as_assembled()
         color([0,0,1]) translate([0,0,can_h/2-sol/2]) holding_ring();
     }
 }
-//as_assembled();
+//can_top();
+
+as_assembled();
+
+//stand();
 
 //holding_ring();
