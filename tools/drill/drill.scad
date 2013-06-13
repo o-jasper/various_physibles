@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 08-06-2013 Jasper den Ouden.
+//  Copyright (C) 09-06-2013 Jasper den Ouden.
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -14,10 +14,12 @@ use<parametric_involute_gear_v5.0.scad>
 
 include <nut.scad>
 
+et=0.25;
+
 $fs=0.6;
 
 //Radius of screw space. (oversized! Smaller things fit in to make it work better.
-r = 5;
+r = 4;
 //Thicknesses.
 t = 3;
 //Bit length.
@@ -25,39 +27,27 @@ h = 35;
 
 or=r+t;
 
-module base_holder()
-{   difference()
-    {
-        linear_extrude(height=h) intersection()
-        {   square(2*[10*or,or+nh+t], center=true);
-            difference()
-            {   union()
-                {   scale([1,1.6]) circle(or);
-                    square([3*or,2*t],center=true);
-                }
-                circle(r);
-            }
-        }
-        for(a = [0,180] ) rotate(a) translate([0,r+2*nh,nt]) rotate([90,0,0]) 
-        {   linear_extrude(height=nh) nut_and_length(h);
-            for(y=[nh:3*nh:h-nh]) translate([0,y,-h]) cylinder(r=sr,h=2*h);
-        }
-    }
-}
-
 bgt=max(3*t,or/2);
 
 bh=max(h,bgt + 2*nt+t); //Bit height
 
 module bit_part()
-{   difference()
+{   
+    nhl = r+nh;
+    difference()
     {   union()
         {   bevel_gear(face_width=bgt, number_of_teeth=6, bore_diameter=2*r);
-            translate([0,0,bgt]) base_holder(h=4*nt);
-            translate([0,0,bgt+4*nt]) cylinder(r=r+t, h=bh-(bgt+4*nt));
             translate([0,0,bh]) cylinder(r=r+t/2, h=or);
+            intersection()
+            {   translate([0,0,bgt]) scale([1,1.1]) cylinder(r=r+1.5*t, h=bh-bgt);
+                cube(2*[r+1.5*t,r+1.5*t,3*l], center=true);
+            }
         }
-        cylinder(r=r+t,h=t);
+        translate([0,nhl,bgt+nt/2]) rotate([90,0]) 
+            linear_extrude(height=2*nhl) nut_profile();
+        translate([0,2*l,bgt+nt/2]) rotate([90,0]) cylinder(r=sr, h=4*l);
+        cylinder(r=r+t,h=t+et/2);
+        cylinder(r=r, h=bh);
         translate([0,0,bh]) cylinder(r1=r,r2=r/2, h=or/2);
     }
 }
@@ -101,11 +91,11 @@ module gear_nob()
 {
     difference()
     {   union()
-        {   cylinder(r=2.5*t,h=3*t);
-            translate([0,0,3*t]) scale([1,1,0.2]) sphere(2.5*t);
+        {   cylinder(r=2.5*t,h=2*t);
+            translate([0,0,2*t]) scale([1,1,0.2]) sphere(2.5*t);
         }
         cylinder(r=1.5*t+et/2,h=9*t);
-        translate([-l,0,1.5*t]) rotate([0,90]) 
+        translate([-l,0,t]) rotate([0,90]) 
         {   cylinder(r=sr,h=2*l);
         }
     }
@@ -113,13 +103,11 @@ module gear_nob()
 
 l=max(bh+or+6*t, 70);
 
-et=0.5;
-
 oy2= 15*11/6-1.1*t;
 
 hl=60;
 
-gx = 2*r+3*t;
+gx = 2*r+1*t;
 gz = bh+2*et+7*t;
 
 module body()
@@ -142,7 +130,8 @@ module body()
                 cylinder(r=r+t,h=8*t);
             }
             cylinder(r=r,h=h+2*t); //Drill bit hole.
-            translate([0,0,bh+or+2*t]) cylinder(r=r+t/2+et,h=2*t+3*et); //Top fitting
+            //Top of bit_part fits in here.
+            translate([0,0,bh+or+2*t]) cylinder(r=r+t/2+et,h=2*t+3*et); 
         }
         //Cut of edge.
         cylinder(r=oy2+3*t,h=l);
@@ -157,10 +146,10 @@ module body()
     }
     difference()
     {   translate([0,0,gz]) rotate([0,90,0])  //Gear goes on this
-        {   cylinder(r=1.5*t,h=gx+5*t);
+        {   cylinder(r=1.5*t,h=gx+7*t);
             cylinder(r=or,h=gx);
         }
-        translate([gx+3.5*t,0]) cylinder(r=sr,h=9*l);
+        translate([gx+5.5*t,0]) cylinder(r=sr,h=9*l);
     }
 }
 
@@ -171,9 +160,9 @@ module as_assembled()
 {
     body();
     translate([0,0,2*t+et]) rotate(90+60*$t) color([0,0,1]) bit_part();
-    translate([gx+et+2.2*t,0,gz]) 
+    translate([gx+et+2*t,0,gz]) 
         rotate([0,90,0]) rotate(360*$t/16) color([0,0,1]) loose_gear();
-    translate([gx+2*et+4.2*t,0,gz]) rotate([0,90,0]) color([1,0,0]) gear_nob();
+    translate([gx+2*et+4*t,0,gz]) rotate([0,90,0]) color([1,0,0]) gear_nob();
 }
 
 //as_assembled();
@@ -182,17 +171,17 @@ module body_cutter(sub)
 {   union()
     {   difference()
         {   translate([0,0,bh+2*(t+et)]) cylinder(r=l,h=l);
-            translate([-oy2-t,0]) cube(2*[t,t,l],center=true);
+            translate([-oy2-t,0]) cube([2*t,t,2*l],center=true);
             if( sub )
-            {   translate([0,0,bh+2*et-t]) rotate([0,-45,0]) cylinder(r=sr,h=l);
-                translate([0,0,bh+2*et-3*t]) rotate([0,-45,0]) cylinder(r=sr,h=l);
-                translate([-4*t,0,bh+2*(et+t)]) cube([2*t,2*sr,2*t],center=true);
+            {   translate([0,0,bh+2*et-t]) rotate([0,-45,0]) cylinder(r=sr/2,h=l);
+                translate([0,0,bh+2*et-3*t]) rotate([0,-45,0]) cylinder(r=sr/2,h=l);
+                translate([-4*t,0,bh+2*(et+t)]) cube([2*t,sr,2*t],center=true);
             }
         }
         if( !sub )
-        {   translate([0,0,bh+2*et-t]) rotate([0,-45,0]) cylinder(r=sr,h=l);
-            translate([0,0,bh+2*et-3*t]) rotate([0,-45,0]) cylinder(r=sr,h=l);
-            translate([-oy2-1.8*t,0,bh+2*(t+et)+4*t]) cylinder(r=sr,h=l);
+        {   translate([0,0,bh+2*et-t]) rotate([0,-45,0]) cylinder(r=sr/2,h=l);
+            translate([0,0,bh+2*et-3*t]) rotate([0,-45,0]) cylinder(r=sr/2,h=l);
+            translate([-oy2-1.8*t,0,bh+2*(t+et)+4*t]) cylinder(r=sr/2,h=l);
         }
     }
 }
@@ -208,8 +197,11 @@ module lower_body()
         body_cutter(false);
     }
 }
-//upper_body();
+//rotate([0,-90]) upper_body();
+//lower_body();
+body();
 
-as_assembled();
+translate([-oy,0]) cylinder(r=2*t,h=h+5*t);
+//as_assembled();
 //bit_part();
 //loose_gear();
