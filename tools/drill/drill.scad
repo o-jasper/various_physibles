@@ -199,9 +199,55 @@ module lower_body()
 }
 //rotate([0,-90]) upper_body();
 //lower_body();
-body();
+//body();
 
-translate([-oy,0]) cylinder(r=2*t,h=h+5*t);
+module spine()
+{   difference()
+    {   translate([-oy,0]) scale([2,1.4,1])
+        {   cylinder(r=2*t,h=h+5*t);
+            translate([0,0,h+5*t]) 
+            {   sphere(2*t);
+                rotate([0,90]) cylinder(r=2*t,r2=3*t,h=2.6*t);
+                translate([2.6*t,0]) scale([0.5,1,1]) sphere(3*t);
+            }
+        }
+        body();
+        translate([-oy-3*t-2*h,0]) cube(h*[4,4,4],center=true);
+        translate([-oy+1.5*t+2*h,0,2*(t+et)-h]) cube(h*[4,4,4],center=true);
+    }
+}
+//rotate([0,-90,0]) spine();
+
+//body();
 //as_assembled();
 //bit_part();
 //loose_gear();
+
+rh = sqrt(nt*nt + nh*nh)/2;
+pt=0.5;
+
+//NOTE improvising to review existing print.
+module bottom_part()
+{   color([1,1,0]) translate([0,0,-2*nt-t]) difference()
+    {   union()
+        {   cylinder(r=r,h=h+2*nt);
+            cylinder(r=rh+nh+2*t, h=2*nt+t);
+        }
+        
+        for( z=[0:2*t:h] ) translate([0,2*l,bgt+1.5*nt+3*t+z]) 
+                               rotate([90,0]) cylinder(r=sr, h=4*l); //connecting hole.
+        
+        cylinder(r=rh,h=2*nt);
+        translate([0,0,nt]) rotate([90,0])
+        {
+            translate([0,0,-rh-nh]) linear_extrude(height=2*rh + 2*nh) nut_profile();
+            translate([-0.6*nt,-h,-rh-nh-pt]) cube([1.2*nt,3*h,pt]);
+            
+            translate([-0.6*nt,-h,rh+nh-pt]) cube([1.2*nt,3*h,pt]);
+            
+            translate([0,0,-3*h]) cylinder(r=sr, h=6*h);
+        }
+    }
+}
+
+bottom_part();
