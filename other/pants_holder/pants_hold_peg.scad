@@ -7,6 +7,9 @@
 //  (at your option) any later version.
 //
 
+//One end goes into the hole and the other around the peg that usually is
+// used with the hole. Now the two are held together at a different distance.
+
 r = 8.5/2;
 t=5;
 

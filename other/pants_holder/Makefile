@@ -1,6 +1,6 @@
 
-default: output/pants_holder.stl
+default: output/pants_hold_peg.stl
 
-output/pants_holder.stl: pants_holder.scad
-	sh ../../bin/scad.sh 'use<'`pwd`'/pants_holder.scad>; rotate([90,0,0]) pants_holder();' \
-	output/pants_holder.stl
+output/pants_hold_peg.stl: pants_hold_peg.scad
+	sh ../../bin/scad.sh 'use<'`pwd`'/pants_hold_peg.scad>; rotate([90,0,0]) pants_holder();' \
+	output/pants_hold_peg.stl
