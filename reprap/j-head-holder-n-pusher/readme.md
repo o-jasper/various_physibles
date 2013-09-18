@@ -63,7 +63,7 @@ There are additional holes for screws.(TODO their location)
 
 ## Design aspects
 Locations screws and size of the holder is the are round to `5mm` to increase
-chances of happy coincidence. `w,h,l = 35,50,20`(TODO still subject to change!)
+chances of happy coincidence. `w,h,l = 35,45,20`(TODO still subject to change!)
 and the screws are `5mm` from walls.
 
 I might want a quickfit version and/or a quickfit on which this can be mounted.

@@ -9,16 +9,18 @@
 
 include<nut.scad>
 
+$fs=0.1;
+
 echo(sr);
 
 //This is intended to attach to the j-head and press down a bowden tube for 1.75mm.
 
 //J-Head small and large radius. //TODO get actual values!
-jh_sr= 5; 
-jh_lr= 10;
+jh_sr= 6; 
+jh_lr= 8;
 jh_sh= 5; //Slot height.
 
-r = 2;
+r = 3;
 
 th=7;
 t=5;
@@ -31,7 +33,7 @@ module pusher()
 {
     linear_extrude(height=th) intersection()
     {
-        scale([(r+t)/(5*r),(r+d+t+2*sr)/(5*r)]) circle(5*r);
+        scale([(r+t)/(5*r),1.2*(r+d+t+2*sr)/(5*r)]) circle(5*r);
         difference()
         {   circle(r+d+t+2*sr);
             circle(r);
@@ -39,7 +41,6 @@ module pusher()
         }
     }
 }
-
 
 module slide(r, h=3*jh_sh)
 {
@@ -50,6 +51,7 @@ module slide(r, h=3*jh_sh)
     }
 }
 
+//Rounds upwards to five mm-dividable units.
 function five (x) = floor(x/5)*5+5;
 
 w= five(2*(jh_lr+t));
