@@ -40,7 +40,9 @@ You might also want to taper the bottom of the pfte tube at ~30 degree.
 (short use of pencil sharpened is okey)
 
 **Print parts**, the sliver is optional, and could be improvised/cut from something,
-but it is not much so maybe better to do it.
+but it is not much so maybe better to do it. The holder probably needs the first
+45mm supported. (`slic3r --support-material-enforce-layers 30 jh_holder.stl` for me
+with 0.3mm layer height)
 
 **Get the j-head**, slide into the holder with the hold end in the direction of the 
 nut holes. Put the pfte tube with widening in, then put the pusher over the pfte 
@@ -63,7 +65,7 @@ There are additional holes for screws.(TODO their location)
 
 ## Design aspects
 Locations screws and size of the holder is the are round to `5mm` to increase
-chances of happy coincidence. `w,h,l = 35,45,20`(TODO still subject to change!)
+chances of happy coincidence. `w,h,l = 35,,20`(TODO still subject to change!)
 and the screws are `5mm` from walls.
 
 I might want a quickfit version and/or a quickfit on which this can be mounted.

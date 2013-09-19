@@ -16,22 +16,24 @@ echo(sr);
 //This is intended to attach to the j-head and press down a bowden tube for 1.75mm.
 
 //J-Head small and large radius. //TODO get actual values!
-jh_sr= 6; 
+jh_sr= 5; 
 jh_lr= 8;
 jh_sh= 5; //Slot height.
+
+jh_rh=6;  //'rim height' top part ..
 
 r = 3;
 
 th=7;
-t=5;
+t=4;
 d=max(5,jh_lr+t-r);
 
-dd = 1;
+dd = 2;
 
 //Screws go into the smaller hole to push down at a widening of the pfte tube
-module pusher() 
+module pusher(h=th) 
 {
-    linear_extrude(height=th) intersection()
+    linear_extrude(height=h) intersection()
     {
         scale([(r+t)/(5*r),1.2*(r+d+t+2*sr)/(5*r)]) circle(5*r);
         difference()
@@ -65,19 +67,34 @@ module holder()
     echo(w,l,h);
     
     difference()
-    {   linear_extrude(height = h) difference()
-        {   square([w,l],center=true);
-            //TODO figure the distance between these things.
-            for(s=[[1,1],[-1,1],[1,-1],[-1,-1]]) scale(s) translate([w/2-5,l/2-5]) circle(sr);
+    {   
+        union()
+        {   linear_extrude(height = th) difference()
+            {   minkowski()
+                {   square([w-10,l-10],center=true);
+                    circle(5);
+                }
+                for(s=[[1,1],[-1,1],[1,-1],[-1,-1]]) scale(s) translate([w/2-5,l/2-5]) circle(sr);
+            }
+            intersection()
+            {   union()
+                {   slide(jh_lr+t,h=h);
+                    pusher(h=h);
+                }
+                cube([w,l,5*h],center=true);
+            }
         }
         for( s=[1,-1] ) translate([0,s*(r+d+sr),-t])
                         {   cylinder(r=sr, h=4*h);
                             linear_extrude(height= t+nh) rotate(30) nut_profile(nt);
                             }
         translate([0,0,-2*jh_sh]) slide(jh_lr);
-        translate([0,0,2*jh_sh]) slide(jh_lr);
-        translate([0,0,2*jh_sh-dd]) cylinder(r=jh_lr,h=jh_sh); //As it is tightened, it drops into a little hole.
-        slide(jh_sr);
+        translate([0,0,2*jh_sh]) slide(jh_lr,h=jh_sh+t/2);
+        
+        translate([0,0,2*jh_sh-dd]) cylinder(r=jh_lr,h=jh_rh); //As it is tightened, it drops into a little hole.
+        slide(jh_sr); //Hole for smallest diameter of j-head.
+        //Hole for pfte tube.
+        translate([0,0,2*jh_sh]) slide(r,h=4*h);
     }
 }
 
@@ -85,8 +102,8 @@ module holder()
 module sliver()
 {
     intersection()
-    {   slide(jh_lr,dd);
-        difference()
+    {   slide(jh_lr,h=dd);
+        linear_extrude(h=dd) difference()
         {   square([w,w],center=true);
             circle(jh_sr);
             translate([-d,0]) square(2*[d,jh_sr],center=true);
