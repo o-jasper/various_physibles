@@ -9,7 +9,9 @@
 
 //TODO terribly missing: holders for the thingy.
 
-//$fs=0.01;
+//$fs=0.1; Bleh 
+
+$fn=60;
 
 //For reprappro mendel(~prusa 2), Tiny carriage with one quick fit.
 
@@ -33,6 +35,8 @@ l = max(sw+2*t, 2*lbl); //(resulting)length(along smooth rods, actually w>l)
 w = lbd+2*(lbr+t);      //(...)width
 h = 2*lbr+sh + 1.6*t;   //(...)height
 
+lock_handle=4;
+
 ///Reiterate all the sizes.
 hold_block_size = [sl-s, sw-s, sh-s];       //Profile used for holding on to it.
 free_block_size = [w-4*(lbr+t), sw-s, h-t]; //Volume and area above this free for use.
@@ -48,7 +52,7 @@ module free_block()
 //hold_block();
 
 with_tierib = false;
-chainable = true;;
+//extra_attach
 
 bx = 15;  //Timing belt distance
 bt = 1.7;   //Accounted thickness.
@@ -62,21 +66,9 @@ module main()
 {   linear_extrude(height = h) difference()
     {   square([w,l],center=true);
         intersection()
-        {   square([w-4*(lbr+t),l-2*t],center=true);
-            square([w,sw],center=true);
+        {   square([w-4*(lbr+t),sw],center=true);
             translate([0,-sw/2]) circle(sw);
             translate([0,+sw/2]) circle(sw);
-        }
-    }
-    if(chainable)
-    {
-        for(y=(l/2-t)*[-1,1]) for(z=[0,2*lbr]) translate([0,y,z])
-        linear_extrude(height = t) difference()
-        {   union()
-            {   square([w+t+2*sr,t+2*sr],center=true);
-                for(x=(w+t+2*sr)*[1,-1]/2) translate([x,0]) circle(t/2+sr);
-            }
-            for(x=(w+t+2*sr)*[1,-1]/2) translate([x,0]) circle(sr);
         }
     }
 }
@@ -123,13 +115,7 @@ module belt_holder_top()
 {
     x= bhl-t/2; y= bw+t;
     rotate([90,0]) difference()
-    {   union()
-        {   rotate([90,0]) linear_extrude(height=t) belt_holder_profile();
-            translate([0,-t/4,-bw/2]) linear_extrude(height=bw) intersection()
-            {   translate([0,-bw,-bw/2]) square([3*bhl,2*bw],center=true);
-                scale([1.4,0.6]) circle(bhl);
-            }
-        }
+    {   rotate([90,0]) linear_extrude(height=t) belt_holder_profile();
         translate([0,0,-bw/2]) linear_extrude(height=bw) 
             for(x=[-bhl/2-t:bp:bhl/2+t]) translate([x,0]) circle(bp/2);
         translate([0,0,-h/2]) linear_extrude(height=h)
@@ -161,10 +147,10 @@ module main_cut()
     for( y=[10-l/2 :10 :l/2-10] ) translate([-lbd/2,y, 2*lbr+t]) cylinder(r=sr, h=2*h);
 }
 
-rx= w/2+2*t; ry= 0; //(-l/2+sr+t)*0.5;
+rx= w/2+t; ry= 0; //(-l/2+sr+t)*0.5;
 
 //Rotating lock radius.
-rlr = rx-w/2 + 2*t+2*lbr;
+rlr = rx-w/2 + 2*t+2*lbr-t;
 
 module carriage_belt_holder()
 {
@@ -175,29 +161,22 @@ module carriage_belt_holder()
 
     translate([-lbd/2-bx,0,bhz-t]) difference()
     {   union()
-        {
-            linear_extrude(height = t) hull()
-            {   translate([y/2+t,0]) square([t,bhl+4.5*t],center=true);
+        {   linear_extrude(height = t) hull()
+            {   translate([y/2+t,0]) square([t,bhl+1.5*t],center=true);
                 for(rx= [-x,x]/2) translate([-y,rx]) circle(t);
-                for(rx= [-bhl/2-t,bhl/2+t]) translate([0,rx]) circle(_r);
             }
-            translate([0,0,-nh]) linear_extrude(height = t+nh) 
-                for(rx= [-_d,_d]) 
-                {   translate([0,rx]) circle(_r);
-                    translate([_r,rx]) square([2*_r,2*_r],center=true);
-                }
-        }
-        for(rx= [-_d,_d]) 
-        {   translate([0,rx,-t]) cylinder(r=sR, h=9*t);
-            translate([0,rx]) linear_extrude(height=h) nut_profile(nt);
+            for(rx= [-x,x]/4) translate([-y,rx]) 
+                              {   sphere(t/3);
+                                  rotate([0,90,0]) cylinder(r1=t/3,r2=t,h=y+t);
+                              }
         }
         for(rx= [-x,x]/2) translate([-y,rx,-t]) cylinder(r=sr, h=2*h);
     }
 }
 
+rlz = 2*lbr+t+sh/2;
 module carriage()
 {   
-    rlz = 2*lbr+t+sh/2;
     difference()
     {   union()
         {   main();
@@ -213,22 +192,55 @@ module carriage()
         {   translate([0,0,t+rlz]) cylinder(r=rlr+s, h=h);
             cylinder(r=sr, h=2*h);
             linear_extrude(height=rlz+nh-t/2) nut_profile(nt);
-        }    
+        }
+        //Dont need overhang over the whole thing.
+        translate([0,0,h]) cube([lbd-2*(sr+t),sw,2*(h-bhz)],center=true);
+        //Cutting corners
+        for(a=[0,180]) rotate(a)
+            translate([lbd/2-lbr-t,0,rlz-sh/2]) rotate([0,45,0]) 
+                           cube([1.5*t,sw,4*t],center=true);
+/*        intersection() //Cuts holes in sides but ugly.
+        {   for(a=[0:90:360])
+                translate([0,l,h/2]) rotate([90,0]) rotate(a)
+                    translate([(w-4*(lbr+t))/4,0]) cylinder(r=h/2-t,h=8*l,$fn=4);
+            translate([0,0,h/2]) difference()
+            {   cube([4*l,4*l,h-2*t],center=true);
+                cube([4*l,4*l,t],center=true);
+            }
+            }*/
     }
 }
 
-module rotate_lock()
-{   linear_extrude(height = t) difference()
-    {   minkowski()
-        {   intersection()
-            {   circle(rlr - sR-t);
-                square(rlr*[1,1]);
-            }
-            circle(sR+t);
-        }
-        circle(sR);
+module _rotate_lock_wall(r,h)
+{
+    linear_extrude(height=h) translate([-t/2,t]) hull()
+    {   circle(r);
+        translate([0,rlr-2*t]) circle(r);
     }
-    translate([0,rlr-t,0]) 
+}
+
+use<../../logos/openhw.escad>
+
+module rotate_lock()
+{   difference()
+    {   union()
+        {   linear_extrude(height = t) difference()
+            {   minkowski()
+                {   intersection()
+                    {   circle(rlr - sR-t);
+                        square(rlr*[1,1]);
+                    }
+                    circle(sR+t);
+                }
+                circle(sR);
+            }
+            if( lock_handle==2 || lock_handle==3) _rotate_lock_wall(t/2,2*t);
+            if( lock_handle==2 ) _rotate_lock_wall(t/3,2.2*t);
+            if( lock_handle==4 ) linear_extrude(height=1.2*t) 
+                                     rotate(-45) translate([0,rlr/2]) oshw_logo_2d(0.9*rlr);
+        }
+    }
+    if( lock_handle==1 ) translate([0,rlr-t,0])  //(ugly imo)
     {   cylinder(r=t*0.6,h=3*t);
         translate([0,0,3*t]) sphere(0.6*t);
     }
@@ -242,13 +254,5 @@ module assembled()
 }
 
 assembled();
-
-/*translate([lbr+t-w/2 - bx,0,2*lbr]) union()
-{   linear_extrude(height =t) rotate(-90) belt_holder_profile();
-    translate([-t,0]) rotate([0,90,0]) cylinder(r1=t/4, r2=t,h=3*t);
-}
-*/
-//cylinder(r=t, h= t+2*lbr
-
-
-//belt_holder_top();
+//carriage();
+//oshw_logo_2d(20);
