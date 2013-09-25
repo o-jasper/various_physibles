@@ -17,35 +17,45 @@ s=1;
 //This is intended to attach to the j-head and press down a bowden tube for 1.75mm.
 
 //J-Head small and large radius. //TODO get actual values!
-jh_sr= 5; 
-jh_lr= 8;
+jh_sr= 6.5; 
+jh_lr= 8.5;
 jh_sh= 5; //Slot height.
 
 jh_rh=6;  //'rim height' top part ..
 
 dd = 2; //j-head 'drops' this much.
 
-quickfit=true;
-w= 80; //100;
+quickfit=true; //TODO length and width switched
+w= 80; //100;(quickfit)
 l= 40;
 th=5;
 //quickfit_s=0.5;
 
-r = 3;
+rt = 2.5; //Tube radius
+r = 1.75;
 t=4;
 d=max(5,jh_lr+t-r);
 
 //Screws go into the smaller hole to push down at a widening of the pfte tube
 module pusher() 
 {
-    linear_extrude(height=2*t) intersection()
-    {
-        scale([(r+d+t/2+2*sr)/(5*r),(r+t/2)/(5*r)]) circle(5*r);
-        difference()
-        {   scale([1,1/2]) circle(r+d+t+2*sr);
-            circle(r);
+    difference()
+    {   linear_extrude(height=3*t) difference()
+        {   union()
+            {   for( s=[1,-1] ) translate([s*(r+d+sr),0]) circle(sr+t/2);
+                intersection()
+                {
+                    scale([(r+d+t/2+2*sr)/(5*r),(rt+t/2)/(5*r)]) circle(5*r);
+                    difference()
+                    {   scale([1,1/2]) circle(rt+d+t+2*sr);
+                        circle(r);
+                    }
+                }
+            }
             for( s=[1,-1] ) translate([s*(r+d+sr),0]) circle(sr);
         }
+        translate([0,0,2*t]) cylinder(r=rt,h=l);
+        translate([0,0,-l]) cylinder(r=rt,h=l+t);
     }
 }
 
@@ -64,10 +74,13 @@ module base()
 h=dd+2*jh_sh;
 module holder_add(p,a)
 {
-    translate(p) rotate(a) linear_extrude(height = h) 
-    {   circle(jh_lr+t);
-        for(s=[1,-1]) translate([r+d+sr,0]*s) circle(sr+t/2);
-        translate([0,jh_lr/2]) square((jh_sr+t/2)*[2,2],center=true);
+    translate(p) rotate(a) union()
+    {   linear_extrude(height = h) 
+        {   circle(jh_lr+t);
+            for(s=[1,-1]) translate([r+d+sr,0]*s) circle(sr+t/2);
+            translate([0,jh_lr/2]) square((jh_sr+t/2)*[2,2],center=true);
+        }
+        for(s=[1,-1]) translate([r+d+sr,0]*s) cylinder(r=(nt/2+t/2),h=max(nh,jh_sh));
     }
 }
 module holder_cut(p,a)
@@ -87,10 +100,10 @@ module holder_cut(p,a)
     }
 }
 
-module single_holder() //(not supported)
+module single_holder(with_base=true) //(not supported)
 {   p=[0,0,0];
     difference()
-    {   union(){ base(); holder_add(p,0); }
+    {   union(){ if(with_base) base(); holder_add(p,0); }
         holder_cut(p,0);
     }
 }
@@ -98,7 +111,10 @@ module single_holder() //(not supported)
 module dual_holder()
 {   p=[0,jh_lr+t/4,0];
     difference()
-    {   union(){ base(); holder_add(p,0);holder_add(-p,180); }
+    {   union()
+        {   base(w=w); 
+            holder_add(p,0);holder_add(-p,180); 
+        }
         holder_cut(p,0);
         holder_cut(-p,180);
         //Two holes for air flow/wiring, plus holes for potential mounting.
@@ -148,8 +164,12 @@ module show()
 
 }
 
-show();
-//sliver();
-//printable();
+//show();
+//single_holder(false);//this is without any quickfit-like thing.
+
+//dual_holder(w=100);
+
+pusher();
+//translate([0,w]) dual_holder();
 
 

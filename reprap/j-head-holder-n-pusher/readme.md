@@ -1,8 +1,18 @@
 
 # J head pfte tube for 1.75 holder
+
+**NOTE** out of date, the tape slips. The design has been modified to use a 
+small bit held back on the pfte itself instead, but the text below isnt updated.
+Also the design has been updated since then to fix some size-of-the-j-head 
+mistakes, but that hasnt been tested.
+
 Uses two screws and nuts to hold in a pfte tube into the 
 [j-head extruder](http://reprap.org/wiki/J-head#Introduction) possibly 
 in a bowden configuration.(though the bowden tube can be arbitrarily short)
+Has a small 'quick-fit' like form factor, quick fits basically attach to a block,
+the size of `jh_holder.stl` is `[80,40,5]mm` 
+
+TODO another .stl for Richraps quickfit, see `[100,28,5]`, think just `+20cm, then.
 
 NOTE: WIP(work in progress)
 
@@ -60,12 +70,4 @@ If the J-head was used before and plastic accumulated, you might want to tighten
 the screws while the hot end is hot.(carefull, the hot end is hot) The plastic might
 then emerge from the nozzle. (depending on if there is space in there)
 
-**Attach** currently there is **no** pre-conceived method of attaching.(WIP)
-There are additional holes for screws.(TODO their location)
-
-## Design aspects
-Locations screws and size of the holder is the are round to `5mm` to increase
-chances of happy coincidence. `w,h,l = 35,,20`(TODO still subject to change!)
-and the screws are `5mm` from walls.
-
-I might want a quickfit version and/or a quickfit on which this can be mounted.
+**Attach** it like a quickfit.(or use your own method)
