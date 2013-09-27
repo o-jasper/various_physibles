@@ -19,17 +19,17 @@ include<nut.scad>
 
 t=4; //Thicknesses
 
-srr = 4.5; //Smooth rod radius.
+s=1; //Extra space around.
 
-lbr = 7;  //Linear bearing radius. 
+srr = 4.5+s; //Smooth rod radius.
+
+lbr = 7.5+s;  //Linear bearing radius. (15mm diam bearing)
 lbl = 25; //.. length
 lbd = 70; //.. distance between smooth rods.
 
-s=0.5;
-
-sw = 40 +s; //Slot width.
-sl = 80 +s;//lbd+2*lbr; //Slot length.
-sh = 5 +s; //Slot height.
+sw = 40 +2*s; //Slot width.
+sl = 80 +2*s;//lbd+2*lbr; //Slot length.
+sh = 5 +2*s; //Slot height.
 
 l = max(sw+2*t, 2*lbl); //(resulting)length(along smooth rods, actually w>l)
 w = lbd+2*(lbr+t);      //(...)width
@@ -57,7 +57,7 @@ with_tierib = false;
 bx = 15;  //Timing belt distance
 bt = 1.7;   //Accounted thickness.
 bz = 15;
-bw = 5;   //... width.
+bw = 5+0.5;   //... width.
 bp = 2.5; //.... pitch
 bhl= 20;  //length to hold it
 bhz = lbr -3*t/4 + bz+bt;
@@ -114,12 +114,10 @@ module belt_holder_profile()
 module belt_holder_top()
 {
     x= bhl-t/2; y= bw+t;
-    rotate([90,0]) difference()
-    {   rotate([90,0]) linear_extrude(height=t) belt_holder_profile();
-        translate([0,0,-bw/2]) linear_extrude(height=bw) 
-            for(x=[-bhl/2-t:bp:bhl/2+t]) translate([x,0]) circle(bp/2);
-        translate([0,0,-h/2]) linear_extrude(height=h)
-            for(x=[-bhl/2-2*t,bhl/2+2*t]) translate([x,0]) scale([1.7,1.4]) circle(t);
+    rotate([90,0,0]) difference()
+    {   rotate([90,0,0]) linear_extrude(height=t) belt_holder_profile();
+        translate([0,0,-bw/2.5]) //linear_extrude(height=bw) 
+            for(x=[-bhl/2-t:bp:bhl/2+t]) translate([x,0]) cylinder(r=0.45*bp, h=bw);
     }
 }
 
@@ -138,10 +136,10 @@ module main_cut()
             if(with_tierib) for( y = [-l/2+lbl/4: (l-lbl/2)/6 : l/2-lbl/4] ) 
                                 translate([0,l+y]) rotate([0,-s*100,0]) tierib_cut();
         }
-        cube([srr,4*l,2*srr],center=true); //Slot smooth rod fits through.
+        cube([2*srr,4*l,2*srr],center=true); //Slot smooth rod fits through.
     }
     //Wedge for the timing belt goes in here.
-    translate([-w/2,0,bhz]) linear_extrude(height = t+bt) square([2*t,2*t],center=true);
+    translate([-w/2,0,bhz]) linear_extrude(height = t+bt+s) square((t+s)*[2,2],center=true);
     
     //Some extra holes for whatever.
     for( y=[10-l/2 :10 :l/2-10] ) translate([-lbd/2,y, 2*lbr+t]) cylinder(r=sr, h=2*h);
@@ -237,7 +235,7 @@ module rotate_lock()
             if( lock_handle==2 || lock_handle==3) _rotate_lock_wall(t/2,2*t);
             if( lock_handle==2 ) _rotate_lock_wall(t/3,2.2*t);
             if( lock_handle==4 ) linear_extrude(height=1.2*t) 
-                                     rotate(-45) translate([0,rlr/2]) oshw_logo_2d(0.9*rlr);
+                                     rotate(-45) translate([0,0.4*rlr]) oshw_logo_2d(rlr);
         }
     }
     if( lock_handle==1 ) translate([0,rlr-t,0])  //(ugly imo)
@@ -253,6 +251,6 @@ module assembled()
        rotate(-90)rotate([180,0]) color([1,0,0]) belt_holder_top();
 }
 
-assembled();
-//carriage();
-//oshw_logo_2d(20);
+//assembled();
+carriage();
+//belt_holder_top();
