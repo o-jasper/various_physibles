@@ -113,7 +113,7 @@ module dual_holder()
     difference()
     {   union()
         {   base(w=w); 
-            holder_add(p,0);holder_add(-p,180); 
+            holder_add(p,0);holder_add(-p,180);
         }
         holder_cut(p,0);
         holder_cut(-p,180);
@@ -123,8 +123,11 @@ module dual_holder()
         {   rotate(45) cube([w/6,w/6,l],center=true);
             for(y=[1,-1]*w/6) translate([0,y,-l]) cylinder(r=sr,h=3*l);
         }
+        //Cut off bits that stick out.
+        for(y=[l,-l]) translate([0,y]) cube([4*w,l,8*w],center=true);
     }
 }
+
 //Thin sliver you can slide in if it is felt it is too  loose.
 module sliver()
 {   sz = l/2-jh_lr-t/4;
@@ -167,9 +170,9 @@ module show()
 //show();
 //single_holder(false);//this is without any quickfit-like thing.
 
-//dual_holder(w=100);
+dual_holder();
 
-pusher();
+//pusher();
 //translate([0,w]) dual_holder();
 
 
