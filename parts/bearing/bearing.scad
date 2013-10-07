@@ -9,8 +9,8 @@
 
 $fn=60;
 
-sh=1;
-r = 6.2/2;
+sh=0.6;
+r = 6.5/2;
 s=0.7*r;
 n=6;
 
@@ -18,7 +18,7 @@ ss=0.5;
 
 t=s;
 
-R = n*(r+s)/3.14;
+R = n*(r+0.5)/3.14;
 Ro = R+r+2*t;
 h=2*(r+t);
 
@@ -42,7 +42,7 @@ module outer()
     difference()
     {   linear_extrude(height=h) difference()
         {   circle(Ro);
-            circle(R+s/2);
+            circle(R);
         }
         translate([0,0,r+t-sh]) cylinder(r=R+r+s+ss, h=2*sh);
         path();
@@ -56,23 +56,28 @@ module guide()
         for(a= [0:60:360]) rotate(a) translate([R,0]) circle(r);
     }
 }
-module _outer_half()
+module outer_half()
 {   intersection()
     {   outer();
         difference()
-        {   translate([Ro/2-t/2,0]) cube([Ro-t,8*Ro,8*Ro],center=true);
-            for(z=[2*sr,h-2*sr]) translate([0,0,z]) rotate_extrude()
-                translate([Ro,0]) circle(sr); 
+        {   union()
+            {   cube([8*Ro,8*Ro,h],center=true);
+                for(a=[0:60:360]) rotate(a) 
+                    translate([Ro,s]) rotate([90,0,0]) linear_extrude(height=2*s)
+                    polygon([[0,h],[0,-2*t],[-t,h]]);
+            }
+            for(a=[0:60:360]) rotate(a+30) 
+                    translate([Ro,s]) rotate([90,0,0]) linear_extrude(height=2*s)
+                    polygon([[0,-(h-2*t)],[0,h-2*t],[-2*t,-(h-2*t)]]);
         }
     }
 }
-module outer_half()
-{   rotate([0,90,0]) _outer_half(); }
 
 module as_show(a=0,as_assembled=false)
 {
-    _outer_half();
-    if(as_assembled) rotate(180) _outer_half();
+    outer_half();
+    if(as_assembled) translate([0,0,h]) 
+                         rotate(30) rotate([0,180,0]) outer_half();
     inner();
     rotate(a)
     {   translate([0,0,r+t-sh/2]) guide();
@@ -86,11 +91,13 @@ module as_assembled(a=0)
 
 module as_print()
 {
-    translate([Ro,0,Ro-t]) outer_half();
-    translate([Ro+h+t,0,Ro-t]) outer_half();
+    translate([2*Ro,0]) outer_half();
+    translate([0,2*Ro]) outer_half();
     inner();
     translate([-2*Ro,0]) guide();
 }
 
-as_show(30);
+as_print();
+
+//outer_half();
 
