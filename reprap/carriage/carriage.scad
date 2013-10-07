@@ -19,7 +19,7 @@ include<nut.scad>
 
 t=4; //Thicknesses
 
-s=1; //Extra space around.
+s=0.6; //Extra space around.
 
 srr = 4.5+s; //Smooth rod radius.
 
@@ -31,18 +31,20 @@ sw = 40 +2*s; //Slot width.
 sl = 80 +2*s;//lbd+2*lbr; //Slot length.
 sh = 5 +2*s; //Slot height.
 
-l = max(sw+2*t, 2*lbl); //(resulting)length(along smooth rods, actually w>l)
+l = max(sw+2*t, 1.5*lbl); //(resulting)length(along smooth rods, actually w>l)
 w = lbd+2*(lbr+t);      //(...)width
-h = 2*lbr+sh + 1.6*t;   //(...)height
+h = 2*lbr+sh + 2*t;   //(...)height
 
 lock_handle=4;
+
+csh=2*sh+t+s; //Height at which to split the carriage.
 
 ///Reiterate all the sizes.
 hold_block_size = [sl-s, sw-s, sh-s];       //Profile used for holding on to it.
 free_block_size = [w-4*(lbr+t), sw-s, h-t]; //Volume and area above this free for use.
 
 echo("hold_block size ", hold_block_size);
-echo("free size ", free_block_size); 
+echo("free size ", free_block_size);  //TODO increased slightly.
 module hold_block()
 {   color([1,0,0]) translate([0,0,2*lbr+t+sh/2]) cube(hold_block_size, center=true); }
 module free_block()
@@ -139,11 +141,15 @@ module main_cut()
         cube([2*srr,4*l,2*srr],center=true); //Slot smooth rod fits through.
     }
     //Wedge for the timing belt goes in here.
-    translate([-w/2,0,bhz]) linear_extrude(height = t+bt+s) square((t+s)*[2,2],center=true);
+    translate([-w/2,0,bhz]) linear_extrude(height = t+bt+s) 
+        square([2*t+4*s,2*t+2*s],center=true);
     
-    //Some extra holes for whatever.
-    for( y=[10-l/2 :10 :l/2-10] ) translate([-lbd/2,y, 2*lbr+t]) cylinder(r=sr, h=2*h);
+    //Decided it needed more space.
+    translate([-lbd/2+t,0,h]) cube([2*t,sw,2*t+sh],center=true);
+    
+    translate([w/2,0,h]) rotate([0,45,0]) cube([h-bhz,2*w,h-bhz],center=true);
 }
+
 
 rx= w/2+t; ry= 0; //(-l/2+sr+t)*0.5;
 
@@ -183,7 +189,6 @@ module carriage()
                 translate([-sr-t,0]) square((sr + t)*[2,2],center=true);
             }
             carriage_belt_holder();
-            translate([-w/2+0.75*t,0,bhz]) cube(t*[1.5,4,4],center=true);
         }
         main_cut();
         translate([rx,ry,-t]) //Space for hinge rotation. 
@@ -197,6 +202,16 @@ module carriage()
         for(a=[0,180]) rotate(a)
             translate([lbd/2-lbr-t,0,rlz-sh/2]) rotate([0,45,0]) 
                            cube([1.5*t,sw,4*t],center=true);
+
+        //location for screws that hold the split carriage together.
+        for(s=[1,-1]) for( y=(bhl/2+2*t)*[1,-1]) 
+                          translate([s*w/2,y,h-csh/2])  //TODO better height
+                              rotate([0,s*45+180,0]) 
+                              translate([0,0,-lbr]) 
+                          {   cylinder(r=sr,h=3*lbr+t);
+                              cylinder(r=2*sr,h=lbr+sr*sqrt(2));
+                          }
+                            
 /*        intersection() //Cuts holes in sides but ugly.
         {   for(a=[0:90:360])
                 translate([0,l,h/2]) rotate([90,0]) rotate(a)
@@ -251,6 +266,31 @@ module assembled()
        rotate(-90)rotate([180,0]) color([1,0,0]) belt_holder_top();
 }
 
+module carriage_split()
+{
+    translate([0,0,h]) cube([2*w,2*w,csh],center=true);
+    translate([0,0,h]) cube([2*t,2*w,csh+2*t],center=true);
+    difference()
+    {   for(x=[w,-w]/2) translate([x,0,h-csh/2]) 
+                            rotate([0,45,0]) cube([2*t,2*w,2*t],center=true);
+        translate([0,0,h]) cube([2*w,bhl+2*t,l],center=true);
+    }
+}
+
 //assembled();
-carriage();
+module split_carriage_bottom()
+{   difference()
+    {   carriage();
+        carriage_split();
+    }
+}
+module split_carriage_top()
+{   intersection()
+    {   carriage();
+        carriage_split();
+    }
+}
+//rotate([0,180,0]) split_carriage_top();
+rotate([0,180,0]) split_carriage_bottom();
+
 //belt_holder_top();

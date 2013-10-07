@@ -37,7 +37,7 @@ t=4;
 d=max(5,jh_lr+t-r);
 
 //Screws go into the smaller hole to push down at a widening of the pfte tube
-module pusher() 
+module jh_pusher() 
 {
     difference()
     {   linear_extrude(height=3*t) difference()
@@ -100,15 +100,18 @@ module holder_cut(p,a)
     }
 }
 
-module single_holder(with_base=true) //(not supported)
+//use jh_pusher instead, even if you just need one.
+module single_holder(with_base=true) 
 {   p=[0,0,0];
     difference()
     {   union(){ if(with_base) base(); holder_add(p,0); }
         holder_cut(p,0);
     }
 }
+module jh_plateless_holder()
+{   single_holder(false); }
 
-module dual_holder()
+module jh_holder()
 {   p=[0,jh_lr+t/4,0];
     difference()
     {   union()
@@ -129,7 +132,7 @@ module dual_holder()
 }
 
 //Thin sliver you can slide in if it is felt it is too  loose.
-module sliver()
+module jh_sliver()
 {   sz = l/2-jh_lr-t/4;
     intersection()
     {   union()
@@ -150,18 +153,18 @@ module sliver()
 
 module printable()
 {
-    dual_holder();
-    translate([0,l/2 + jh_lr+t]) sliver();
-    translate([0,-l/2 - jh_lr-t])pusher();
+    jh_holder();
+    translate([0,l/2 + jh_lr+t]) jh_sliver();
+    translate([0,-l/2 - jh_lr-t])jh_pusher();
 }
 
 module show()
 {
     x=jh_lr+t/4;
-    translate([0,x,h+t]) pusher();
-    dual_holder();
+    translate([0,x,h+t]) jh_pusher();
+    jh_holder();
     translate([0.1,x+0.1,0.1]) rotate(90) ///rotate([180,0,0]) 
-    {   color([0,0,1]) sliver();
+    {   color([0,0,1]) jh_sliver();
         translate([0,0,dd]) color([0,1,0]) cylinder(r=jh_sr,h=jh_sh);
     }
 
@@ -170,9 +173,11 @@ module show()
 //show();
 //single_holder(false);//this is without any quickfit-like thing.
 
-dual_holder();
+jh_holder();
 
-//pusher();
-//translate([0,w]) dual_holder();
+//jh_pusher();
+//translate([0,w]) jh_holder();
 
 
+module jh_holder_quickfit()
+{   jh_holder(w=100); }
