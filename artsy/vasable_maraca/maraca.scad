@@ -8,9 +8,11 @@
 $fn=80;
 $fs=0.5;
 
-R=40; stem_len=R;
+R=40;       //Overall size.
+t=2;        //Thicknesses.
+stem_len=R; //Length of handle. Negative to disable handle.
 
-s=1;
+s=0.6;
 module outer_shape()
 {
     intersection()
@@ -32,26 +34,25 @@ module body()
     union()
     {   difference()
         {   outer_shape();
-            for(a=[0:60:300]) rotate(a) union() //CUts out insides
-            {   translate([f*R,0,-R]) cylinder(r=sf*R,h=1.1*R);
-                hull()
-                {   translate([f*R,0]) cylinder(r=sf*R,h=s);
-                    translate([f*R/2,0,hf*R/2]) cylinder(r=0.4*R,h=s);
-                    translate([0,0,hf*R]) cylinder(r=0.6*R,h=s);
-                }
+            difference() //Inside cavity.
+            {   scale((R-t)*[1,1,1]/R) outer_shape();
+                cube([4*R,4*R,s],center=true);
             }
+            for(a=[0:60:300]) rotate(a) //Holes for pegs.
+                translate([f*R,0]) cylinder(r1=sf*R,r2=2*sf*R,h=2*s);
+            //Hole in top.
             translate([0,0,hf*R+s]) cylinder(r1=0.6*R,r2=0.12*R,h=(1.3-hf)*R);
         }
         intersection()
-        {   union()
-            {   translate([0,0,0.8*R]) 
+        {   union() //Inside beam
+            {   cylinder(r1=0.4*R,r2=0,h=0.4*R,$fn=6);
+                cylinder(r=0.07*R,h=0.8*R,$fn=6);
+                translate([0,0,0.8*R]) //Spokes.
                 {   sphere(0.05*R);
-                    for(a=[0:60:360]) rotate(30+a)
-                        rotate([37,0,0]) scale([1,2]) translate([0,0,-0.04*R]) 
+                    for(a=[0:60:360]) rotate(30+a) 
+                        rotate([37,0,0]) scale([1,2]) translate([0,0,-0.02*R]) 
                         cylinder(r=0.05*R,h=R, $fn=4);
                 }
-                cylinder(r1=0.4*R,r2=0,h=0.4*R,$fn=6);
-                cylinder(r=0.07*R,h=0.8*R,$fn=6);
             }
             outer_shape();
         }
@@ -66,16 +67,12 @@ module bit()
     }
 }
 
-module maraca(stem_len=stem_len)
+module vasable_maraca(stem_len=stem_len)
 {
+    th=0.2*R;
     union()
     {   body();
-        difference()
-        {   union() for(a=[0:60:360]) rotate(a) translate([f*R,0]) bit();
-            for(a=[0:60:360]) rotate(a) cube(R*[0.04,1,5],center=true);
-            cylinder(r1=0.35*R,r2=0,h=0.6*R);
-        }
-        th=0.2*R;
+        for(a=[0:60:360]) rotate(a) translate([f*R,0]) bit();
         if(stem_len>0)
         {
             intersection()
@@ -97,21 +94,26 @@ module maraca(stem_len=stem_len)
     }
 }
 
-module maraca_no_stem()
-{   maraca(stem_len=-R); }
+module vasable_maraca_no_stem()
+{   vasable_maraca(stem_len=-R); }
 
 module show(stem_len=stem_len)
 {
     difference()
-    {   maraca(stem_len=stem_len);
+    {   vasable_maraca(stem_len=stem_len);
         cube([R,R,2*R]);
     }
 }
 module just_show(){ show(); }
 
 module as_printable()
-{   maraca(); }
+{   vasable_maraca(); }
 
-maraca();
+show();
+/*
+difference()
+{   body();
+    cube([R,R,2*R]);
+    }*/
 //show();
 //outer_shape();
