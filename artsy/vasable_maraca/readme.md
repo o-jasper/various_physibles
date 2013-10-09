@@ -12,7 +12,8 @@ I printed it with one layer but `slic3r`s(0.9.10b)
 `avoid_crossing_perimeters` got it outside the whole item causing some ugliness there.
 
 Of course you could just make vasable-maraca which is basically just a base shape,
-stop mid print and chuck the noisemarkers in *then*..
+stop mid print and chuck the noisemarkers in *then*.. 
+Or [have bits you just poke loose](http://www.thingiverse.com/thing:14685).
 
 ### License
 See at the top of the `.scad` files. `shaker.scad` is under 
