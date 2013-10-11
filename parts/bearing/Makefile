@@ -8,7 +8,7 @@ basic: vertslide
 
 #These are all methods, each method seperately contains files relating to that method
 # Files including the word `show` are just for visualization.
-all: vertslide vertslide_no_guide insert_halfway ringclip
+all: vertslide vertslide_no_guide insert_halfway ringclip ringclip_one_ring
 
 vertslide: output/inner.stl output/outer_half_vertslide.stl output/guide.stl \
 	output/vertslide_show.stl \

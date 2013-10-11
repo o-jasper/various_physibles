@@ -116,7 +116,7 @@ module vertslide_as_print()
     if(with_guide) translate([-2*Ro,0]) guide();
 }
 
-vertslide_show();
+//vertslide_show();
 //outer_half();
 
 //Different ways of using this below:
@@ -137,7 +137,7 @@ module insert_halfway()
     }
 }
 
-//* Ring that clips around: (untested)
+//* Pair of half ring that clips around and onto each other: (untested)
 //  => inner + guide + (can also be done without guide but not provided)
 module _ring_sub(f=0.3)
 {
@@ -183,5 +183,15 @@ module ringclip_show()
     translate([0,0,2*h]) outer_half_ringclip();
 }
 //ringclip_show();
+
+//* Single ring that clips around: (untested)
+//  => inner + guide + (can also be done without guide but not provided)
+module ringclip_one_cut()
+{   difference()
+    {   cylinder(r=Ro,h=h+eh);
+        _ring_sub();
+        translate([-t/2,0]) cube([t,8*Ro,8*h]);
+    }
+}
 
 //* Complete outer ring but cut in center. (link to example)
