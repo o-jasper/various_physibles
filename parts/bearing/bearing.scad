@@ -10,9 +10,9 @@
 $fn=60;
 
 sh=0.6;
-r = 6.5/2;
+r = 6.2/2;
 s=0.7*r;
-n=6;
+n=12;
 
 ss=0.5;
 
@@ -24,8 +24,16 @@ h=2*(r+t);
 
 sr=1;
 
-module path()
-{   rotate_extrude() translate([R,r+t]) circle(r); }
+with_guide=true;
+
+anti_sag_a=50;
+
+module path(anti_sag=false)
+{   rotate_extrude() translate([R,r+t]) 
+    {   circle(r); 
+        if(anti_sag) rotate(anti_sag_a) translate([r,0]) square(2*[r,r],center=true);
+    }
+}
 
 module inner()
 {
@@ -34,7 +42,7 @@ module inner()
         {   circle(R-s/2);
             square((R-r)*[1,1],center=true);
         }
-        path();
+        path(true);
     }
 }
 module outer()
@@ -44,7 +52,8 @@ module outer()
         {   circle(Ro);
             circle(R);
         }
-        translate([0,0,r+t-sh]) cylinder(r=R+r+s+ss, h=2*sh);
+        if(with_guide)
+            translate([0,0,r+t-sh]) cylinder(r=R+r+s+ss, h=2*sh);
         path();
     }
 }
@@ -53,7 +62,7 @@ module guide()
     linear_extrude(height=sh) difference()
     {   circle(R+r+s);
         circle(R);
-        for(a= [0:60:360]) rotate(a) translate([R,0]) circle(r);
+        for(a= [0:360/n:360]) rotate(a) translate([R,0]) circle(r+2*ss);
     }
 }
 module outer_half()
@@ -62,42 +71,44 @@ module outer_half()
         difference()
         {   union()
             {   cube([8*Ro,8*Ro,h],center=true);
-                for(a=[0:60:360]) rotate(a) 
-                    translate([Ro,s]) rotate([90,0,0]) linear_extrude(height=2*s)
-                    polygon([[0,h],[0,-2*t],[-t,h]]);
+                for(a=[90,270]) rotate(a) translate([Ro,s]) cube(2*[s,Ro,h],center=true);
             }
-            for(a=[0:60:360]) rotate(a+30) 
-                    translate([Ro,s]) rotate([90,0,0]) linear_extrude(height=2*s)
-                    polygon([[0,-(h-2*t)],[0,h-2*t],[-2*t,-(h-2*t)]]);
+            for(a=[0,180]) rotate(a) translate([Ro,s]) cube(2*[s,Ro,h],center=true);
         }
     }
 }
 
 module as_show(a=0,as_assembled=false)
 {
-    outer_half();
-    if(as_assembled) translate([0,0,h]) 
-                         rotate(30) rotate([0,180,0]) outer_half();
+    outer_half(with_guide=with_guide);
+    if(as_assembled) translate([0,0,h]) rotate(30) rotate([0,180,0]) 
+                         outer_half(with_guide=with_guide);
     inner();
     rotate(a)
-    {   translate([0,0,r+t-sh/2]) guide();
+    {   if(with_guide) translate([0,0,r+t-sh/2]) guide();
         for(a=[0:360/n:360]) rotate(a) 
             translate([R,0,r+t]) color([1,0,0]) sphere(r);
     }
 }
 
 module as_assembled(a=0)
-{   as_show(a,true); }
+{   as_show(a,true, with_guide=with_guide); }
+
+module just_show()
+{
+    difference()
+    {   as_assembled();
+        for(a=[180,210]) rotate(a) cube(R*[8,8,8]);
+    }
+}
 
 module as_print()
 {
-    translate([2*Ro,0]) outer_half();
-    translate([0,2*Ro]) outer_half();
+    translate([2*Ro,0]) outer_half(with_guide=with_guide);
+    translate([0,2*Ro]) outer_half(with_guide=with_guide);
     inner();
-    translate([-2*Ro,0]) guide();
+    if(with_guide) translate([-2*Ro,0]) guide();
 }
 
-as_print();
-
-//outer_half();
+just_show();
 

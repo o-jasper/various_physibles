@@ -1,0 +1,3 @@
+
+# Parametric bearing
+WIP
