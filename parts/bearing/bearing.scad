@@ -9,8 +9,13 @@
 
 $fn=60;
 
+ball_r = 3;
+ball_e = 0.1;
+
+eh=0.5;
+
 sh=0.6;
-r = 6.2/2;
+r = ball_r + ball_e;
 s=0.7*r;
 n=12;
 
@@ -20,11 +25,11 @@ t=s;
 
 R = n*(r+0.5)/3.14;
 Ro = R+r+2*t;
-h=2*(r+t);
+h=2*(r+t); //NOTE not actual height. (+eh)
 
 sr=1;
 
-with_guide=true;
+with_guide=true; //Guiding plate.
 
 anti_sag_a=50;
 
@@ -70,10 +75,10 @@ module outer_half()
     {   outer();
         difference()
         {   union()
-            {   cube([8*Ro,8*Ro,h],center=true);
-                for(a=[90,270]) rotate(a) translate([Ro,s]) cube(2*[s,Ro,h],center=true);
+            {   cube([8*Ro,8*Ro,h+eh/2],center=true);
+                for(a=[90,270]) rotate(a) translate([Ro,s]) cube(2*[s,Ro,h+eh/2],center=true);
             }
-            for(a=[0,180]) rotate(a) translate([Ro,s]) cube(2*[s,Ro,h],center=true);
+            for(a=[0,180]) rotate(a) translate([Ro,s]) cube(2*[s,Ro,h+eh/2],center=true);
         }
     }
 }
@@ -81,13 +86,13 @@ module outer_half()
 module as_show(a=0,as_assembled=false)
 {
     outer_half(with_guide=with_guide);
-    if(as_assembled) translate([0,0,h]) rotate(30) rotate([0,180,0]) 
+    if(as_assembled) translate([0,0,h+eh/2]) rotate(30) rotate([0,180,0]) 
                          outer_half(with_guide=with_guide);
     inner();
     rotate(a)
-    {   if(with_guide) translate([0,0,r+t-sh/2]) guide();
+    {   if(with_guide) translate([0,0,r+t-sh/2+eh/2]) guide();
         for(a=[0:360/n:360]) rotate(a) 
-            translate([R,0,r+t]) color([1,0,0]) sphere(r);
+            translate([R,0,r+t+eh/2]) color("red") sphere(ball_r);
     }
 }
 
@@ -98,7 +103,7 @@ module just_show()
 {
     difference()
     {   as_assembled();
-        for(a=[180,210]) rotate(a) cube(R*[8,8,8]);
+        for(a=[180,210-180/n]) rotate(a) cube(R*[8,8,8]);
     }
 }
 
@@ -111,4 +116,6 @@ module as_print()
 }
 
 just_show();
+
+//outer_half();
 
