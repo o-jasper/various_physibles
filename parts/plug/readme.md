@@ -1,4 +1,7 @@
 
+## Printable plastic part of plug.
+Idea it to put wires in that touch when in use.
+
 Use at own risk! Not for high voltages or currents! Do **NOT** use this as 
 information to use it, you have to know your electrodynamics and this is 
 *not comprehenisive*, just some ways it can go wrong:
