@@ -31,11 +31,9 @@ l= 40;
 th=5;
 //quickfit_s=0.5;
 
-rt = 2.5; //Tube radius
 r = 1.75;
 t=4;
 d=max(5,jh_lr+t-r);
 
-///----Pusher
-wr=3.5; //Screw head radius.(or washer radius, if you want that.
-//-----
+//Distance of the screws that push down the pusher. //NOTE: not continue down yet.
+pusher_d = r+d+sr; 
