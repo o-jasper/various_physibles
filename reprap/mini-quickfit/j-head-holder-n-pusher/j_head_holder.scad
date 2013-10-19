@@ -7,57 +7,7 @@
 //  (at your option) any later version.
 //
 
-include<nut.scad>
-
-$fn=60;
-
-echo(sr);
-
-s=1;
-//This is intended to attach to the j-head and press down a bowden tube for 1.75mm.
-
-//J-Head small and large radius. //TODO get actual values!
-jh_sr= 6.5; 
-jh_lr= 8.5;
-jh_sh= 5; //Slot height.
-
-jh_rh=6;  //'rim height' top part ..
-
-dd = 2; //j-head 'drops' this much.
-
-quickfit=true; //TODO length and width switched
-w= 80; //100;(quickfit)
-l= 40;
-th=5;
-//quickfit_s=0.5;
-
-rt = 2.5; //Tube radius
-r = 1.75;
-t=4;
-d=max(5,jh_lr+t-r);
-
-//Screws go into the smaller hole to push down at a widening of the pfte tube
-module jh_pusher() 
-{
-    difference()
-    {   linear_extrude(height=3*t) difference()
-        {   union()
-            {   for( s=[1,-1] ) translate([s*(r+d+sr),0]) circle(sr+t/2);
-                intersection()
-                {
-                    scale([(r+d+t/2+2*sr)/(5*r),(rt+t/2)/(5*r)]) circle(5*r);
-                    difference()
-                    {   scale([1,1/2]) circle(rt+d+t+2*sr);
-                        circle(r);
-                    }
-                }
-            }
-            for( s=[1,-1] ) translate([s*(r+d+sr),0]) circle(sr);
-        }
-        translate([0,0,2*t]) cylinder(r=rt,h=l);
-        translate([0,0,-l]) cylinder(r=rt,h=l+t);
-    }
-}
+include<params.scad>
 
 module slide(r)
 {
@@ -173,9 +123,6 @@ module show()
 //show();
 //single_holder(false);//this is without any quickfit-like thing.
 
-jh_holder();
-
-//jh_pusher();
 //translate([0,w]) jh_holder();
 
 
