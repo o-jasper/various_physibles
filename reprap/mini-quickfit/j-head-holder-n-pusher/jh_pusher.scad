@@ -84,15 +84,15 @@ module pusher_top()
 
 module pusher_pincher()
 {
-    s=0.6;
-    linear_extrude(height=t-s) union()
+    s=0; ts=0.4;
+    linear_extrude(height=t-ts) union()
     {   difference()
-        {   circle(2*rt-s);
-            for(a=[0:60:300]) rotate(a) translate([rt-s,0]) circle(s);
+        {   circle(2*rt-ts);
+            for(a=[0:60:300]) rotate(a) translate([rt-s,0]) circle(0.5);
             circle(rt-s);
         }        
-        for(a=[0:60:300]) rotate(30+a) translate([rt-s/2,0]) circle(s);
+        for(a=[0:60:300]) rotate(30+a) translate([rt-s/2,0]) circle(0.5);
     }
 }
 
-pusher_top();
+pusher_pincher();
