@@ -22,30 +22,31 @@ module base()
 {   linear_extrude(height = th) square([w,l],center=true); }
 
 h=dd+2*jh_sh;
-module holder_add(p,a)
+module holder_add(p,a) //Single holder added features.
 {
     translate(p) rotate(a) union()
-    {   linear_extrude(height = h) 
+    {   linear_extrude(height = h)
         {   circle(jh_lr+t);
-            for(s=[1,-1]) translate([r+d+sr,0]*s) circle(sr+t/2);
+            for(x=pusher_d*[1,-1]) translate([x,0]) circle(sr+t/2);
             translate([0,jh_lr/2]) square((jh_sr+t/2)*[2,2],center=true);
         }
-        for(s=[1,-1]) translate([r+d+sr,0]*s) cylinder(r=(nt/2+t/2),h=max(nh,jh_sh));
+        //Pegs the screws go through.
+        for(x=pusher_d*[1,-1]) translate([x,0])cylinder(r=(nt/2+t/2),h=max(nh,jh_sh));
     }
 }
-module holder_cut(p,a)
+module holder_cut(p,a) //Single holder substracted features.
 {
     q=t;
     translate(p+[0,0,-q]) rotate(a)
-    {   rotate(90) linear_extrude(height=l) slide(jh_sr);
-        for(s=[1,-1]) translate([r+d+sr,0]*s) 
+    {   rotate(90) linear_extrude(height=l) slide(jh_sr); //Small radius slide in/out.
+        for(x=pusher_d*[1,-1]) translate([x,0]) //Hole for screws and nuts.
                       {   cylinder(r=sr,h=l);
                           linear_extrude(height=t+nh) nut_profile(nt);
                       }
-        linear_extrude(height=q+2*dd) rotate(90) slide(jh_lr);
+        linear_extrude(height=q+2*dd) rotate(90) slide(jh_lr); //Large radius slide bottom
        
-        translate([0,0,q+dd+jh_sh]) cylinder(r=jh_lr, h=l);
-        translate([0,0,q+2*dd+jh_sh]) 
+        translate([0,0,q+dd+jh_sh]) cylinder(r=jh_lr, h=l); //The j-head drops a bit here.
+        translate([0,0,q+2*dd+jh_sh])  //Small large radius slide top.
             linear_extrude(height=l) rotate(90) slide(jh_lr);
     }
 }
@@ -105,13 +106,13 @@ module printable()
 {
     jh_holder();
     translate([0,l/2 + jh_lr+t]) jh_sliver();
-    translate([0,-l/2 - jh_lr-t])jh_pusher();
+//    translate([0,-l/2 - jh_lr-t])jh_pusher();
 }
 
 module show()
 {
     x=jh_lr+t/4;
-    translate([0,x,h+t]) jh_pusher();
+//    translate([0,x,h+t]) jh_pusher();
     jh_holder();
     translate([0.1,x+0.1,0.1]) rotate(90) ///rotate([180,0,0]) 
     {   color([0,0,1]) jh_sliver();
@@ -120,7 +121,7 @@ module show()
 
 }
 
-//show();
+show();
 //single_holder(false);//this is without any quickfit-like thing.
 
 //translate([0,w]) jh_holder();

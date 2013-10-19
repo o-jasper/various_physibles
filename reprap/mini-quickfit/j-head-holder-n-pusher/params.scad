@@ -11,8 +11,6 @@ include<nut.scad>
 
 $fn=60;
 
-echo(sr);
-
 s=1;
 //This is intended to attach to the j-head and press down a bowden tube for 1.75mm.
 
@@ -31,9 +29,7 @@ l= 40;
 th=5;
 //quickfit_s=0.5;
 
-r = 1.75;
 t=4;
-d=max(5,jh_lr+t-r);
-
+d= 10; //.75; //max(5,jh_lr+t-r);
 //Distance of the screws that push down the pusher. //NOTE: not continue down yet.
-pusher_d = r+d+sr; 
+pusher_d = 14; // r+d+sr; 

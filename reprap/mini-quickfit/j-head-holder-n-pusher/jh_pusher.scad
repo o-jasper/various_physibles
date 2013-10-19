@@ -11,7 +11,8 @@ include<params.scad>
 
 top_screwable = true;
 
-rt = 2.5; //Tube radius
+$r = 2/2; // radius of filament(accounted, actually made a bit bigger than needed)
+$rt = 1.75; //Tube radius
 ph = (top_screwable ? 4 : 3)*t; //Pusher height.
 
 //-----
@@ -20,12 +21,13 @@ ph = (top_screwable ? 4 : 3)*t; //Pusher height.
 // enters the j-head.
 module pusher_whole(srr=sr+t/2)
 {
+    r=$r; rt=$rt;
     ar= 2*rt+t/2;
     difference()
     {   union()
         {   linear_extrude(height=ph) difference()
             {   union()
-                {   for( x=(r+d+sr)*[1,-1] ) translate([x,0]) circle(srr);
+                {   for( x=pusher_d*[1,-1] ) translate([x,0]) circle(srr);
                     intersection()
                     {   scale([(r+d+t/2+2*sr)/(5*r),(rt+t/2)/(5*r)]) circle(5*r);
                         scale([1,1/2]) circle(rt+d+t+2*sr);
@@ -42,20 +44,25 @@ module pusher_whole(srr=sr+t/2)
                 
             }
         }
-        if(top_screwable) translate([0,0,ph-t]) cylinder(r=rt,h=ph);
+        if(top_screwable) translate([0,0,ph-t]) cylinder(r=rt < 2.5 ? 2.5 : rt+t/3,h=ph);
 //The side hole inspired by Erik de Bruijns http://www.thingiverse.com/thing:1899/
         translate([0,0,-l]) cylinder(r=rt,h=l+t); 
-        translate([0,4*r,2*t]) cube([4*rt,8*r,t],center=true); //Side hole for nut/plug.
-        translate([0,0,2*t-t/2]) cylinder(r=2*rt, h=t+1); 
-        translate([0,4*r,ph]) cube([2*r,8*r,ph],center=true); //Side hole for nut/plug.
+        translate([0,4*rt,2*t]) cube([4*rt,8*rt,t],center=true); //Side hole for nut/plug.
+        translate([0,0,2*t-t/2]) cylinder(r=2*rt, h=t+1);        // .. end location.
+
+        translate([0,4*rt,ph]) cube([2*rt,8*rt,ph],center=true); //Side hole for tube
+        translate([0,0,2*t-t/2]) cylinder(r=rt, h=l);            //..main hole.
+        translate([0,0,0.7*t]) cylinder(r1=0,r2=2*rt,h=1.3*t);   // guide for filament.
         
         //Hole for filament.
-        translate([0,0,-ph]) cylinder(r=r,h=3*ph);
+        translate([0,0,-ph]) cylinder(r=$r,h=3*ph);
         //Keep bottom flat.
         translate([0,0,-ph]) cube(ph*[2,2,2],center=true);
     }
+
 }
 
+//Cut for two-part printing with less overhang.
 module pusher_cut()
 {
     cube([2*l,2*l,ph-t],center=true);
@@ -64,15 +71,14 @@ module pusher_cut()
                        rotate([0,45,0]) cube([t,l,t],center=true);
 }
 
-module pusher_bottom()
+module pusher_bottom() //Bottom part of two.
 {
     intersection()
     {   pusher_whole();
         pusher_cut();
     }
 }
-
-module pusher_top()
+module pusher_top() //Top part of two.
 {
     rotate([180,0,0]) difference()
     {   pusher_whole();
@@ -80,9 +86,7 @@ module pusher_top()
     }
 }
 
-//pusher_whole();
-
-module pusher_pincher()
+module pusher_pincher() //Pincher, potential alternative to holding the filament?
 {
     s=0; ts=0.4;
     linear_extrude(height=t-ts) union()
@@ -95,4 +99,10 @@ module pusher_pincher()
     }
 }
 
-pusher_pincher();
+// --- 3mm filament-associated tube(untested!)
+module pusher_bottom_3mm() { pusher_bottom($r=1.7, $rt=2.8); }
+module pusher_top_3mm()    { pusher_top($r=1.7, $rt=2.8); }
+module pusher_whole_3mm()  { pusher_whole($r=1.7, $rt=2.8); }
+module pusher_pincher_3mm(){ pusher_pincher(rt=2.8); }
+
+pusher_whole_3mm();
