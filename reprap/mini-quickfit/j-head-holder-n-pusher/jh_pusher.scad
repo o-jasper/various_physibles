@@ -28,10 +28,7 @@ module pusher_whole(srr=sr+t/2)
         {   linear_extrude(height=ph) difference()
             {   union()
                 {   for( x=pusher_d*[1,-1] ) translate([x,0]) circle(srr);
-                    intersection()
-                    {   scale([(r+d+t/2+2*sr)/(5*r),(rt+t/2)/(5*r)]) circle(5*r);
-                        scale([1,1/2]) circle(rt+d+t+2*sr);
-                    }
+                    scale([(pusher_d+2*sr)/(5*r),(rt+t/2)/(5*r)]) circle(5*r);
                 } //Screw holes.
                 for( x=pusher_d*[1,-1] ) translate([x,0]) circle(sR);
             }
@@ -46,13 +43,14 @@ module pusher_whole(srr=sr+t/2)
         }
         if(top_screwable) translate([0,0,ph-t]) cylinder(r=rt < 2.5 ? 2.5 : rt+t/3,h=ph);
 //The side hole inspired by Erik de Bruijns http://www.thingiverse.com/thing:1899/
-        translate([0,0,-l]) cylinder(r=rt,h=l+t); 
         translate([0,4*rt,2*t]) cube([4*rt,8*rt,t],center=true); //Side hole for nut/plug.
         translate([0,0,2*t-t/2]) cylinder(r=2*rt, h=t+1);        // .. end location.
 
         translate([0,4*rt,ph]) cube([2*rt,8*rt,ph],center=true); //Side hole for tube
         translate([0,0,2*t-t/2]) cylinder(r=rt, h=l);            //..main hole.
         translate([0,0,0.7*t]) cylinder(r1=0,r2=2*rt,h=1.3*t);   // guide for filament.
+
+        translate([0,0,-t]) cylinder(r1=1.5*rt, r2=rt,h=2*t);  //tube Hole on bottom
         
         //Hole for filament.
         translate([0,0,-ph]) cylinder(r=$r,h=3*ph);
@@ -94,7 +92,7 @@ module pusher_pincher() //Pincher, potential alternative to holding the filament
         {   circle(2*rt-ts);
             for(a=[0:60:300]) rotate(a) translate([rt-s,0]) circle(0.5);
             circle(rt-s);
-        }        
+        }
         for(a=[0:60:300]) rotate(30+a) translate([rt-s/2,0]) circle(0.5);
     }
 }
