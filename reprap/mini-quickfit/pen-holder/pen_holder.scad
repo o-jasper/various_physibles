@@ -36,7 +36,9 @@ dz = 4*t; //Range of motion.(only in structure)
 ds = phw/2+3*sR; //
 
 clamping_flap = true;
-top_clamping_flap = false;
+pen_holder_wires = true;
+
+with_holes=true;
 
 module teardrop(r) //Look at the MCAD version.. MCAD needs to simplify their shit.
 {   circle(r);
@@ -52,20 +54,16 @@ module pen_holder()
             for(x=[-pd,pd]/2) translate([x,0]) square([pfmt,phw],center=true);
         }
     }
-    linear_extrude(height=t) for(a=[0,180]) rotate(a) difference()
-    {   hull()
-        {   translate([ds,0]) circle(sR+t/2);
-            translate([0,-sR-t/2]) square([pht,2*sR+t]);
-        }
-        translate([ds,0]) circle(sR);
-        square((phw-pht)*[1,1],center=true);
-    }
     //Flap you put a clamp on to control it with a filament.
-    if(top_clamping_flap) translate([0,phw/2,phh]) rotate([90,0,0]) 
-        linear_extrude(height=pht)
-        {   square(phw*[1,1],center=true);
-            translate([0,phw/2]) circle(phw/2);
-        }
+    if(pen_holder_wires) for(a=[0,-90,180]) rotate(a)
+        translate([phw/2-pht,0,phh]) rotate([0,90,0]) rotate(90)
+            linear_extrude(height=pht) difference()
+            {   union()
+                {   square([4*sr,phw/2],center=true);
+                    translate([0,phw/4]) rotate(-90) circle(2*sr);
+                }
+                translate([0,phw/4]) rotate(-90) teardrop(sr);
+            }
     if(clamping_flap) difference()
     {   linear_extrude(height=6*sr) translate([-t/4+s,phw/2]) square([t/2-2*s,3*t+sr]);
      //Hole for screw. Might later add something that screws on here to clamp on the
@@ -79,64 +77,81 @@ $r = 2/2; // radius of filament(accounted, actually made a bit bigger than neede
 $rt = 1.75; //Tube radius
 
 q= 2*$rt+t/2;
-
-//Tube holder bit(not a separate part)
-module tube_holder(hinge_o=false)
+module tube_hole_and_slot()
+{   linear_extrude(height=8*q) //Tube hole and slot.
+    {   circle($rt);
+        translate([4*q,0]) square([8*q,1.8*$rt],center=true);
+    }
+}
+module spring_holder(sub=true,s=0)
 {
-    w=2*(2*$rt+t/2);
+    l=4*q; wtop = q/1.5; h=1.5*t;
+    difference()
+    {   hull()
+        {   translate([-q,0]) cube([2*q+s,l,t/16]);
+            translate([-wtop/2,0,h-t/16]) cube([wtop+s,l,t/16]);
+        }
+        if(sub) translate([0,0,-t]) 
+        {   translate([0,l-q]) rotate(90) tube_hole_and_slot();
+            translate([0,q]) cylinder(r=sR,h=8*q);
+        }
+    }
+}
+
+translate([0,w]) spring_holder();
+//Tube holder bit(not a separate part)
+module tube_holder()
+{
+    d=1.5*q;
+    w=2*(2*$rt+t);
     difference()
     {   //Main shape.
-        translate([0,w/2]) rotate([90,0,0]) linear_extrude(height=w) difference()
-        {   union()
-            {   polygon([[0,-w/2], [0,0], [(hinge_o ? 1.3 : 1)*w,0],
-                         [w,-w/2], [0,-3*w/2]]);
-                if(hinge_o) translate([w,0]) circle(w/sqrt(8));
-            }
-            if(hinge_o) translate([w,0]) rotate(-90) teardrop(sr);
+        translate([0,w/2]) rotate([90,0,0]) linear_extrude(height=w) 
+        {   polygon([[0,-w/2], [0,1.5*t], [w,1.5*t],
+                     [w,-w/2], [0,-3*w/2]]);
         }
-        translate([q,0,-q]) linear_extrude(height=8*q) //Tube hole and slot.
-        {   circle($rt);
-            translate([4*q,0]) square([8*q,1.8*$rt],center=true);
-        }
-        translate([q,0,-q]) 
-        {   linear_extrude(height=1.5*$rt) //nut space and slot.
+        translate([d,0,-q]) 
+        {   tube_hole_and_slot();
+            linear_extrude(height=1.5*$rt) //nut space and slot.
             {   circle(2*$rt);
                 translate([4*$rt,0]) square([8*$rt,4*$rt],center=true);
             }
             translate([0,0,$rt]) cylinder(r1=2*$rt,r2=$rt,h=$rt); 
+            translate([0,0,-8*q]) cylinder(r=$r,h=8*q); //Filament hole.
         }
-        translate([q,0,-4*q]) cylinder(r=$r,h=8*q); //Filament hole.
-//        translate([5.7*q,0,]) cube(q*[8,8,8],center=true);
+    }
+    translate([phw/2-2*sR-t,0,-2*q]) rotate([0,90,0]) 
+        linear_extrude(height=pht) 
+        intersection()
+    {   scale([5,1]) rotate(45) square((phw-pht)*[1,1],center=true);
+        square([5*q+t/16,phw+2*pht],center=true);
     }
 }
 
 //Block slides in the slider(addition and substraction to combine with other things)
-module slider_add(hinge_o=false)
-{   //Main block shape.
-    linear_extrude(height=phh) square((phw+2*pht+2*s)*[1,1],center=true);
-    linear_extrude(height=dz+2*t)  //'shoulders' with springs in them go here.
-    {   square([2*ds,2*sR+2*t],center=true);
-        for(a=[0,180]) rotate(a) translate([ds,0]) circle(sR+t);
-    }
-    translate([0,2*sR+t,phh+q]) rotate(90) tube_holder(hinge_o=hinge_o);
+module slider_add()
+{   
+    f=1.2;
+    step = f*(phw-2*pht)/sqrt(2)+t;
+//Main block shape.
+    difference()
+    {   linear_extrude(height=phh) square((phw+2*pht+2*s)*[1,1],center=true);
+        if(with_holes) for(z=[th+step:step:phh-step]) translate([0,0,z])
+            scale([1,1/f,1]) rotate([45,0,0]) cube([8*l,step,step],center=true);
+    }    
+    //holds the tube.
+    translate([0,2*sR+t,phh+2*q]) rotate(90) tube_holder();
 }
 
 module slider_sub()
 {
     q=2*sR+t/4+s;
-    //Sliding of thingy for springs.
-    translate([0,0,-dz]) linear_extrude(height=2*dz)
-    {   square([2*ds,2*sR+t+2*s],center=true);
-        for(x=[-ds,ds]) translate([x,0]) circle(sR+t/2+s);
-    }
     // Sliding of square part.
     cube((phw+2*s)*[1,1,0]+[0,0,8*phh],center=true);
-    for(x=[-ds,ds]) translate([x,0,-2*q]) 
-    {   cylinder(r=sr,h=2*phh); // Holes for screws/wires that guide the spring.
-        cylinder(r1=2*q,r2=0, h=4*q); //Slight guide tapering.
-    }
     //Slot for wing.
-    translate([-t/4,0,-t]) cube([t/2,8*q,phh-2*q+2*t]);
+    translate([-t/4,0,-t]) cube([t/2,8*q,phh]);
+    //Slot for spring pusher/
+    translate([0,2*sR+t,phh+q+2*t]) spring_holder(sub=false,s=0.3);
 }
 
 //Single loose slider.
@@ -155,8 +170,9 @@ module slider()
 
 module as_assembled()
 {
-    color("red") translate([0,phw/2+pht,dz*$t/2]) pen_holder();
-    mqf_double_pen_holder(secondary=secondary);
+    color("red") translate([0,phw/2+pht,(phh+th)*$t/2]) pen_holder();
+    mqf_double_slider(secondary=secondary);
+//    color("blue") translate([0,0.8*q+2*sR+t,phh+2*q-t/2]) spring_holder();
 }
 
 syr= 12+s; //Syringe radius.(it is pretty small.
@@ -165,18 +181,33 @@ fh = 1.2*(syr-sybr);
 
 module syringe_add()
 {
+    h=(fh+t+phh)/2; q= (phh-h);
     cylinder(r=syr+pht,h=fh+t);
+    intersection()
+    {   cylinder(r=syr+pht,h=phh);
+        difference()
+        {   hull()
+            {   translate([0,0,t]) cube(2*[2*syr,sybr/4,1],center=true);
+                translate([0,0,phh]) cube(2*[2*syr,syr+t,1],center=true);
+            }
+            translate([0,0,h]) rotate([45,0,0]) cube([8*syr,q,q],center=true);
+        }
+    }
 }
 module syringe_sub()
 {
-    translate([0,0,-4*t]) cylinder(r=sybr,h=8*phh);
-    cylinder(r1=sybr,r2=syr,h=fh+0.01*t);
-    translate([0,0,fh]) cylinder(r=syr,h=phh);
+    translate([0,0,-4*phh]) cylinder(r=sybr,h=8*phh);
+    translate([0,0,-2]) //Note: the syringe will need about ~2cm of extra length.
+    {   cylinder(r1=sybr,r2=syr,h=fh+0.01*t);
+        translate([0,0,fh]) cylinder(r=syr,h=8*phh);
+    }
 }
 
 //Mini quickfit holder
-module mqf_double_pen_holder(secondary=0)
+module mqf_double_slider(secondary=0)
 {
+    d=phw/2+pht+t;
+    pulley_h=fh+t;
     intersection()
     {   union()
         {   translate([0,0,th/2]) cube([w,l,th],center=true);
@@ -194,27 +225,34 @@ module mqf_double_pen_holder(secondary=0)
             else if(secondary==1){ translate([0,syr]) syringe_sub(); }
             //Two holes for air flow/wiring, plus holes for potential mounting.
             //(note: currently identical to j-head holder one)
-            for(x=[l,-l]/2) translate([x,0]) 
+            if( secondary==0 ) for(x=[l,-l]/2) translate([x,0]) 
             {   rotate(45) cube([w/6,w/6,l],center=true);
                 for(y=[1,-1]*w/6) translate([0,y,-l]) cylinder(r=sr,h=3*l);
             }
+            else
+            {   for(x=[l,-l]/1.8) translate([x,0]) 
+                   for(y=[1,-1]*w/8) translate([-w/12,y-w/12,th/4]) cube([l/3,w/6,8*w]);
+            }
         }
     }
+    if(secondary==1) //Things to put (todo whatsitcalled) on.
+    {
+        for(x=[-d-3*t,-d,d,d+3*t]) translate([x-t/2,0,pulley_h]) 
+            rotate([0,90.0]) linear_extrude(height=t) difference()
+            {   union()
+                {   circle(3*sr);
+                    translate([pulley_h/2,0]) square([pulley_h,6*sr],center=true);
+                }
+                teardrop(sr);
+            }
+    }
+
 }
 
-module diamond_pen_holder()
-{
-     difference()
-     {   slider_add();
-         slider_sub();
-     }
-     linear_extrude(height=t/2) difference()
-     {   
-         for(x=[1,-1]*w/6) translate([x,0,-l]) cylinder(r=sr,h=3*l);
-     }
-     
-}
+module mqf_syringe_n_slider()
+{   mqf_double_slider(secondary=1); }
 
+//Not sure of use
 module filament_holder() 
 {
     difference()
