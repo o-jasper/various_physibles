@@ -128,7 +128,7 @@ module slider()
 //pen_holder();
 
 //slider();
-//translate([0,2*phw]) pen_holder();
+translate([0,2*phw]) pen_holder();
 
 holder();
 
