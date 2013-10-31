@@ -38,6 +38,11 @@ ds = phw/2+3*sR; //
 clamping_flap = true;
 top_clamping_flap = false;
 
+module teardrop(r) //Look at the MCAD version.. MCAD needs to simplify their shit.
+{   circle(r);
+    translate([-r/sqrt(2),0]) rotate(45) square([r,r],center=true);
+}
+
 module pen_holder()
 {
     linear_extrude(height=phh) difference() 
@@ -65,10 +70,8 @@ module pen_holder()
     {   linear_extrude(height=6*sr) translate([-t/4+s,phw/2]) square([t/2-2*s,3*t+sr]);
      //Hole for screw. Might later add something that screws on here to clamp on the
      // filament.
-        translate([-4*t,phw/2 + 2*t+sr/2,t+sr]) rotate([0,90,0]) linear_extrude(height=8*t)
-        {   circle(sr);
-            translate([-sr/sqrt(2),0]) rotate(45) square([sr,sr],center=true);
-        }
+        translate([-4*t,phw/2 + 2*t+sr/2,t+sr]) rotate([0,90,0]) 
+            linear_extrude(height=8*t) teardrop(sr);
     }
 }
 
@@ -78,14 +81,18 @@ $rt = 1.75; //Tube radius
 q= 2*$rt+t/2;
 
 //Tube holder bit(not a separate part)
-module tube_holder()
+module tube_holder(hinge_o=false)
 {
     w=2*(2*$rt+t/2);
     difference()
-    {   intersection()
-        {   translate([0,w/2]) rotate([90,0,0]) linear_extrude(height=w) //Main shape.
-                polygon([[0,-w/2], [0,0], [w,0], [w,-w/2], [0,-3*w/2]]);
-            translate([w/2,0,-4*w]) cylinder(r=w/2,h=8*w);
+    {   //Main shape.
+        translate([0,w/2]) rotate([90,0,0]) linear_extrude(height=w) difference()
+        {   union()
+            {   polygon([[0,-w/2], [0,0], [(hinge_o ? 1.3 : 1)*w,0],
+                         [w,-w/2], [0,-3*w/2]]);
+                if(hinge_o) translate([w,0]) circle(w/sqrt(8));
+            }
+            if(hinge_o) translate([w,0]) rotate(-90) teardrop(sr);
         }
         translate([q,0,-q]) linear_extrude(height=8*q) //Tube hole and slot.
         {   circle($rt);
@@ -99,19 +106,19 @@ module tube_holder()
             translate([0,0,$rt]) cylinder(r1=2*$rt,r2=$rt,h=$rt); 
         }
         translate([q,0,-4*q]) cylinder(r=$r,h=8*q); //Filament hole.
-        translate([5.7*q,0,]) cube(q*[8,8,8],center=true);
+//        translate([5.7*q,0,]) cube(q*[8,8,8],center=true);
     }
 }
 
 //Block slides in the slider(addition and substraction to combine with other things)
-module slider_add()
+module slider_add(hinge_o=false)
 {   //Main block shape.
     linear_extrude(height=phh) square((phw+2*pht+2*s)*[1,1],center=true);
     linear_extrude(height=dz+2*t)  //'shoulders' with springs in them go here.
     {   square([2*ds,2*sR+2*t],center=true);
         for(a=[0,180]) rotate(a) translate([ds,0]) circle(sR+t);
     }
-    translate([0,2*sR+t,phh+q]) rotate(90) tube_holder();
+    translate([0,2*sR+t,phh+q]) rotate(90) tube_holder(hinge_o=hinge_o);
 }
 
 module slider_sub()
@@ -148,8 +155,8 @@ module slider()
 
 module as_assembled()
 {
-    color("red") translate([0,phw/2+pht,phh*$t/2]) pen_holder();
-    mqf_double_pen_holder();
+    color("red") translate([0,phw/2+pht,dz*$t/2]) pen_holder();
+    mqf_double_pen_holder(secondary=secondary);
 }
 
 syr= 12+s; //Syringe radius.(it is pretty small.
@@ -166,11 +173,6 @@ module syringe_sub()
     cylinder(r1=sybr,r2=syr,h=fh+0.01*t);
     translate([0,0,fh]) cylinder(r=syr,h=phh);
 }
-
-//as_assembled();
-
-//translate([0,-10]) cylinder(r=10,h=50);
-
 
 //Mini quickfit holder
 module mqf_double_pen_holder(secondary=0)
@@ -213,7 +215,27 @@ module diamond_pen_holder()
      
 }
 
-//mqf_double_pen_holder(secondary=1);
+module filament_holder() 
+{
+    difference()
+    {   rotate([0,-90,0]) linear_extrude(height=1.2*t) intersection()
+        {   square(t*[3,10]);
+            difference()
+            {   translate(t*[1.5,2.5]) circle(2.5*t);
+                translate(t*[1.5,1.5]) rotate(180) teardrop(sr);
+            }
+        }
+        translate([-0.6*t,0,-t])
+        {   cube([1.75,8*t,9*t],center=true);
+            translate([0,4*t]) cylinder(r=1.75/2,h=8*t);
+        }
+        
+    }
+}
+
+translate([w,0]) filament_holder();
+
+/*mqf_double_pen_holder(secondary=1);
 
 use<../j-head-holder-n-pusher/j_head_holder.scad>;
 
@@ -221,5 +243,6 @@ color("red") translate([2*(phw-pht),-2*pht,th+0.1]) rotate(-90)
 {   diamond_pen_holder();
     pen_holder();
 }
-jh_holder();
+jh_holder();*/
 
+as_assembled(secondary=1);
