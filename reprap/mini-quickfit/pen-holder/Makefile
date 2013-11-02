@@ -2,7 +2,7 @@
 default: recommend
 
 recommend: output/mqf_syringe_n_slider.stl \
-	output/spring_holder.stl output/pen_holder.stl
+	output/spring_holder.stl output/pen_holder.stl output/filament_holder.stl
 
 other:  output/mqf_double_slider.stl 
 

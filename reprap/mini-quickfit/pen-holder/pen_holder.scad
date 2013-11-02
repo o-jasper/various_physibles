@@ -22,7 +22,7 @@ t=3;
 s=0.4;
 
 sr=1.5;
-sR=1.65;
+sR=1.8;
 
 pd = 5;
 pfmt = 0.5; //'membrane' spring holds it in.
@@ -73,8 +73,8 @@ module pen_holder()
     }
 }
 
-$r = 2/2; // radius of filament(accounted, actually made a bit bigger than needed)
-$rt = 1.75; //Tube radius
+$r = 1.2; // radius of filament(accounted, actually made a bit bigger than needed)
+$rt = 2.2; //Tube radius
 
 q= 2*$rt+t/2;
 module tube_hole_and_slot()
@@ -98,21 +98,20 @@ module spring_holder(sub=true,s=0)
     }
 }
 
-translate([0,w]) spring_holder();
 //Tube holder bit(not a separate part)
 module tube_holder()
 {
-    d=1.5*q;
+    d=1.7*q;
     w=2*(2*$rt+t);
     difference()
     {   //Main shape.
         translate([0,w/2]) rotate([90,0,0]) linear_extrude(height=w) 
-        {   polygon([[0,-w/2], [0,1.5*t], [w,1.5*t],
+        {   polygon([[0,-w/2], [0,2*t], [w,2*t],
                      [w,-w/2], [0,-3*w/2]]);
         }
         translate([d,0,-q]) 
         {   tube_hole_and_slot();
-            linear_extrude(height=1.5*$rt) //nut space and slot.
+            translate([0,0,-$rt]) linear_extrude(height=2*$rt) //nut space and slot.
             {   circle(2*$rt);
                 translate([4*$rt,0]) square([8*$rt,4*$rt],center=true);
             }
@@ -172,7 +171,7 @@ module as_assembled()
 {
     color("red") translate([0,phw/2+pht,(phh+th)*$t/2]) pen_holder();
     mqf_double_slider(secondary=secondary);
-//    color("blue") translate([0,0.8*q+2*sR+t,phh+2*q-t/2]) spring_holder();
+    color("blue") translate([0,0.8*q+2*sR+t,phh+2*q]) spring_holder();
 }
 
 syr= 12+s; //Syringe radius.(it is pretty small.
@@ -207,7 +206,7 @@ module syringe_sub()
 module mqf_double_slider(secondary=0)
 {
     d=phw/2+pht+t;
-    pulley_h=fh+t;
+    pulley_h=fh+1.2*t;
     intersection()
     {   union()
         {   translate([0,0,th/2]) cube([w,l,th],center=true);
@@ -235,13 +234,13 @@ module mqf_double_slider(secondary=0)
             }
         }
     }
-    if(secondary==1) //Things to put (todo whatsitcalled) on.
+    if(secondary==1) //Things to put pulleys on.
     {
-        for(x=[-d-3*t,-d,d,d+3*t]) translate([x-t/2,0,pulley_h]) 
-            rotate([0,90.0]) linear_extrude(height=t) difference()
+        for(x=[-d-4*t,-d,d,d+4*t]) translate([x-0.75*t,0,pulley_h]) 
+            rotate([0,90.0]) linear_extrude(height=1.5*t) difference()
             {   union()
-                {   circle(3*sr);
-                    translate([pulley_h/2,0]) square([pulley_h,6*sr],center=true);
+                {   circle(4*sr);
+                    translate([pulley_h/2,0]) square([pulley_h,8*sr],center=true);
                 }
                 teardrop(sr);
             }
@@ -259,28 +258,19 @@ module filament_holder()
     {   rotate([0,-90,0]) linear_extrude(height=1.2*t) intersection()
         {   square(t*[3,10]);
             difference()
-            {   translate(t*[1.5,2.5]) circle(2.5*t);
+            {   translate(t*[1.5,2.5]) circle(2*t);
                 translate(t*[1.5,1.5]) rotate(180) teardrop(sr);
             }
         }
         translate([-0.6*t,0,-t])
-        {   cube([1.75,8*t,9*t],center=true);
-            translate([0,4*t]) cylinder(r=1.75/2,h=8*t);
+        {   cube([1.75,7*t,9*t],center=true);
+            translate([0,3*t]) cylinder(r=1.75/2,h=8*t);
         }
         
     }
 }
 
-translate([w,0]) filament_holder();
-
-/*mqf_double_pen_holder(secondary=1);
-
-use<../j-head-holder-n-pusher/j_head_holder.scad>;
-
-color("red") translate([2*(phw-pht),-2*pht,th+0.1]) rotate(-90)
-{   diamond_pen_holder();
-    pen_holder();
-}
-jh_holder();*/
+translate([w/4,w/2]) filament_holder();
 
 as_assembled(secondary=1);
+translate([0,w/2]) spring_holder();
