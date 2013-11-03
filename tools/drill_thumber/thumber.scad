@@ -1,45 +1,80 @@
 //Author Jasper den Ouden 24-10-2013
 // Placed in public domain
 
+$fn=60;
+
 //Clamps (small) drills for easier manual handling.
-
-r=10;
-ar=0.5;
-h=r;
 sr=2;
-s=0.5;
+s=0.7;
 
-a=40;
+dr=0.4;
 
-module thumby(female=true)
+t=4;
+l=30;
+w=10;
+
+male=true;
+
+module base(ds=0)
 {
     intersection()
-    {   scale([1,1,h/(1.5*r)]) sphere(r);
+    {   translate([-t,-l/2,w]/2) cube([t,l,w],center=true);
         difference()
-        {   translate([0,0,-h/4]) cube([8*r,8*r,h/2],center=true);
-            translate([0,-4*r]) rotate([-90,0,0]) cylinder(r=ar,h=8*r);
-            translate([r/2,0,-h]) cylinder(r=sr,h=8*h);
-            if(female) translate([-r,0]) rotate([0,-a,0]) cube([r/2,r/2,8*h],center=true);
+        {   translate([t/2,0,w/2]) scale([1,l/(4*t),1]) sphere(2*t);
+            translate([0,l/4-t/2]) cylinder(r=s+ds,h=w);
         }
     }
-    if(!female)
-        union()
-        {   intersection()
-            {   scale([1,1,h/(1.5*r)]) sphere(r);
-                cube([8*r,8*r,h],center=true);
-                translate([-r,0]) rotate([0,a,0]) cube([r/2-s,r/2-s,8*h],center=true);
+}
+
+module d(ds=0)
+{
+    translate([-t/2,(l-t)/2]) cylinder(r1=t/2+ds,r2=t+sd,h=w);
+    difference()
+    {   translate([-t/2-50*ds,(l-t)/4,3*w/4+2*s]) 
+            cube([t+100*ds,(l-t+100*ds)/2,w/2-4*s+ds],center=true);
+        translate([0,l/2,w]) rotate([0,45,0]) cube([1.5*t-ds,l/2+100*ds,1.5*t-ds],center=true);
+    }
+}
+
+module male(ds=0)
+{
+    translate([t/2,-(l-t)/2]) difference()
+    {   union()
+        {   base(ds); 
+            d(ds);
+        }
+        translate([0,l/4-t/2]) cylinder(r=dr,h=w); //Drill groove
+        translate([w,-l/2+3*sr,w/2]) rotate([0,-90,0]) cylinder(r=sr,h=8*w); //Screw.
+    }
+}
+
+module female()
+{
+    translate([t/2,-(l-t)/2]) difference()
+    {   union()
+        {   hull()
+            {   translate([0,0,w]) rotate(180) rotate([180,0,0]) base();
+                translate([t/3,l/4+t/2,w/2]) rotate(20) scale([1/2,1,1]) sphere(w/2);
+            }
+            linear_extrude(height=w) hull()
+            {   translate([-t/2,(l-t)/2]) circle(0.8*t);
+                translate([t/2,l/4-t]) circle(t/2);
             }
         }
+        translate([-t/2,(l-t)/2]) for(a=[-40,-20,-10,0]) rotate(a) 
+            translate([t/2,-(l-t)/2]) d(2*s);
+        translate([-t/2,0,0]) cube([t,l/2+t,8*w],center=true);
+            
+        translate([0,l/4-t/2]) cylinder(r=dr,h=w); //Drill groove
+        translate([w,-l/2+3*sr,w/2]) rotate([0,-90,0])  //Screw and nut.
+        {   cylinder(r=sr,h=8*w);
+            translate([0,0,w-1.55*t]) cylinder(r2=3*sr,r1=4*sr,h=t,$fn=6);
+        }
+    }
 }
 
-module thumby_male(){ thumby(false); }
-module thumby_female(){ thumby(true); }
-
-module thumby_assembled()
-{
-    translate([0,0,-0.1]) color("blue") thumby_male();
-    rotate([180,0,0]) thumby_female();
+module thumby()
+{   rotate(-4) male();
+    color("blue") female();
 }
-
-thumby_assembled();
-//thumby_male();
+thumby();
