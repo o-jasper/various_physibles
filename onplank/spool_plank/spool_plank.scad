@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 20-04-2013 Jasper den Ouden.(ojasper.nl)
+//  Copyright (C) 10-11-2013 Jasper den Ouden.(ojasper.nl)
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -8,6 +8,7 @@
 //
 
 use<rounded_box.scad>
+use<openhw.escad>
 
 wd = 6; //minimum distance to wall.
 
@@ -32,11 +33,14 @@ sr=1.4; //Screw/whatever holes.
 
 echo(dx);
 
+cut_fancy=true;
+cut_logo=true;
+
 module spool_plank_profile()
 {   
     difference()
-    {   translate([-wd,-t])
-        {   rounded_square(wd+gl,2*t+pt, r);
+    {   translate([-wd,-2*t/3])
+        {   rounded_square(wd+gl,1.33*t+pt, r);
             translate([dx,t-dl]) square([t,dl+rr+t/2]);
         }
         square([pl,pt]);
@@ -46,7 +50,7 @@ module spool_plank_profile()
 module reinforcements()
 {//Dont think these are good..
     rl = min(dl-rr, dx-r, gl+wd-dx, 4*t);
-    linear_extrude(height= t) polygon([[dx-rl-t,0], [dx,-rl], [dx+rl,0]]);
+    linear_extrude(height= t/2) polygon([[dx-rl-t,0], [dx,-rl], [dx+rl,0]]);
 }
 
 module spool_plank()
@@ -60,13 +64,16 @@ module spool_plank()
             }
             if( reinforce )
             {   reinforcements();
-                translate([0,0,w-t]) reinforcements();
+                translate([0,0,w-t/2]) reinforcements();
             }
         }
+        //Hole for rod.
         translate([0,-dl,w/2]) rotate([0,90]) cylinder(r=rr, h=pl);
+        //Hole along length(no apparent reason)
         translate([dx-wd+t/2,-rr+dl,w/2]) rotate([90,0]) cylinder(r=sr, h=pl);
+        //'Security pin' hole.
         translate([dx-wd+t/2,-dl,0]) cylinder(r=sr, h=pl);
-        if( cut_more )
+        if( cut_more ) 
         {   translate([0,pl,w/2]) rotate([90,0]) 
             {
                 scale([dx-t,w/2-t]/w) cylinder(r=w, h=3*pl);
@@ -74,6 +81,18 @@ module spool_plank()
             }
             translate([0,rr-dl+t,t]) cube([pl,dl-rr-2*t,w-2*t]);
         }
+        if(cut_fancy) for( x=[w-dl:w/2+t/2:-w/2] ) translate([dx,x,w/2]) 
+            intersection()
+            {   rotate([0,-90,0]) union()
+                {   cylinder(r=w/2-t/2,h=pl,$fn=4);
+                    for(s=[1,-1]) for(s2=[1,-1]) 
+                                      translate([s*(w-t/2)/2,s2*(w+t)/4]) 
+                                          cylinder(r=w/2-t/2,h=pl,$fn=4);
+                }
+                cube([pl,pl,w-t],center=true);
+            }
+        if(cut_logo) rotate([0,-90,0]) translate([w/2,pt/2,2*t/3]) 
+                         linear_extrude(height=pl) oshw_logo_2d(w-t/2);
     }
 }
 
@@ -94,7 +113,7 @@ module splitter_sub() //This goes off both.
 module split_spool_plankpart()
 {
     intersection()
-    {   spool_plank();
+    {   spool_plank(cut_fancy=false);
         difference()
         {   splitter();
             splitter_sub();
@@ -103,7 +122,7 @@ module split_spool_plankpart()
 }
 module split_spool_hangpart()
 {   translate([0,0,wd-dx]) rotate([0,-90,0]) difference() 
-    {   spool_plank();
+    {   spool_plank(cut_fancy=false);
         splitter();
         splitter_sub();
     }
@@ -132,3 +151,6 @@ module little_extra_reach(h)
 //split_spool_hangpart();
 
 spool_plank();
+
+module spool_plank_plain()
+{   spool_plank(cut_fancy=false,cut_logo=false); }
