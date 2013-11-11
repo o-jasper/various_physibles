@@ -9,7 +9,7 @@ runs/
 */pics/*.JPG
 */pics/*.PNG
 */pics/shot*.png
-
+*/pics/cat?/
 
 .#*
 */.#*
