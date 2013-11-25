@@ -7,7 +7,7 @@
 //  (at your option) any later version.
 //
 
-include<gear_outer.scad>
+include<MCAD/involute_gears.scad>
 
 $fs=0.5;
 $fn=40;
@@ -59,8 +59,10 @@ f=0.2;
 pitch = 180;
 mf= 49*pitch/(500*36);
 
+br=2*sr;
+
 module g(n)
-{   gear_outer(number_of_teeth=n, circular_pitch=pitch); }
+{   gear(flat=true,number_of_teeth=n, circular_pitch=pitch, bore_diameter=2*br); }
 
 //NOTE the clock kindah has a 'sum number' which is the constant sum of tooth
 // given some tooth size and a distance between two rotating points.
@@ -114,7 +116,7 @@ module show_sequence(hor=false)
 
 //show_sequence();
 
-gh=th;
+gh=1.5;
 sh=0.3;
 sr=0.5;
 
@@ -126,11 +128,12 @@ module stack_gear(n,m) //Implements the many sets of connected gears.
         difference()
         {   translate([0,0,sh]) union()
             {   linear_extrude(height=gh) g(n);
-                linear_extrude(height=3*gh+sh) g(m);
+                linear_extrude(height=3*gh+2*sh) g(m);
                 cylinder(r=rb,h=1.5*gh-sh);//1=mf*(n-3),r2=mf*(m-3),h=2*gh);
                 translate([0,0,1.5*gh-sh]) cylinder(r1=rb,r2=mf*(m-3),h=gh/2);
             }
             cylinder(r=sr,h=8*gh);
+            cylinder(r=br,h=8*gh);
         }
     }
     else
@@ -141,8 +144,8 @@ dz=2*gh+2*sh;
 
 module stack_space(n,m) //Space for said gears.
 {
-    cylinder(r=mf*(n+2)+sr,h=gh+2*sh); //Bigger gear
-    cylinder(r=mf*(m+2)+sr,h=dz+gh+2*sh); //Smaller top gear
+    cylinder(r=mf*(n+2)+2*sr,h=gh+2*sh); //Bigger gear
+    cylinder(r=mf*(m+2)+2*sr,h=dz+gh+2*sh); //Smaller top gear
 }
 
 $which = 1;
@@ -162,13 +165,39 @@ module arm_gear(h,ro,ri)
             cylinder(r=ro,h=h);
         }
         translate([0,0,-h]) cylinder(r=ri,h=3*h);
+        translate([0,0,h]) cube([8*ro,0.8*ro,2*dz],center=true);
+        translate([0,4*ro,h-dz/2]) rotate([90,0,0]) cylinder(r=2*sr,h=8*ro);
     }
     if( $which == 2 )
     {
-        cylinder(r=mf*(3+n),h=gh+2*sh);
+        cylinder(r=mf*(3+n)+2*sr,h=gh+2*sh);
         cylinder(r=ro+sr,h=h);
     }
 }
+module seconds()
+{   ex = ($which==2 ? sr : 0);
+    difference()
+    {   union()
+        {   arm_gear(13.5*dz,10*mf-sr,3*mf);
+            translate([0,0,ex/2]) cylinder(r1=20*mf-sr+ex,r2=ex,h=4*dz); 
+        }
+        if($which==1) translate([0,0,gh/2]) cylinder(r1=15*mf-sr+ex,r2=3*mf,h=2.5*dz-gh); 
+    }
+}
+module minutes()
+{   ex = ($which==2 ? sr : 0);
+    arm_gear(8*dz, 14*mf-sr,10*mf);
+    difference()
+    {   translate([0,0,gh]) cylinder(r1=11*mf+dz+ex,r2=14*mf-sr+ex,h=dz+gh+ex);
+        rotate_extrude() translate([14*mf-sr,dz+gh/2]) 
+            if( $which==1 ) translate([dz/sqrt(8),0]) circle(gh/2);
+        for(s=[1,-1]) translate([-44*mf,s*(12*mf-sr/2),dz+gh/2]) 
+                          rotate([0,90,0]) cylinder(r=sr,h=88*mf);
+        if($which==1) translate([0,0,-10*mf]) cylinder(r=10*mf,h=88*mf);
+    }
+}
+module hours()
+{   arm_gear(2.5*dz, 20*mf-sr,14*mf); }
 
 module escapement_gear()
 {
@@ -192,10 +221,12 @@ module top_gear()
     {   cylinder(r=27*mf,h=gh+2*sh); }
 }
 
+extra_sum=0.2;
+
 module cut_sequence()
 {
     v=[0,0,dz];
-    off = [0,mf*sum_number,0];
+    off = [0,mf*(sum_number+extra_sum),0];
 
 //    linear_extrude(height=gh) rotate(180/9) g(9);
     if( $which==1 ) escapement_gear();
@@ -213,9 +244,13 @@ module cut_sequence()
     
     translate([0,-4*mf*sum_number/3]) 
     {
-        translate(v*1) arm_gear(12*dz,2*gh-sr,gh); //seconds
-        translate(v*5) arm_gear(7*dz, 4*gh-sr,2*gh); //minutes
-        translate(v*9) arm_gear(2*dz, 6*gh-sr,4*gh); //hours
+        translate(v*1) seconds();
+        translate(v*5) minutes();
+        translate(v*9) hours();
+        if( $which==2 ) translate(5*v)
+        {   translate([0,0,dz]) cylinder(r=(sum_number-2)*mf,h=dz-gh);
+//            translate([0,0,dz/2]) sphere((sum_number-5)*mf);
+        }
     }
 }
 
@@ -229,16 +264,28 @@ module _base_profile(neg=true)
 }
 
 module body()
-{   difference()
+{   dy=1.4*R;
+    difference()
     {   union()
         {   translate([0,0,-gh]) linear_extrude(height=10*(2*gh+2*sh)+gh)
                 _base_profile(false);
             for(z=dz*[1,5,9]) translate([0,0,z-gh]) 
                                   linear_extrude(height=3*gh+2*sh) _base_profile(true);
+            translate([0,0,-gh]) linear_extrude(height=4*dz) difference()
+            {   hull()
+                {   circle((sum_number+2)*mf);
+                    translate([0,-dy]) circle(sum_number*mf/2);
+                }
+                translate([0,-dy]) circle(sum_number*mf/4);
+            }
         }
         cut_sequence($which=2);
-        translate([0,0,-mf*100]) cylinder(r=sr,h=mf*300);
-        translate([0,mf*sum_number,-mf*100]) cylinder(r=sr,h=mf*300);
+        translate([0,0,-mf*100]) cylinder(r=br,h=mf*300);
+        translate([0,mf*sum_number,-mf*100]) cylinder(r=br,h=mf*300);
+        for(s=[1,-1]) 
+            translate([s*(sum_number+extra_sum)*mf,
+                       0.7*(sum_number+extra_sum)*mf,-4*sum_number*mf])
+                cylinder(r=2*sr,h=8*sum_number*mf);
     }
 }
 
@@ -255,8 +302,7 @@ module sliver_cutter(neg=true)
 module sliver(n)
 {
     if(n==0) //First one has a whole body.
-    {
-        difference()
+    {    difference()
         {   body();
             translate([0,0,400*mf]) sliver_cutter();
         }
@@ -282,13 +328,14 @@ module sliver_show(gears=false, inc=-dz, grid=true)
 
 module clock_show()
 {
-    intersection()
+    color([1,1,0]) intersection()
     {   body();
         translate([-100,0]) cube(100*[2,2,2],center=true);
     }
     cut_sequence($which=1);
-    escapement();
+    rotate(180) escapement();
 }
 clock_show();
+//sliver(0);
 
-translate([0,0,-10]) color("blue") square([100,100],center=true);
+//translate([0,0,-10]) color("blue") square([100,100],center=true);
