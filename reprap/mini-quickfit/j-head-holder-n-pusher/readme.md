@@ -13,16 +13,15 @@ held down by the pusher this wont be needed.
 ### The pusher
 The pusher - pushes a pfte tube down into the J-head, M3 screws go through the pusher
 and `jh_holder.stl` do so. Currently it is designed for a bowden setup. 
-A second pfte tube with a m5 nut screwed onto the end is inserted on the side.
+A second pfte tube with a M5 nut screwed onto the end is inserted from the side.
 
-Of course it might be something else than a m5 nut, as long as it fits and can hold
-on. There is also a printable pincher this `jh_pusher_pincher.stl`. Note that you 
-might want to ensure sufficient inner diameter using a drill bit.
+The pusher is split up into `jh_pusher_bottom.stl` and `jh_pusher_top.stl`, 
+the latter has a slot on the side. These halves are pressed
+together with the same screwing action as the pusher pushes down with, and that 
+pushes the M5 nut close bit too.
 
-`jh_pusher_whole.stl` is the pusher, *however* it basically needs support, which
-can be annoying, for this reason it is split up into `jh_pusher_bottom.stl` and 
-`jh_pusher_top.stl`, the latter has a slot on the side. These halves are pressed
-together with the same screwing action as the pusher pushes down with.
+`jh_pusher_top.stl` is made so you only need to unscrew a bit and it can then 
+slide sideward.
 
 Once the pusher is pushing the external pfte tube for bowden use should be still
 able to removed or reinstalled, if the filament is retracted first.
