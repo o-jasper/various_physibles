@@ -8,6 +8,8 @@ runs/
 #'Raw' image
 */pics/*.JPG
 */pics/*.PNG
+*/*/pics/*.JPG
+*/*/pics/*.PNG
 */pics/shot*.png
 */pics/cat?/
 
