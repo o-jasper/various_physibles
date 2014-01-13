@@ -4,12 +4,6 @@
 
 * `plank_hook/` plain hook-kindah thing for under plank.
 
-* `clamp_hanger/` puts a clamp under a plank, i use it to hold stuff i can 
-  read without taking space on the table.
-
-* `wedge/` thing that you put between the plan and the slide-on-plank to close
-  the distance.
-
 ## Parameters
 In order of importance:
 

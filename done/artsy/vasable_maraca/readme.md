@@ -1,3 +1,4 @@
+(note: i find this thing.. boring)
 
 # [Maraca](https://en.wikipedia.org/wiki/Maraca) that can be printed with zero infill
 Can be printed with just one perimeter.(bottom layers should also be enabled)

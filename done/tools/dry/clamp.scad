@@ -210,5 +210,5 @@ module as_show()
     color([0,0.6,0]) clamp_male();    
 }
 
-//zas_show();
+as_show();
 //as_print();

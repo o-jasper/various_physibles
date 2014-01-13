@@ -1,5 +1,4 @@
 
-# Corner mirror stick
 For if you're trying to look around corners.
 
 # Instructions

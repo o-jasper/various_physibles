@@ -2,6 +2,8 @@ NOTE the status is: Probably it works, but i dont feel like testing or
 developing it further. If you try it please provide feedback for others.
 (be specific) `clamp_` and `dry_` are more likely to work than `tiny_`.
 
+If i develop it further, i will likely start from scratch.
+
 # Clamps
 Clamps inspired on [thingiverse user KidCrazy](http://www.thingiverse.com/KidCrazy/designs)'s
 ['KCS' clamp](http://www.thingiverse.com/thing:89457). Untested. Intended improvements are:
@@ -19,7 +21,8 @@ Print it, the `_set.stl` files contains a pair with the plastic spring,
 Then put the parts together, it will resist a bit halfway due to the guide. 
 Going in diagnonally seems to work better.
 
-If you use the plastuc spring, just put it in.
+If you use the plastuc spring, just put it in. Note that plastic is subject to 
+[creep](https://en.wikipedia.org/wiki/Creep_%28deformation%29) when under constant tension.
 
 For regular springs there are probably multiple good strategies. 
 * use metal wires and twisting them up, the spring then goes over the metal wires.

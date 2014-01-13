@@ -90,6 +90,6 @@ module as_print()
     
 }
 
-//as_print();
+as_print();
 
 //TODO would-be-nice to have as_show.

@@ -2,6 +2,9 @@
 # Image to text forms.
 To my annoyance, imagemagick does not actually have anything decent on this :/
 
+Note: [embossanova](https://cubehero.com/physibles/iamwil/embossanova) does a 
+similar thing.
+
 Uses SDL to turn a image to various tabular forms;
 
 **rgba**,**rgb**,**gray**  tab-separated rgb(a)/grayscale on each line, 

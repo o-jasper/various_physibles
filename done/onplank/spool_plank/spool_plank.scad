@@ -7,7 +7,6 @@
 //  (at your option) any later version.
 //
 
-use<rounded_box.scad>
 use<openhw.escad>
 
 wd = 6; //minimum distance to wall.
@@ -40,7 +39,10 @@ module spool_plank_profile()
 {   
     difference()
     {   translate([-wd,-2*t/3])
-        {   rounded_square(wd+gl,1.33*t+pt, r);
+        {   minkowski()
+            {   circle(r);
+                translate([r,r]) square([wd+gl-2*r,1.33*t+pt-2*r]);
+            }
             translate([dx,t-dl]) square([t,dl+rr+t/2]);
         }
         square([pl,pt]);
