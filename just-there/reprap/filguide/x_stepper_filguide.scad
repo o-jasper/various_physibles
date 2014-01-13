@@ -25,7 +25,10 @@ gcw = 3; //Width of cut to get wire to guide.(equal to gw, but recommend not.
 module round_stepper_profile()
 {   d = (sw-ssw)/2;
     difference() 
-    {   rounded_square(sw+2*t,sw+2*t, t+d);
+    {   minkowski()
+        {   translate([t+d,t+d]) square([sw-2*d,sw-2*d]);
+            circle(t+d);
+        }
         translate([t,t]) 
             polygon([[d,0],[0,d],         [0,sw-d], [d,sw],
                      [sw-d,sw],[sw,sw-d], [sw,d],[sw-d,0]]);

@@ -2,8 +2,9 @@
 I may use paper to draw designs on, but reading it while using the laptop, 
 it gets in my way. So i put yet another thing to clamp onto the plank.
 
-Works pretty well for me, though i do have to push the paper high enough so it
-doesnt slide loose too easily.(the paper block has to be thick enough too.)
+Works okay for me, but dont find it good enough over-all. I have to push the paper
+high enough so it doesnt slide loose too easily.
+(the paper block has to be thick enough too.)
 I also needed to use rubber bands to grip it better. None of the tape i had had
 enough grip, though some did better than the plastic.
 

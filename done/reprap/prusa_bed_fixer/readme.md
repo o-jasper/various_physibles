@@ -7,3 +7,6 @@ vertically. (right?) Of course the z-end-stop does too.
 
 Use spacers on top the calibrate it. 
 This is not a convenient calibration method much, so hope it stays in calibration.
+
+`output/bed_fixer_through.stl` has the hole all the way through.. 
+It might be too weak, so it isnt defaultly made by the Makefile.

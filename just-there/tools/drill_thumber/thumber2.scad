@@ -34,7 +34,7 @@ module top(really=true)
         }
         difference()
         {   sphere(w/2);
-            if(really) translate([sx,0,t/2]) cylinder(r1=2*sr,r2=3*sr,h=t,$fn=6);
+            if(really) translate([sx,0,t/2]) cylinder(r1=1.5*sr,r2=3*sr,h=t,$fn=6);
             drill_space();
             if(really) translate([-l/2,w/6]) rotate([90,0,0]) 
                 linear_extrude(height=l) difference()
