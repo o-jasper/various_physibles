@@ -122,11 +122,28 @@ module base()
     linear_extrude(height=1) base_floor_2d(R);
 }
 
-//rotate([90,0]) translate([2*servo_sx,0]) side_servo();
+module servo()
+{
+    color("grey") include<9G_Servo_in_OpenSCAD/9g_servo.scad>;
+}
 
-//translate([4*servo_sx,0]) 
-//rotate([0,0,90]) rotate([0,90]) side_camera();
-//base();
-//color([0,0,1]) servo_holder();
-//include<9G_Servo_in_OpenSCAD/9g_servo.scad>
-//translate([10,10,-3]) cube([2,2,18],center=true);
+//WARNING placement is all a bit off!
+
+module show(half=true, phi=360*$t,theta=30+90*sin(360*$t))
+{   
+    translate([-servo_sy/2,0]) rotate(phi) translate([0,0,h+2*t+20]) rotate([90,0]) 
+    {   side_servo();
+        servo();
+        translate([servo_sy/2,0,45]) rotate(-theta) rotate([0,90,0]) side_camera();
+    }
+    intersection()
+    {   base();
+        if(half) translate([-4*w,0]) cube(8*[w,w,w]);
+    }
+    {   translate([0,0,2*t+h/2]) color("blue") servo_holder();
+        translate([0,0,h/2+2*t]) servo();
+    }
+//    translate([10,10,200]) cube([2,2,18],center=true);
+}
+
+show(half=false);
