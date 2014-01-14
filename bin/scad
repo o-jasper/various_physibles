@@ -1,0 +1,23 @@
+#!/bin/bash
+# Jasper den Ouden
+# Placed in public domain.
+
+direct()
+{
+    mkdir -p `dirname $2`
+    
+    FILE=/tmp/`date +%s`$RANDOM.scad
+    echo $1 > $FILE
+    openscad $FILE -o $2
+}
+    
+case $1 in
+    module) #Compile one module in there.
+        MODULE="$4"
+        if [ "$4" == "" ]; then #Figure out module to use from input if not supplied.
+            MODULE=$(echo $3 | cut -f 2 -d/ |cut -f 1 -d.)
+        fi
+        direct "use<$(pwd)/$2>;$MODULE();" $3 ;;
+    direct) #"free form"(probably better not do it, just put the modules in there.)
+        direct $2 $3 ;;
+esac
