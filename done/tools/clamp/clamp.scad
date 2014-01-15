@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 21-05-2013 Jasper den Ouden.
+//  Copyright (C) 15-01-2014 Jasper den Ouden.
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published

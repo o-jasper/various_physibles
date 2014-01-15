@@ -1,12 +1,17 @@
+*note* obviously soldering irons can get very hot! Be careful and make sure it
+is stable and you are not surprised by how much heat gets out of this thing.
+I am **not** convinced this thing is good enough!
+
 # Soldering iron holder
 The idea is that the tin can and dissipates the heat, and wires inside
 prevent the soldering iron from touching the tin can directly, making 
 spots of it very hot.
 
-### A lot to be desired!!
-
+### A **lot** to be desired!!
 However, it does *not* quite succeed, the outside can still probably get very
 hot, but no melting seen yet.
+
+Also it **needs** sufficient weight in the bottom to be stable!
 
 A lot remains to be desired from the design. Entering the internal wires are 
 a pain in the ass, it is way oversized, and maybe some kind of housing would be good.
