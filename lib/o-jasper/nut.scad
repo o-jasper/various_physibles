@@ -21,7 +21,7 @@ module nut2d()
 }
 module nut_profile(){ echo("nut_profile depreciated, use nut2d instead"); nut2d(); }
 
-module nut2d(l)
+module nut2d_with_length(l)
 {   nut2d(nt=nt);
     translate([0,l/2]) square([nt,l],center=true);
 }
