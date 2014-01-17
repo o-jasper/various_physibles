@@ -7,7 +7,8 @@ nt = 5.8;
 nh = 2.6;
 
 sr = 1.3; //Screw radius.
-sR=2; //much-bigger-than.
+sR=1.8; //much-bigger-than.
+shr=2.5;
 
 module nut2d()
 {

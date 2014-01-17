@@ -16,6 +16,8 @@ lr=0.6; //Radius of line.
 h=30;  //Height of belt.
 sl=10; //Segment length.
 
+include<o-jasper/nut.scad>
+
 echo(1.5*(lr+t));
 
 module segment(d=h-t)
@@ -121,14 +123,16 @@ module show_segments()
     translate([0,3*d]) wire_h_arching_segment(holes=false,dimples=false);
     translate([0,5*d]) wire_flatback_segment();
 }
-
-shr=4;sr=1.3;sR=2;
 //Belt mechanism.
 
-module wire_belt_male()
-{   difference()
+module wire_belt_male(d=h-t)
+{   rels=d*[1,-1]/2;
+    difference()
     {   union()
-        {   rotate([90,0,0]) flattened_segment(h=h,t=t,lr=lr);
+        {   intersection()
+            {   hull() for(x=rels) for(y=[0,sl/2]) translate([x,y]) sphere(lr+t);
+                translate([0,0,4*sl-0.75*(lr+t)]) cube(sl*[8,8,8],center=true);
+            }
             //Leads to the screw holder.
             translate([0,0,-0.75*(lr+t)]) linear_extrude(1.5*(lr+t)) hull()
             {   translate([0,sl]) circle(shr+t);
@@ -141,6 +145,7 @@ module wire_belt_male()
         }
         translate([0,sl]) cylinder(r=shr,h=8*t);
         translate([0,sl,-4*t]) cylinder(r=sr,h=8*t);
+        for(x=rels) translate([x,-sl]) rotate([-90,0,0]) cylinder(r=lr,h=8*sl);
     }
 }
 
@@ -178,6 +183,4 @@ module show()
 {   show_connector();
     translate([h+4*t,0]) show_segments();
 }
-//show();
-
-flattened_segment();
+show();
