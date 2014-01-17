@@ -39,6 +39,7 @@ The released entries have readmes with links to release files and more info.
 * Also tried making plugs. The latest iteration being based on the pill
   connector idea. However, it requires much more testing.
 * Some simple stuff to connect plates.
+* It would be nice to allow adding pictures to surfaces..
 
 # Author, License
 Jasper den Ouden currently, feel free to fork/cooperate, attribution is much

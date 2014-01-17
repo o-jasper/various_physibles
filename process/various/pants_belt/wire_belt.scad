@@ -53,8 +53,19 @@ module sub(r,d,inf=-1)
     }
 }
 
+module flattened_segment(d=h-t)
+{   rels=d*[1,-1]/2;
+    intersection()
+    {   segment(sl=sl,d=h-t);
+        translate([0,0,-4*h]) linear_extrude(height=8*h) difference()
+        {   square([8*h,1.5*(lr+t)],center=true);
+            union() for(x=rels) translate([x,0]) circle(lr);
+        }
+    }
+}
+
 al=h; aiR=1.3*t;air=t; 
-module h_arching_segment(extra_round=true,holes=true,dimples=true)
+module wire_h_arching_segment(extra_round=true,holes=true,dimples=true)
 {
     arch_r=h/2-lr-t;
     intersection()
@@ -78,37 +89,46 @@ module h_arching_segment(extra_round=true,holes=true,dimples=true)
             translate([x,0]) for(y=(al/2-2*t)*[1,0,-1]) translate([0,y]) sphere(2*t);
         }
     }
-
 }
+//Segment consisting with a frame with a thin plate.
+module wire_flatback_segment(hole=false,d=h-t)
+{
+    rels=d*[1,-1]/2;
+    intersection()
+    {
+        union()
+        {   for(x=rels) translate([x,0])
+            {   hull() for(y=(al-t)*[1,-1]/2) translate([0,y]) sphere(lr+0.8*t); }
+            for(y=(al-t)*[1,-1]/2) translate([0,y]) 
+            {   hull() for(x=rels) translate([x,0]) sphere(lr+0.8*t); }
+            translate([0,0,-t]) cube([al,h,t],center=true);
+        }
+        difference()
+        {   cube([h+t,al+t,1.5*(lr+t)],center=true);
+            for(x=rels) translate([x,-al]) rotate([-90,0,0]) cylinder(r=lr,h=8*al);
+            if(hole) translate([0,0,-2*t]) scale([al/2-2*t,h/2-2*t]/al) cylinder(r=al,h=8*t);
+        }
+    }
+}
+
 module show_segments()
 {
     d= al/2+2*t;
     wire_segment();
     translate([0,2*d]) wire_bead();
 
-    translate([0,d]) h_arching_segment();
-    translate([0,3*d]) h_arching_segment(holes=false,dimples=false);
+    translate([0,d]) wire_h_arching_segment();
+    translate([0,3*d]) wire_h_arching_segment(holes=false,dimples=false);
+    translate([0,5*d]) wire_flatback_segment();
 }
 
-d=h-t;
-rels=d*[1,-1]/2;
 shr=4;sr=1.3;sR=2;
 //Belt mechanism.
-
-module flattened_segment()
-{   intersection()
-    {   segment();
-        translate([0,0,-4*h]) linear_extrude(height=8*h) difference()
-        {   square([8*h,1.5*(lr+t)],center=true);
-            union() for(x=rels) translate([x,0]) circle(lr);
-        }
-    }
-}
 
 module wire_belt_male()
 {   difference()
     {   union()
-        {   rotate([90,0,0]) flattened_segment();
+        {   rotate([90,0,0]) flattened_segment(h=h,t=t,lr=lr);
             //Leads to the screw holder.
             translate([0,0,-0.75*(lr+t)]) linear_extrude(1.5*(lr+t)) hull()
             {   translate([0,sl]) circle(shr+t);
@@ -129,7 +149,7 @@ module wire_belt_female()
 {
     intersection()
     {   union()
-        {   translate([0,-sl+4*t]) rotate([90,0,0]) flattened_segment();
+        {   translate([0,-sl+4*t]) rotate([90,0,0]) flattened_segment(h=h,t=t,lr=lr);
             scale([1,1,1.2]) hull()
             {   sphere(lr+3*t);
                 translate([0,bsl]) sphere(lr+3*t);
@@ -158,4 +178,6 @@ module show()
 {   show_connector();
     translate([h+4*t,0]) show_segments();
 }
-show();
+//show();
+
+flattened_segment();
