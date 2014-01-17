@@ -9,6 +9,14 @@ There is a bunch of stuff here, i have categorized things as 'basically done',
 ongoing 'process' and 'just kept here'. Though i may the latter in particular
 and may even change the 'done' things a bit.
 
+### Using
+You need to add the `lib/` directory to the list of folders for libraries 
+[here are some methods](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Libraries).
+For instance you could add it to `OPENSCADPATH`(the openscad version of `PATH`,
+a `:`-separated) on linux, with:
+
+    export OPENSCADPATH=path_to_project/various_physibles/lib/:$OPENSCADPATH
+
 ### Some of the released stuff
 The released entries have readmes with links to release files and more info.
 **Under `done/`**.

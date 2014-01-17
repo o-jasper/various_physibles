@@ -1,5 +1,5 @@
 
-include<../../../done/lib/nut.scad>
+include<o-jasper/nut.scad>
 
 //Base knob design.
 module knob(r,t,h,n=12, rs=-1)

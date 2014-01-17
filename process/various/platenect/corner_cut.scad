@@ -7,15 +7,13 @@
 //  (at your option) any later version.
 //
 
-include<../lib/rounded_box.scad>
-
 inf = 100;
 t = 7;
 tx= t;
 ty= t;
 tz= t;
 r=  1.2*t;
-wall_t=10; //Wall thickness.
+wall_t = 10; //Wall thickness.
 wall_tx= wall_t;
 wall_ty= wall_t;
 wall_tz= wall_t;
@@ -39,9 +37,14 @@ module walls()
     }
 }
 
+module rounded_cube(dx,dy,dz)
+{
+    hull() for(x=[r,dx-r]) for(y=[r,dy-r]) for(z=[r,dz-r]) translate([x,y,z]) sphere(r);
+}
+
 module corner()
 {   difference()
-    {   translate([-tx,-ty,-tz]) rounded_cube(dx,dy, dz, r);
+    {   translate([-tx,-ty,-tz]) rounded_cube(dx,dy,dz, r);
         walls();
         translate([wall_tx+tx,wall_ty+ty,wall_tz+tz]) rounded_cube(inf,inf,inf, r);
         //Holes for screws.
