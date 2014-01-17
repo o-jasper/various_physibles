@@ -13,7 +13,7 @@ and may even change the 'done' things a bit.
 You need to add the `lib/` directory to the list of folders for libraries 
 [here are some methods](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Libraries).
 For instance you could add it to `OPENSCADPATH`(the openscad version of `PATH`,
-a `:`-separated) on linux, with:
+a `:`-separated) on linux, with:(in `~/.bashrc`)
 
     export OPENSCADPATH=path_to_project/various_physibles/lib/:$OPENSCADPATH
 
