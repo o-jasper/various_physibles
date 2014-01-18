@@ -31,10 +31,11 @@ module nut_helper_thin(sr=sR,nt=nt,nh=nh,t=-1)
     nut_helper(sr=sr,nt=nt,nh=nh,t=t,bt=t);
 }
 
-module nut_winged(sr=sR,nt=nt,nh=nh,t=-1,bt=-1)
+module nut_winged(sr=sR,nt=nt,nh=nh,t=-1,bt=-1,w45=-1,cut_space=false)
 {
     t= (t<0 ? sr : t);
     bt = (bt<0 ? nh : bt);
+    w45= (w45<0 ? 16*t : w45);
     difference()
     {   union()
         {   hull()
@@ -44,7 +45,10 @@ module nut_winged(sr=sR,nt=nt,nh=nh,t=-1,bt=-1)
             translate([0,t]) rotate([90,0,0]) linear_extrude(height=2*t) intersection()
             {   union() for(x=(sr+4*t)*[1,-1]) translate([x,0]) scale([1,2]) circle(4*t);
                 translate([0,4*t]) square(t*[16,8],center=true);
-                translate([0,8*t]) rotate(45) square(t*[16,16],center=true);
+                translate([0,8*t]) rotate(45) difference()
+                {   square([w45,w45],center=true);
+                    if(cut_space) square((1.5*nt)*[2,2],center=true);
+                }
             }
         }
         translate([0,0,bt]) linear_extrude(height=2*nh) nut2d();
@@ -61,5 +65,34 @@ module screw_cap(sr=sr,nt=nt)
     }
 }
 
-screw_cap();
-//nut_winged();
+module nut_winged_flat(t=-1)
+{   t= (t<0 ? sr : t);
+    intersection()
+    {   nut_winged(w45=25*sr,cut_space=true);
+        scale([1.3,1.3,0.5]) sphere(sR+2*nt);
+        scale([0.95,0.95,1.6]) sphere(sR+2*nt);
+    }
+}
+
+module nut_lobed(bt=-1,t=-1)
+{
+    t= (t<0 ? sr : t);
+    bt = (bt<0 ? nh : bt);
+    intersection()
+    {   union()
+        {   scale([1,0.8,1]) intersection()
+            {   sphere(nt+t);
+                translate([0,0,nt+t]) sphere(1.2*(nt+t));
+                translate([0,0,-1.9*nh]) cube(nh*[8,8,8],center=true);
+            }
+            for(x=nt*[1,-1]) translate([x,0,0.4*nt]) scale([1.5,1,1.5]) sphere(nt/2);
+        }
+        difference()
+        {   translate([0,0,4*nh]) cube(nh*[8,8,8],center=true);
+            translate([0,0,bt]) linear_extrude(height=2*nh) nut2d();
+            translate([0,0,-nh]) cylinder(r=sr,h=8*nh,$fn=max($fn,20));
+        }
+    }
+}
+
+nut_winged_flat();

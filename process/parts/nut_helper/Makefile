@@ -1,6 +1,8 @@
 
-default: output/nut_helper.stl output/nut_helper_thin.stl output/nut_winged.stl \
-	output/screw_cap.stl
+default: output/nut_helper.stl output/nut_helper_thin.stl \
+	output/nut_winged.stl output/screw_cap.stl
+
+some_more: output/nut_lobed.stl output/nut_winged_flat.stl
 
 clean:
 	rm output/*.stl
