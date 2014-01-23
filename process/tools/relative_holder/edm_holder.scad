@@ -9,6 +9,8 @@
 
 include<params.scad>
 
+d=4*bcr; //Distance
+
 module screwthing()
 {   linear_extrude(height=t) difference()
     {   hull() for(x=(bcr+2*t+sr)*[1,-1]) translate([x,0]) circle(sr+t);

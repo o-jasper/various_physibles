@@ -2,6 +2,9 @@
 # Parametric bearing
 Bearing in two halves with (optional)ball guider. Balls can be bb-gun balls.
 
+Dont risk anything on it, but seems to be able to work 'okey' if the loads is
+not too high. 
+
 ### How to use it
 The halves currently slide over each other, the friction and lines of
 extrusion hold them together okey-ish but not ruggedly enough, You could
@@ -31,7 +34,7 @@ Filenames also exactly match openscad `module` names.
   Depends on the item if that is at all wise.
 
 ### TODO
-* Find standard bearing sizes and provide them as `.stl`.
+* Find standard bearing sizes and provide them as `.stl` from the makefiles.
 * Preventing the inside from getting dirt in it?
 
 ## License

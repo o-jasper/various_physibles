@@ -1,4 +1,6 @@
 
+SCAD=../../../bin/scad
+
 default: basic
 
 clean:
@@ -23,5 +25,4 @@ ringclip: output/ringclip.stl output/outer_half_ringclip.stl  output/inner.stl o
 all_show: vertslide_show.stl ringclip_show.stl
 
 output/%.stl: bearing.scad
-	sh ../../bin/scad.sh 'use<'`pwd`'/'$<'>;'`echo $@ | cut -f 2 -d/ |cut -f 1 -d.`'();' \
-		$@
+	$(SCAD) module $< $@
