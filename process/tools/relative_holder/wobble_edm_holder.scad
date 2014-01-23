@@ -10,7 +10,8 @@
 include<params.scad>
 
 $fs=0.1;
-d=9*bcr; //Distance
+bl=170;
+d=5*bcr; //Distance
 
 module screwthing_add(d=(bcr+1.5*t+sr))
 {   hull() for(x=d*[1,-1]) translate([x,0]) circle(sr+t);
@@ -41,19 +42,45 @@ module wobble_edm_bottom() //Bottom where thing slides.
     }
 }
 
-wt=1;
-module wobble(h= (zh-t)/2, is_space=false)
-{    
+module reacher(is_spacer=false)
+{
+    bl=bl/2;
+    rd=d-sd-2*(sr+t);
     difference()
-    {   union()
-        {   translate([0,sd+t+sr-d]) linear_extrude(height=h) screwthing_add(d=sr+t);
-            if(!is_spacer) linear_extrude(height=wt) difference()
+    {   hull()
+        {   translate([0,-rd]) circle(2*(sr+t));
+            translate([0,bl-rd])  circle(sr+2*t);
+        }
+        hull()
+        {   translate([0,-rd]) circle(2*sr+t);
+            translate([0,bl-rd])  circle(sr+t);
+        }
+    }
+    difference() 
+    {   hull()
+        {   square((sr+t/2)*[2,2],center=true); 
+            translate([0,bl-rd+sr+t]) square([2*(t+sr),t],center=true);
+        }
+        translate([0,(bl-rd)/2+sr+t]) square([t,bl-rd+t],center=true);
+    }
+    translate([0,-rd]) square([3*(t+sr),t],center=true);
+}
+
+/*difference()
             {   hull()
                 {   translate([0,sd+t+sr-d]) screwthing_add(d=sr+t);
                     square([2,2]*(sr+t/2),center=true);
                 }
                 hull(){ translate([0,-sr-t]) circle(t/2); translate([0,-d]) circle(2*t); }
-            }
+                }*/
+wt=1;
+module wobble(h= (zh-t)/2, is_spacer=false)
+{    
+    difference()
+    {   union()
+        {   translate([0,sd+t+sr-d]) linear_extrude(height=h) screwthing_add(d=sr+t);
+            if(!is_spacer) linear_extrude(height=wt) 
+                               reacher(is_spacer=is_spacer,bl=bl,d=d,t=t,sr=sr);
             if(!is_spacer) translate(-[sr+t/2,sr+t/2]) cube([2*sr+t,2*sr+t,h]);
         }
         translate([0,-d,-t]) cylinder(r=sr,h=8*mrh);
