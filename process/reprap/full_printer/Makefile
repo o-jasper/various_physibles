@@ -1,7 +1,7 @@
 
 default: corners bed
 
-corners: output/zrod_tcorner.stl output/zrod_bcorner.stl output/corner.stl output/xrod_corner.stl
+corners: output/top_corner.stl output/bottom_motor_corner.stl output/bottom_bare_corner.stl 
 bed:     output/bed_holder.stl 
 
 output/%.stl: fullp.scad corner.scad params.scad bed.scad

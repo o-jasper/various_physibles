@@ -5,20 +5,26 @@ pt=10; //Plate thickness.
 bh=20; //Bed height.
 bw=200;
 
+bsd=5;
+
 bbr=4;//5; //Smooth rod radius.
 sbr=3;
 
-zrd= pt+bbr+2*t; //Z rod distance.
-dc=bbr/sqrt(2)+3*t; //Distance of bed corners to rods.
+sw=43; //TODO correct value
+sh=sw;
+ssd=sw/6;
 
-w=bw+2*pt+2*zrd; 
+zrd=pt+t/2+sw/2; //... OR use gears at the bottom to get them as close as possible..
+//zrd= pt+bbr+2*t; //Z rod distance.
+dc=bbr/sqrt(2)+t; //Distance of bed corners to rods.
+
+w=bw+2*pt+2*zrd-2*t; 
 l=w; 
 fh=40; //Front height.
 
 bzd=min(bw/3, 100-bbr-t);
 
 bt=1.5*t; //Bottom thickness of corners.
-
 
 sr=2; //Screw radius.
 
@@ -42,3 +48,8 @@ max_z=bed_z(max_a);
 min_z=bed_z(min_a);
 
 h=max_z+2*fh+2*bh; //Sizes.
+
+tbr=20; //Timing belt radius.
+
+pr = 10; //Radius of pulleys.
+hl=max(sw+pt+2*(t+sr),80); //Length it holds the plates.

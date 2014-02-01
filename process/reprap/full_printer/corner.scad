@@ -10,10 +10,10 @@
 //Stuff connecting plates.
 
 include<params.scad>
+use<pulley.scad>
 
 ut=2*t;
 
-hl=80;
 hh=fh-bt;
 sr=2;
 
@@ -24,137 +24,200 @@ module planks_space()
     }
 }
 
-module _corner(thicken_diag=t,thicken_diag_t=t)
-{   translate([0,0,-bt]) difference()
-    {   union()
-        {   linear_extrude(height=bt+hh) minkowski()
-            {   difference()
-                {   square([hl-t,hl-t]);
-                    translate([hl-t,hl-t]) circle(hl-pt-t,$fn=4);
+ch=bt+min(hl/4,sh);
+
+module base_corner(reinforce=true)
+{
+    r=pt/2+t;
+    d=hl-r;
+    f=0.2;
+    translate([pt/2,pt/2,-bt]) union()
+    {   intersection() 
+        {   union() for(pos=[[0,d],[d,0]]) hull()
+            {   cylinder(r=r,h=bt);
+                translate(-f*[r,r]) cylinder(r=(1-f)*r,h=bt); 
+                translate([0,0,ch-r/2]) 
+                {   sphere(r);
+                    translate(-f*[r,r]) sphere((1-f)*r);
                 }
-                circle(t);
+                translate(pos) 
+                {   cylinder(r=r,h=bt);
+                    translate([0,0,h-r/2]) sphere(r);
+                }
             }
-            linear_extrude(height=3*bt) minkowski()
-            {   union(){ square([hl-ut,pt]); square([pt,hl-ut]); }
-                circle(ut);
-            }
+            cube([8*hl,8*hl,2*ch],center=true);
         }
-        difference() //Hollow it out.
-        {   translate([pt+t,pt+t,bt]) cube([hl,hl,2*hh]);
-            //Thicken diagonal.
-            if(thicken_diag>0) translate([hl,hl]) 
-                                   cylinder(r=hl-pt+thicken_diag_t,h=bt+thicken_diag, $fn=4);
+        for(pos=[[0,d],[d,0]]) translate(pos) intersection()
+        {   scale([1,2]) cylinder(r=r,h=ch+r);
+            cube(2*[r,r,8*ch],center=true);
         }
-        //Drill holes.
-        for( x= hl*[1,2]/3 ) translate([pt+x,pt+x,(hh+bt)/2]) 
-                                 for(a=[[90,0,0],[0,-90,0]]) 
-            rotate(a) cylinder(r=sr,h=8*hl);
+        if(reinforce) hull() for(a=[0,90]) rotate(a) translate([hl-r,0]) cylinder(r=r,h=bt+t);
     }
 }
 
-module corner(thicken_diag=t,bt=bt)
-{   difference()
-    {   _corner(thicken_diag=thicken_diag,bt=bt);
-        planks_space();
-    }    
+module base_corner_sub()
+{
+    r=pt/2+t;
+    d2= hl-t;
+    union()
+    {   planks_space();
+        difference()
+        {   translate([d2,d2,ch-r/2]) 
+                for(a=[[0,-90,0],[90,0,0]]) rotate(a) cylinder(r=sr,h=2*d2);
+            translate((pt+2*t)*[1,1]) cube(hl*[8,8,8]);
+        }
+    }
 }
-//Corner with additional holder for z-rods.
-module zrod_bcorner()
+
+module bottom_drill_sub()
+{
+    d=pt+t+sr;
+    for(pos=[[d+t/2,hl-d,-t-bt],[hl-d,d+t/2,-t-bt]]) translate(pos) cylinder(r=sr,h=hl);
+}
+
+//TODO add feet, bottom plate ability.
+module bottom_bare_corner() 
+{
+    difference()
+    {   base_corner();
+        base_corner_sub();
+        bottom_drill_sub();
+    }
+}
+
+module bottom_motor_corner(bottom_hole=false)
 {
     difference()
     {   union()
-        {   _corner();
-            translate([zrd,zrd,-bt]) linear_extrude(height=fh) difference()
-            {   circle(bbr+1.5*t); circle(bbr); }
-            translate([adx,adx,ah/2-t]) rotate(45) 
-                translate([0,2.5*(aw+t)]) rotate([90,0,0]) cylinder(r=aw+2*t,h=5*(aw+t));
-        }
-        //Space for arm.
-        translate([adx,adx,ah/2-t]) rotate(45) 
-        {   translate([0,1.5*aw+1.7*t])
-                rotate([90,0,0]) linear_extrude(height=3*aw+3.4*t) hull()
-            {   circle(aw+t);
-                rotate(min_a) translate([fh,0]) circle(aw+2*t);
-                translate([t,fh]) circle(aw);
+        {   bottom_bare_corner();
+            translate([0,0,-bt]) hull() //Rest of the plate under the motor.
+            {   translate([pt+t/2+sw,pt+t/2+sw]) cylinder(r=t/2,h=bt+t);
+                cube([pt+t/2+sw,pt+t/2+sw,bt+t]);
             }
-            //And hinge cylinder
-            translate([0,2.6*(aw+t)]) rotate([90,0,0]) cylinder(r=ah/4,h=5.2*(aw+t));
         }
-        planks_space();
-        translate([0,0,-bt-4*fh]) cube([8,8,8]*fh,center=true);
+        translate((pt+t/2)*[1,1]) difference()
+        {   cube([sw,sw,2*sh]);
+            translate([0,0,sh+t]) rotate(45) cube(2*[sqrt(2)*ssd+sr+t,sw,t],center=true);
+        }
+        translate((pt+t/2+0.3*sw)*[1,1,0]+[0,0,0.3*t]) cube(2*[sw,sw,sh]);        
+        translate([pt+t/2+ssd,pt+t/2+ssd,bt+t]) cylinder(r=sr,h=sw);
+        if(bottom_hole) translate([zrd,zrd,-bt-t]) cylinder(r=sw/2-t,h=8*t);
     }
+
 }
 
-relpos=[[zrd+2*(bbr+sr),zrd+2*(bbr+sr)],[zrd-bbr,hl/2],[hl/2,zrd-bbr]];
-
-module _holder(r=2*t)
-{   linear_extrude(height=2*bt) hull()
-    {   translate([zrd,zrd]) circle(3*bbr+r-2*t);
-        for( pos=relpos ) translate(pos) circle(r);
-    }
-}
-
-module zrod_holder()
+module x_rod_add()
 {
-    difference()
-    {   _holder(r=t);
-        for(pos=relpos) translate(pos) translate([0,0,-bt]) cylinder(r=sr,h=4*bt);
-        translate([zrd,zrd,-bt]) cylinder(r=bbr,h=8*bt);
+    translate([zrd,zrd]) hull()
+    {   translate([0,0,bbr+bt+t]) 
+            rotate([0,90,0]) cylinder(r=bbr+t,h=6*t); //x rod.
+        translate([t,0,-bt]) cylinder(r=t,h=t);
     }
+}
+module x_rod_sub()
+{
+    translate([pt+t,zrd,bbr+bt+t]) rotate([0,90,0]) cylinder(r=bbr,h=hl); //x rod.
 }
 
-module x_rod_add(a=0)
+//Top corners are all the same, a thingie is put on that allows it to be wiggled
+//into the correct place.
+//TODO .. two of them need pulleys.
+
+module belt_corner_holes()
 {
-    translate([zrd,0,bbr+bt+t]) rotate(a) rotate([-90,0,0])  //x rod.
-        linear_extrude(height=hl-zrd) difference()
-    {   circle(bbr+1.5*t);
-        circle(bbr);
-    }
+    translate([zrd,zrd,-bt]) for(a=[0:90:270]) rotate(a) translate((bbr+2*t)*[1,1]) child();
 }
-module zrod_tcorner()
+
+module belt_corner_block(a=0)
 {
-    difference()
+    translate([zrd,zrd]) rotate(a) translate([-zrd,-zrd]) difference()
     {   union()
-        {   if(rod_adjustable) _corner(bt=2*bt,thicken_diag_t=2*t);
-            else _corner(thicken_diag_t=2*t);
-            x_rod_add();
+        {   x_rod_add();
             translate([zrd,zrd,-bt]) cylinder(r=bbr+1.5*t,h=fh);
+            hull()
+            {   belt_corner_holes() cylinder(r=sr+t,h=2*t);
+                translate([zrd,zrd,-bt]) cylinder(r=4*t,h=t);
+            }
         }
-        //Hole for z rod, and holder.
-        if(rod_adjustable)
-        {   translate([zrd,zrd,-fh]) cylinder(r=bbr+0.5*t,h=8*fh);
-            translate([0,0,-3*bt]) _holder();
-            for( pos=relpos ) translate(pos) 
-               translate([0,0,-fh]) cylinder(r=2*sr,h=fh+3*bt);
-        }
-        else
-        {   translate([zrd,zrd,-fh]) cylinder(r=bbr,h=8*fh);
-        }
-        planks_space();
+        x_rod_sub();
+        translate([zrd,zrd,-fh]) cylinder(r=bbr,h=8*fh);
+        belt_corner_holes() translate([0,0,-t]) cylinder(r=sr,h=8*t);
     }
 }
-module xrod_corner()
+
+module top_corner_floor2d(sub=0)
+{
+    hull()
+    {   square([hl+t-sub,t]);
+        square([t,hl+t-sub]);
+        translate([1,1]*(zrd+bbr+2*sr+3*t-sub)) circle(t);
+    }
+}
+
+module top_bare_corner()
 {
     difference()
     {   union()
-        {   if(rod_adjustable) _corner(bt=2*bt,thicken_diag_t=2*t);
-            else _corner(thicken_diag_t=2*t);
-            translate([0,zrd,bbr+bt+t]) rotate([0,90,0]) cylinder(r=bbr+1.5*t,h=6*t); //x rod.
+        {   base_corner(reinforce=false);
+            difference()
+            {   translate([0,0,-bt]) linear_extrude(height=bt+t) top_corner_floor2d();
+                linear_extrude(height=8*t) top_corner_floor2d(sub=t);
+            }
         }
-        planks_space();
-        translate([0,zrd,bbr+bt+t]) rotate([0,90,0]) cylinder(r=bbr,h=hl); //x rod.
+        base_corner_sub();
+            
+        belt_corner_holes() translate([0,0,-t]) cylinder(r=sr+t/2,h=8*t);
+        translate([zrd,zrd,-bt-t]) cylinder(r=bbr+t,h=8*t);
     }
 }
 
-//All plates are the same.
-module side_plate()
+module top_motor_corner_floor2d(sub=0)
+{   hull()
+    {   square(bt*[1,1]);
+        translate([zrd,zrd]) pulley_pos() 
+            translate([-sub,0]) scale([1,2]) circle(t);
+        for(pos=[[hl-sub,0],[0,hl-sub]]) translate(pos) circle(t);
+        translate([1,1]*(zrd+bbr+2*sr+3*t-sub)) circle(t);
+    }
+}
+module top_motor_corner(with_pulley=false)
 {
-    fz= (min_z+bh+fh)/2;
-    translate([pt,0]) rotate([0,-90,0]) linear_extrude(height=pt) difference()
-    {   square([h,l-pt]);
-        translate([fz,l/4]) square([h-fz-fh,2*l]);
+    difference()
+    {   union()
+        {   base_corner(reinforce=false);
+            translate([0,0,-bt]) linear_extrude(height=bt) top_motor_corner_floor2d();
+            translate([0,0,-bt]) linear_extrude(height=bt+t) difference()
+            {   top_motor_corner_floor2d(); top_motor_corner_floor2d(sub=t); }
+            
+            //Holds the pulley.
+            if(with_pulley) translate([zrd,zrd]) pulley_pos() hull()
+            {   translate([-2*pr,0,pr+2*sr+t]) pulley_add_1();
+                translate([0,0,-bt]) scale([1,2,1]) cylinder(r=t,h=t);
+            }
+        }
+        base_corner_sub();
+            
+        belt_corner_holes() translate([0,0,-t]) cylinder(r=sr+t/2,h=8*t);
+        translate([zrd,zrd,-bt-t]) cylinder(r=bbr+t,h=8*t);
+        if(with_pulley) translate([zrd-2*pr,zrd,pr+2*sr+t]) pulley_sub();
     }
 }
 
-zrod_bcorner();
-//translate([hl,hl]) zrod_holder();
+module corner_show(place_block=true)
+{
+    d=hl+pt+t;
+    
+    bottom_motor_corner();
+//    color("gray") translate((pt+t/2)*[1,1]) cube([sw,sw,sh]);
+    color("green") translate([zrd,zrd]) cylinder(r=bbr,h=4*sh);
+
+    translate([d,0]) bottom_bare_corner();
+
+    translate([0,d]) top_bare_corner();
+    if(place_block) color("blue") translate([0,d,bt]) belt_corner_block();
+    translate([d,d]) top_motor_corner();
+    if(place_block) color("blue") translate([d,d,bt]) belt_corner_block();
+    translate([2*d,0]) belt_corner_block();
+}
+corner_show();
+
