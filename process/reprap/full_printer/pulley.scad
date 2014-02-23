@@ -11,7 +11,7 @@ include<params.scad>
 
 module pulley_pos() //At the position of the pulley.
 {   d=hl-zrd;//tbr+3*t+2*sr/3;
-    for(pos=[[d,0],[0,d]]) translate(pos) rotate(45) child();
+    for(s=[1,-1]) rotate(45) scale([1,s,1]) translate([d,d]/sqrt(2)) child();
 }
 
 module pulley_add_1(){ translate([pr,2*t]) rotate([90,0,0]) cylinder(r=pr-t/2,h=4*t); }

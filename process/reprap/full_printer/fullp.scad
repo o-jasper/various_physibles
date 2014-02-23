@@ -50,6 +50,9 @@ module show(a=min_a+(max_a-min_a)*$t)
             }
             translate([zrd-w/2,zrd-l/2]) 
             {   color("red") translate([0,0,bed_z]) bed_holder();
+                color("purple") translate([0,0,bed_z]) pulley_pos() 
+                    cylinder(r=1,h=h-bed_z-phz);
+                
 //                if(rod_adjustable) color("red") translate([-zrd,-zrd,h]) zrod_holder();
                 color("green") cylinder(r=bbr,h=h+2*bt);//h+fh); //z rods
             }
@@ -57,6 +60,21 @@ module show(a=min_a+(max_a-min_a)*$t)
         }
 }
 
-show((min_a+max_a)/2);
 
-echo(h);
+show((min_a+max_a)/2);
+use<pulley.scad>
+
+module bed_n_corner_show(bed_z=-3*fh)
+{
+    translate([zrd,zrd]) 
+    {   color("red") translate([0,0,bed_z]) bed_holder();
+    }
+    translate([0.3,0.3]) rotate(90) rotate([180,0,0]) 
+    {   top_motor_corner();
+        color("blue") translate([0,0,bt]) belt_corner_block(a=90);
+    }
+    translate([zrd,zrd,-100]) pulley_pos() cylinder(r=1,h=200);
+
+}
+
+//bed_n_corner_show();

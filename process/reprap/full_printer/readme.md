@@ -43,6 +43,17 @@ Relatively heavy 8mm dia Y bars, go light for the carriage and X bars.(those mov
 Might want an smallish aluminium extruded profile for that? 
 (Wait what about those curtain rails [still being made](https://www.gamma.nl/assortiment/intensions-practical-basic-rail-flexrail-wit/p/B933508?q=fh_location%3d%2f%2fcatalog01%2fnl_NL%2f%24s%3drail%2ffh_item_type%3d{product}%26fh_eds%3d%25C3%259F%26fh_lister_pos%3d13%26fh_refview%3dsearch%26fh_secondid%3db_product_b021933508) Okey, that *is* a little crazy, no idea if it is up to it.)
 
+### Putting the torque trough the smooth rods
+Thats an idea, the effective mass is I/R^2 with the radius of the pulley. Lets say
+that is 2cm, I for a 1m 1cm diameter smooth rod 
+
+
+I = πρLR^4 /2 ~ 1.5\*(8\*10^3 kg/^3 )\*1m\*(0.5\*10^-2 m)^4 = 1.6\*10^-5 kgm^2
+
+m\_effective = I/R^2 = I/2\*10^-2 m = 7\*10^-4 kg = 0.7g
+
+Seems ridiculously good...
+
 # Design: left behind(ish)
 
 ## Bed lifting.

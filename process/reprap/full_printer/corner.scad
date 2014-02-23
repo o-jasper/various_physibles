@@ -103,20 +103,18 @@ module bottom_motor_corner(bottom_hole=false)
         translate([pt+t/2+ssd,pt+t/2+ssd,bt+t]) cylinder(r=sr,h=sw);
         if(bottom_hole) translate([zrd,zrd,-bt-t]) cylinder(r=sw/2-t,h=8*t);
     }
-
 }
 
 module x_rod_add()
-{
-    translate([zrd,zrd]) hull()
-    {   translate([0,0,bbr+bt+t]) 
-            rotate([0,90,0]) cylinder(r=bbr+t,h=6*t); //x rod.
-        translate([t,0,-bt]) cylinder(r=t,h=t);
+{   translate([zrd,zrd]) hull()
+    {   translate([0,0,xrh]) 
+            rotate([0,90,0]) cylinder(r=bbr+t/2,h=6*t); //x rod.
+        translate([bbr+t,0]) cylinder(r=t,h=t);
     }
 }
 module x_rod_sub()
 {
-    translate([pt+t,zrd,bbr+bt+t]) rotate([0,90,0]) cylinder(r=bbr,h=hl); //x rod.
+    translate([pt+t,zrd,xrh]) rotate([0,90,0]) cylinder(r=bbr,h=hl); //x rod.
 }
 
 //Top corners are all the same, a thingie is put on that allows it to be wiggled
@@ -124,19 +122,20 @@ module x_rod_sub()
 //TODO .. two of them need pulleys.
 
 module belt_corner_holes()
-{
-    translate([zrd,zrd,-bt]) for(a=[0:90:270]) rotate(a) translate((bbr+2*t)*[1,1]) child();
+{    translate([zrd,zrd,-bt]) for(a=[0:90:270]) rotate(a) translate((bbr+2*t)*[1,1]) child();
 }
 
+//Block x-rod, z-rod and belt controller go into.
 module belt_corner_block(a=0)
 {
     translate([zrd,zrd]) rotate(a) translate([-zrd,-zrd]) difference()
     {   union()
         {   x_rod_add();
-            translate([zrd,zrd,-bt]) cylinder(r=bbr+1.5*t,h=fh);
-            hull()
-            {   belt_corner_holes() cylinder(r=sr+t,h=2*t);
-                translate([zrd,zrd,-bt]) cylinder(r=4*t,h=t);
+            translate([zrd,zrd]) cylinder(r=bbr+t,h=xrh+bbr+t);
+            linear_extrude(height=t) difference()
+            {   hull() belt_corner_holes() circle(sr+t);
+                translate([zrd,zrd]) for(a=[90,180,270]) rotate(a) 
+                    translate([bbr+2*t,0]) circle(t);
             }
         }
         x_rod_sub();
@@ -154,15 +153,19 @@ module top_corner_floor2d(sub=0)
     }
 }
 
+module top_corner_floor_n_wall()
+{
+    translate([0,0,-bt]) linear_extrude(height=bt) top_corner_floor2d();
+    translate([0,0,-bt]) linear_extrude(height=bt+t) difference()
+    {   top_corner_floor2d(); top_corner_floor2d(sub=t); }
+}
+
 module top_bare_corner()
 {
     difference()
     {   union()
         {   base_corner(reinforce=false);
-            difference()
-            {   translate([0,0,-bt]) linear_extrude(height=bt+t) top_corner_floor2d();
-                linear_extrude(height=8*t) top_corner_floor2d(sub=t);
-            }
+            top_corner_floor_n_wall();
         }
         base_corner_sub();
             
@@ -171,38 +174,42 @@ module top_bare_corner()
     }
 }
 
-module top_motor_corner_floor2d(sub=0)
-{   hull()
-    {   square(bt*[1,1]);
-        translate([zrd,zrd]) pulley_pos() 
-            translate([-sub,0]) scale([1,2]) circle(t);
-        for(pos=[[hl-sub,0],[0,hl-sub]]) translate(pos) circle(t);
-        translate([1,1]*(zrd+bbr+2*sr+3*t-sub)) circle(t);
+module pulley_holder()
+{
+    difference()
+    {   translate([zrd,zrd]) union()
+        {   hull() pulley_pos() translate([0,-pr]) 
+            {   translate([-2*t,0,phz]) rotate([0,90,0]) cylinder(r=sr+t,h=4*t);
+            }
+            rotate(45) translate([(hl-zrd)/sqrt(2),0,-bt])  intersection()
+            {   linear_extrude(height=phz+bt) difference()
+                {   circle(3*t); scale([0.5,0.7]) circle(3*t); }
+                cube([4*t,8*t,8*phz],center=true);
+            }
+        }
+        
+        translate([zrd,zrd,phz]) pulley_pos() union()
+        {   translate([-t,-pr]) rotate([0,90,0]) cylinder(r=pr+t/4,h=2*t);
+            translate([-4*t,-pr]) rotate([0,90,0]) cylinder(r=sr,h=8*t);
+        }
     }
 }
-module top_motor_corner(with_pulley=false)
-{
+module top_motor_corner(with_pulley=true)
+{                
     difference()
     {   union()
         {   base_corner(reinforce=false);
-            translate([0,0,-bt]) linear_extrude(height=bt) top_motor_corner_floor2d();
-            translate([0,0,-bt]) linear_extrude(height=bt+t) difference()
-            {   top_motor_corner_floor2d(); top_motor_corner_floor2d(sub=t); }
-            
-            //Holds the pulley.
-            if(with_pulley) translate([zrd,zrd]) pulley_pos() hull()
-            {   translate([-2*pr,0,pr+2*sr+t]) pulley_add_1();
-                translate([0,0,-bt]) scale([1,2,1]) cylinder(r=t,h=t);
-            }
+            top_corner_floor_n_wall();
+            if(with_pulley) pulley_holder();
         }
         base_corner_sub();
             
         belt_corner_holes() translate([0,0,-t]) cylinder(r=sr+t/2,h=8*t);
         translate([zrd,zrd,-bt-t]) cylinder(r=bbr+t,h=8*t);
-        if(with_pulley) translate([zrd-2*pr,zrd,pr+2*sr+t]) pulley_sub();
     }
 }
 
+//TODO feh make space for belt path..
 module corner_show(place_block=true)
 {
     d=hl+pt+t;
@@ -214,9 +221,10 @@ module corner_show(place_block=true)
     translate([d,0]) bottom_bare_corner();
 
     translate([0,d]) top_bare_corner();
-    if(place_block) color("blue") translate([0,d,bt]) belt_corner_block();
+    if(place_block) color("blue") translate([0,d]) belt_corner_block();
     translate([d,d]) top_motor_corner();
-    if(place_block) color("blue") translate([d,d,bt]) belt_corner_block();
+    if(place_block) color("blue") translate([d,d]) belt_corner_block();
+    translate([d+zrd,d+zrd,-bt-t/2-10]) color("purple") cylinder(r=20,h=10); 
     translate([2*d,0]) belt_corner_block();
 }
 corner_show();

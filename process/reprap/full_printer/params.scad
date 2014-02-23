@@ -52,4 +52,7 @@ h=max_z+2*fh+2*bh; //Sizes.
 tbr=20; //Timing belt radius.
 
 pr = 10; //Radius of pulleys.
+phz = 5*t+2*bbr+pr; //Distance 'it hangs'
 hl=max(sw+pt+2*(t+sr),80); //Length it holds the plates.
+
+xrh = bbr+bt+2*t; //How far the x rod hangs.
