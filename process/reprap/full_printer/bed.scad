@@ -11,16 +11,34 @@ include<params.scad>
 use<pulley.scad>
 use<corner.scad>
 
-module bed_holder() //TODO also raising method.
+module pulley_add_1()
+{ translate([pr,2*t]) rotate([90,0,0]) cylinder(r=pr-t/2,h=4*t); }
+module pulley_add()
+{   pulley_pos() pulley_add_1(); }
+
+module pulley_sub(bottom=true)
+{
+    pulley_pos() union()
+    {   cylinder(r=2*sr,h=l);
+        translate([pr,t]) rotate([90,0,0]) cylinder(r=pr+2*sr,h=2*t);
+        translate([pr,fh]) rotate([90,0,0]) cylinder(r=sr,h=8*fh);
+        translate([pr,6*t]) rotate([90,0,0]) cylinder(r=pr-t/2,h=4*t); 
+        translate([pr,-2*t]) rotate([90,0,0]) cylinder(r=pr-t/2,h=4*t); 
+    }    
+}
+
+include</home/jasper/oproj/physical/reprap/i3ext/inc/nema17.scad>
+
+dl=l/3;
+
+module bed_holder(save=true) //TODO also raising method.
 {   d=bzd;
+    fh=lh;
     th=fh+bh;
 
-    dl=l/3;
     dist = sqrt(dl*dl+dc*dc);
 
-    pz=fh-pr-t-2*sr;
-
-    difference()
+    color("red") difference()
     {   union() 
         {   for(pos=[[dl,dc,0],[dc,dl,0]])
             {   hull() //Main shape.
@@ -28,15 +46,15 @@ module bed_holder() //TODO also raising method.
                     translate(pos+[0,0,fh-t]) cylinder(r=bbr+t,h=t);
                     translate(pos*(dist-fh/1.5)/dist) cylinder(r=t/2,h=fh);
                 }
-                hull()
+                hull() //Floor plate.
                 {   cylinder(r=bbr+t,h=t);
-                    translate(pos*(dist-fh/1.5)/dist) cylinder(r=t/2,h=t);
+                    translate(pos*(dist-fh/1.5)/dist) cylinder(r=t,h=t);
                 }
             }
             translate([dc+bsd,dc+bsd,fh-t]) cylinder(r=sr+2*t,h=t);
 
             //Screw 'platform'
-            translate([dc,dc,fh-t]) rotate(45) cube(2*[sr+t,sqrt(2)*dc,t],center=true);
+//            translate([dc,dc,fh-t]) rotate(45) cube(2*[sr+t,sqrt(2)*dc,t],center=true);
             cylinder(r=bbr+t,h=th);
 
             pulley_pos() hull()
@@ -51,14 +69,67 @@ module bed_holder() //TODO also raising method.
             cylinder(r=sr,h=h+t);
         }
         translate([0,0,pz]) pulley_sub();
+        if(save) translate((lh/2+bbr)*[1,1,0]+[0,0,hl/4+t]) for(a=[0,-90]) rotate(a)
+                 rotate([90,0,0]) scale([0.7,1]) cylinder(r=lh/2-t,8*hl,$fn=4);
+
+    }
+    if($show) color("purple") pulley_pos() translate([pr,3*t/4,pz]) rotate([90,0,0]) pulley();
+}
+
+wr=pz/2;
+mz=pz+pr-wr;
+
+module motor_pos()
+{   rotate(45) translate([sqrt(2)*dl,-sh/2]) rotate([90,0,0]){ child(0); child(1); }} 
+
+module bed_holder_w_motor(save=true)
+{
+    msd=6;
+    bed_holder(save=save);
+    color("red") translate([-zrd,-zrd]) difference()
+    {   union()
+        {   translate([0,0,mz]) motor_pos() 
+                translate([-sw/2-t,-mz,-sh-t]) 
+            {   cube([sw+2*t,sw/2,sh+2*t]);
+                cube([sw/2-t,sw+t,sh+2*t]);
+            }
+            hull()
+            {   translate([dl,zrd+t]) cylinder(r=t,h=sw/2);
+                translate((dl-sw/sqrt(8))*[1,1]+(sw+2*t)*[1,-1]/sqrt(8)) 
+                    cylinder(r=t,h=sw/2);
+            }
+            hull()
+            {   translate([zrd+t,dl]) cylinder(r=t,h=sw/2);
+                translate((dl-sw/sqrt(8))*[1,1]+(sw+2*t)*[-1,1]/sqrt(8)) 
+                    cylinder(r=t,h=sw/2);
+            }
+        }
+        translate([0,0,mz]) motor_pos() union()
+        {   translate([0,0,-sh/2]) cube([sw+t,sw+t,sh+t/2],center=true);
+            for(x=(sw/2-msd)*[1,-1]) for(y=(sw/2-msd)*[1,-1]) 
+                translate([x,y,-4*sh]) cylinder(r=sr,h=8*sh);
+            translate([0,0,-4*sh]) cylinder(r=wr+t/3,h=8*sh);
+            //Holes of saving
+            translate([0,0,-sh/2]) rotate([90,0,0]) cylinder(r=sw/2,h=8*sh,$fn=4);
+            translate([0,0,-sh/2]) rotate([0,-90,0]) cylinder(r=sw/2-t,h=8*sh,$fn=4);
+        }
     }
 }
 
+module winder() //TODO hole should not be circular!
+{   pulley(pr=wr,pt=10,sr=2.5,f=1/6);
+}
+
+include<fits/nema17.scad>
+
 module show_bed()
 {
-    color("red") translate([zrd,zrd]) bed_holder();
+    $show=true;
+    translate([zrd,zrd]) bed_holder_w_motor();
 //    planks_space();
-    color("green") translate([zrd,zrd,fh+bh]) cylinder(r=tbr,h=10);
-    //Illustrates space the pulley may not violate.
+    translate([0,0,mz])motor_pos() 
+    {   nema();
+        translate([0,0,t]) winder();
+    }
 }
 show_bed();

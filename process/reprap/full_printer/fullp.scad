@@ -12,11 +12,12 @@ use<corner.scad>;
 use<bed.scad>;
 use<plates.scad>;
 
-include</home/jasper/oproj/physical/reprap/i3ext/inc/nema17.scad>
+//TODO fix this link...
+use<pulley.scad>
 
-module show(a=min_a+(max_a-min_a)*$t)
+module show(bed_z=h/2,$realnema=false)
 {    
-    bed_z = bed_z(a);//
+    $show=true;
    //Bottom corners.
     for(z=bbr*[0,-2]) translate([0,w/2-zrd+bbr,h-(bbr+bt+t)+z]) rotate([90,0,0]) 
         color("green") cylinder(r=sbr,h=w-2*zrd); //x rod
@@ -24,7 +25,7 @@ module show(a=min_a+(max_a-min_a)*$t)
     for(a=[0,180]) rotate(a)
         {   
             rotate(90) translate([-l/2+0.2,-w/2+0.2])
-            {   bottom_bare_corner(); //TODO
+            {   bottom_motor_corner(); //NOTE: bottom corners the same for simplicity
                 translate([0,0,h]) rotate(90) rotate([180,0,0]) 
                 {   top_bare_corner();
                     color("blue") translate([0,0,bt]) belt_corner_block();
@@ -32,9 +33,7 @@ module show(a=min_a+(max_a-min_a)*$t)
             }
             translate([-l/2+0.3,-w/2+0.3]) 
             {   bottom_motor_corner();
-                color("gray") translate((pt+t/2+sw/2)*[1,1,0]+[0,0,sh]) 
-                {   nema17();
-                }//cube([sw,sw,sh]);
+                translate((pt+t/2+sw/2)*[1,1,0]+[0,0,sh]) nema();
                 
                 translate([zrd+bbr+t/2,zrd,h-(bbr+bt+t)]) rotate([0,90,0]) 
                     color("green") cylinder(r=bbr,h=l-bbr-zrd); //y rods
@@ -49,9 +48,10 @@ module show(a=min_a+(max_a-min_a)*$t)
                 translate([l/2-pt,-w/2,0]) rotate(90) color([0.4,0.4,0.9]) side_plate();
             }
             translate([zrd-w/2,zrd-l/2]) 
-            {   color("red") translate([0,0,bed_z]) bed_holder();
-                color("purple") translate([0,0,bed_z]) pulley_pos() 
-                    cylinder(r=1,h=h-bed_z-phz);
+            {   translate([0,0,bed_z]) if(a==0)
+                {   bed_holder(); } else{ bed_holder_w_motor(); }
+                color("purple") translate([0,0,bed_z+pz]) pulley_pos() 
+                    cylinder(r=1,h=h-bed_z-phz-pz);
                 
 //                if(rod_adjustable) color("red") translate([-zrd,-zrd,h]) zrod_holder();
                 color("green") cylinder(r=bbr,h=h+2*bt);//h+fh); //z rods
@@ -61,8 +61,7 @@ module show(a=min_a+(max_a-min_a)*$t)
 }
 
 
-show((min_a+max_a)/2);
-use<pulley.scad>
+show();
 
 module bed_n_corner_show(bed_z=-3*fh)
 {
