@@ -41,7 +41,7 @@ module holder_cut(p,a) //Single holder substracted features.
     {   rotate(90) linear_extrude(height=l) slide(jh_sr); //Small radius slide in/out.
         for(x=pusher_d*[1,-1]) translate([x,0]) //Hole for screws and nuts.
                       {   cylinder(r=sr,h=l);
-                          linear_extrude(height=t+nh) nut_profile(nt);
+                          linear_extrude(height=t+nh) nut2d(nt);
                       }
         linear_extrude(height=q+2*dd) rotate(90) slide(jh_lr); //Large radius slide bottom
        
@@ -121,11 +121,13 @@ module show()
 
 }
 
-show();
+//show();
 //single_holder(false);//this is without any quickfit-like thing.
 
 //translate([0,w]) jh_holder();
 
+
+jh_holder();
 
 module jh_holder_quickfit()
 {   jh_holder(w=100); }

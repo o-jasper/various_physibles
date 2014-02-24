@@ -7,7 +7,7 @@
 //  (at your option) any later version.
 //
 
-include<nut.scad>
+include<o-jasper/nut.scad>
 
 $fn=60;
 

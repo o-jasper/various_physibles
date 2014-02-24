@@ -1,4 +1,6 @@
 
+SCAD=../../../../bin/scad
+
 default:scad
 
 all: scad
@@ -12,10 +14,8 @@ pushers: output/jh_pusher_bottom.stl output/jh_pusher_top.stl
 
 pushers_3mm: output/jh_pusher_bottom_3mm.stl output/jh_pusher_top_3mm.stl
 
-output/jh_pusher_%.stl: params.scad jh_pusher.scad
-	sh ../../../bin/scad.sh 'use<'`pwd`'/'jh_pusher.scad'>;'`echo $@ | cut -f 2 -d/ | cut -f 2- -d_ | cut -f 1 -d.`'();'\
-	 $@
+output/jh_pusher_%.stl: jh_pusher.scad params.scad 
+	$(SCAD) module $< $@
 
-output/%.stl: params.scad j_head_holder.scad
-	sh ../../../bin/scad.sh 'use<'`pwd`'/j_head_holder.scad>;'`echo $@ | cut -f 2 -d/ |cut -f 1 -d.`'();'\
-	 $@
+output/%.stl: j_head_holder.scad params.scad 
+	$(SCAD) module $< $@
