@@ -32,11 +32,6 @@ aw=2*t;
 
 min_z=100;
 
-ad=(w-sqrt(2)*zrd)/cos(min_a)-t;
-ah=3*aw;
-aR=ad/5;
-ar=aR/3;
-
 adx= zrd+2*bbr+t;// w/2-pt-t-ah/2-2*bbr-t; //Distance from corners of thingy.
 
 h=500; //Sizes.
