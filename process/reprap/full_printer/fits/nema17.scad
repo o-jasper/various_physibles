@@ -2,7 +2,7 @@ include</home/jasper/oproj/physical/reprap/i3ext/inc/nema17.scad>
 
 $realnema=true;
 
-sw=40; //Stepper size.
+sw=43; //Stepper size.
 sh=48;
 
 module nema()

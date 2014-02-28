@@ -1,9 +1,12 @@
 
 default: corners bed pulley
 
-corners: output/top_corner.stl output/bottom_motor_corner.stl output/bottom_bare_corner.stl 
+corners: output/corner.stl output/top_motor_corner.stl output/rod_block.stl
 bed:     output/bed_holder.stl output/bed_holder_w_motor.stl 
 pulley:  output/pulley.stl
 
 output/%.stl: fullp.scad corner.scad params.scad bed.scad pulley.scad
 	sh bin/one.sh $< $@
+
+clean:
+	rm output/*.stl

@@ -15,6 +15,9 @@ use<plates.scad>;
 //TODO fix this link...
 use<pulley.scad>
 
+module bottom_bare_corner(){ corner(); }
+module bottom_motor_corner(){ corner(); }
+
 module show(bed_z=h/2,$realnema=false)
 {    
     $show=true;

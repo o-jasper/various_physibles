@@ -7,10 +7,12 @@
 //  (at your option) any later version.
 //
 
-//Stuff connecting plates.
+//Stuff connecting plates, and  holding steppers, and rods.
+//All the corners excepting two that hold pulleys aswel are the same.
 
 include<params.scad>
 use<pulley.scad>
+use<fits/nema17.scad>
 
 ut=2*t;
 
@@ -81,24 +83,37 @@ module base_corner_sub()
     }
 }
 
-module bottom_motor_corner(bottom_hole=false)
+module around_nema2d(sub=0)
+{
+    da = zrd+bbr+2*sr+3*t-sub;
+    db= da+t;//hl+t-sub;
+    hull()
+    {   square([db,t]);
+        square([t,db]);
+        translate([da,da]) circle(t);
+    }
+}
+
+module rod_mounting_hole_pos() //Positions the blocks holding the sliders.
+{    translate([zrd,zrd,-bt]) for(a=[0:90:270]) rotate(a) 
+          translate((bbr+2*t)*[1,1]) child();
+}
+
+module corner()
 {
     difference()
     {   union()
         {   base_corner();
-            translate([0,0,-bt]) hull() //Rest of the plate under the motor.
-            {   translate([pt+t/2+sw,pt+t/2+sw]) cylinder(r=t/2,h=bt+t);
-                cube([pt+t/2+sw,pt+t/2+sw,bt+t]);
-            }
+            translate([0,0,-bt]) linear_extrude(height=bt+t) around_nema2d(sub=0);
         }
         translate((pt+t/2)*[1,1]) difference()
         {   cube([sw,sw,2*sh]);
             translate([0,0,sh+t]) rotate(45) cube(2*[sqrt(2)*ssd+sr+t,sw,t],center=true);
         }
-        translate((pt+t/2+0.3*sw)*[1,1,0]+[0,0,0.3*t]) cube(2*[sw,sw,sh]);        
         translate([pt+t/2+ssd,pt+t/2+ssd,bt+t]) cylinder(r=sr,h=sw);
-        if(bottom_hole) translate([zrd,zrd,-bt-t]) cylinder(r=sw/2-t,h=8*t);
         base_corner_sub();
+        rod_mounting_hole_pos() translate([0,0,-t]) cylinder(r=sr+t/2,h=8*t);
+        translate([zrd,zrd,-bt-t]) cylinder(r=bbr+t,h=8*t);
     }
 }
 
@@ -110,68 +125,29 @@ module x_rod_add()
     }
 }
 module x_rod_sub()
-{
-    translate([pt+t,zrd,xrh]) rotate([0,90,0]) cylinder(r=bbr,h=hl); //x rod.
+{   translate([pt+t,zrd,xrh]) rotate([0,90,0]) cylinder(r=bbr,h=hl); //x rod.
 }
 
-//Top corners are all the same, a thingie is put on that allows it to be wiggled
-//into the correct place.
-//TODO .. two of them need pulleys.
-
-module belt_corner_holes()
-{    translate([zrd,zrd,-bt]) for(a=[0:90:270]) rotate(a) translate((bbr+2*t)*[1,1]) child();
-}
-
-//Block x-rod, z-rod and belt controller go into.
-module belt_corner_block(a=0)
+//That the block x-rod, z-rod go into.
+module rod_block(a=0)
 {
     translate([zrd,zrd]) rotate(a) translate([-zrd,-zrd]) difference()
     {   union()
         {   x_rod_add();
             translate([zrd,zrd]) cylinder(r=bbr+t,h=xrh+bbr+t);
             linear_extrude(height=t) difference()
-            {   hull() belt_corner_holes() circle(sr+t);
+            {   hull() rod_mounting_hole_pos() circle(sr+t);
                 translate([zrd,zrd]) for(a=[0:90:270]) rotate(a) 
-                    translate([bbr+2*t,0]) circle(t);
+                     translate([bbr+1.8*t,0]) circle(t);
             }
         }
         x_rod_sub();
         translate([zrd,zrd,-fh]) cylinder(r=bbr,h=8*fh);
-        belt_corner_holes() translate([0,0,-t]) cylinder(r=sr,h=8*t);
+        rod_mounting_hole_pos() translate([0,0,-t]) cylinder(r=sr,h=8*t);
     }
 }
 
-module top_corner_floor2d(sub=0)
-{
-    da = zrd+bbr+2*sr+3*t-sub;
-    db= da+t;//hl+t-sub;
-    hull()
-    {   square([db,t]);
-        square([t,db]);
-        translate([da,da]) circle(t);
-    }
-}
-
-module top_corner_floor_n_wall()
-{
-    translate([0,0,-bt]) linear_extrude(height=bt) top_corner_floor2d();
-    translate([0,0,-bt]) linear_extrude(height=bt+t) difference()
-    {   top_corner_floor2d(); top_corner_floor2d(sub=t); }
-}
-
-module top_bare_corner()
-{
-    difference()
-    {   union()
-        {   base_corner(reinforce=false);
-            top_corner_floor_n_wall();
-        }
-        base_corner_sub();
-            
-        belt_corner_holes() translate([0,0,-t]) cylinder(r=sr+t/2,h=8*t);
-        translate([zrd,zrd,-bt-t]) cylinder(r=bbr+t,h=8*t);
-    }
-}
+module top_bare_corner(){   corner(); }
 
 module pulley_holder()
 {
@@ -201,19 +177,9 @@ module pulley_holder()
                   translate([-0.75*t,-pr]) rotate([0,90,0]) pulley();
 
 }
-module top_motor_corner(with_pulley=true)
-{                
-    difference()
-    {   union()
-        {   base_corner(reinforce=false);
-            top_corner_floor_n_wall();
-            if(with_pulley) pulley_holder();
-        }
-        base_corner_sub();
-            
-        belt_corner_holes() translate([0,0,-t]) cylinder(r=sr+t/2,h=8*t);
-        translate([zrd,zrd,-bt-t]) cylinder(r=bbr+t,h=8*t);
-    }
+module top_motor_corner()
+{   corner();
+    pulley_holder();
 }
 
 //TODO feh make space for belt path..
@@ -221,16 +187,18 @@ module corner_show(place_block=true)
 {
     d=hl+pt+t;
     
-    bottom_motor_corner();
-//    color("gray") translate((pt+t/2)*[1,1]) cube([sw,sw,sh]);
-    color("green") translate([zrd,zrd]) cylinder(r=bbr,h=4*sh);
+    corner();
+    translate([zrd,zrd,sh]) 
+    {   translate([0,0,sh/2]) color("green") cylinder(r=bbr,h=4*sh);
+        nema17();
+    }
 
     translate([0,d]) top_bare_corner();
-    if(place_block) color("blue") translate([0,d]) belt_corner_block();
+    if(place_block) color("blue") translate([0,d]) rod_block();
     translate([d,d]) top_motor_corner();
-    if(place_block) color("blue") translate([d,d]) belt_corner_block();
+    if(place_block) color("blue") translate([d,d]) rod_block();
     translate([d+zrd,d+zrd,-bt-t/2-10]) color("purple") cylinder(r=20,h=10); 
-    translate([2*d,0]) belt_corner_block();
+    translate([d,0]) tod_block();
 }
 
 $show=true;
