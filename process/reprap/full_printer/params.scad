@@ -1,7 +1,7 @@
 
 sr=2; //Screw radius.
 t=4;
-pt=10; //Plate thickness.
+pt=4; //Plate thickness.
 
 bh=20; //Bed height.
 bw=200;

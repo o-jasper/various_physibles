@@ -26,11 +26,12 @@ module planks_space()
 
 ch=bt+min(hl/4,sh);
 
-module base_corner(reinforce=true)
+module base_corner(reinforce=false,plate=true)
 {
     r=pt/2+t;
     d=hl-r;
     f=0.2;
+    phw=d/4;
     translate([pt/2,pt/2,-bt]) union()
     {   intersection() 
         {   union() for(pos=[[0,d],[d,0]]) hull()
@@ -52,6 +53,17 @@ module base_corner(reinforce=true)
             cube(2*[r,r,8*ch],center=true);
         }
         if(reinforce) hull() for(a=[0,90]) rotate(a) translate([hl-r,0]) cylinder(r=r,h=bt+t);
+        if(plate) for(a=[0,-90]) rotate(a) scale([a<0 ? -1 : 1,1,1]) 
+           linear_extrude(height=t) difference()
+        {   hull()
+            {   circle(r);
+                translate([phw,0]) circle(r);
+                translate([0,hl-r]) circle(r);
+                translate([phw,hl-r]) circle(r);
+            }
+            for(x=(phw-pt)*[1,3]/4) for(y=(phw-pt-t)*[0,1]) 
+               translate([pt+t+x,hl-r-y]) circle(sr);
+        }
     }
 }
 
@@ -69,27 +81,11 @@ module base_corner_sub()
     }
 }
 
-module bottom_drill_sub()
-{
-    d=pt+t+sr;
-    for(pos=[[d+t/2,hl-d,-t-bt],[hl-d,d+t/2,-t-bt]]) translate(pos) cylinder(r=sr,h=hl);
-}
-
-//TODO add feet, bottom plate ability.
-module bottom_bare_corner() 
-{
-    difference()
-    {   base_corner();
-        base_corner_sub();
-        bottom_drill_sub();
-    }
-}
-
 module bottom_motor_corner(bottom_hole=false)
 {
     difference()
     {   union()
-        {   bottom_bare_corner();
+        {   base_corner();
             translate([0,0,-bt]) hull() //Rest of the plate under the motor.
             {   translate([pt+t/2+sw,pt+t/2+sw]) cylinder(r=t/2,h=bt+t);
                 cube([pt+t/2+sw,pt+t/2+sw,bt+t]);
@@ -102,6 +98,7 @@ module bottom_motor_corner(bottom_hole=false)
         translate((pt+t/2+0.3*sw)*[1,1,0]+[0,0,0.3*t]) cube(2*[sw,sw,sh]);        
         translate([pt+t/2+ssd,pt+t/2+ssd,bt+t]) cylinder(r=sr,h=sw);
         if(bottom_hole) translate([zrd,zrd,-bt-t]) cylinder(r=sw/2-t,h=8*t);
+        base_corner_sub();
     }
 }
 
@@ -227,8 +224,6 @@ module corner_show(place_block=true)
     bottom_motor_corner();
 //    color("gray") translate((pt+t/2)*[1,1]) cube([sw,sw,sh]);
     color("green") translate([zrd,zrd]) cylinder(r=bbr,h=4*sh);
-
-    translate([d,0]) bottom_bare_corner();
 
     translate([0,d]) top_bare_corner();
     if(place_block) color("blue") translate([0,d]) belt_corner_block();
