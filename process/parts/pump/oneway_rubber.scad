@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 26-01-2014 Jasper den Ouden.
+//  Copyright (C) 05-03-2014 Jasper den Ouden.
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -16,7 +16,7 @@ t=2;
 r=bw/2+t/2;
 l=10;
 
-slot_r=bw/4;
+slot_r=bw/8;
 
 module slit()
 {
