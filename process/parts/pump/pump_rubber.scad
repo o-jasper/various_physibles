@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 26-01-2014 Jasper den Ouden.
+//  Copyright (C) 05-03-2014 Jasper den Ouden.
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -17,43 +17,55 @@ R=10; H=60;
 
 s=0.1;
 
-module cover2d()
-{
-    hull()
-    {   circle(r+t);
-        translate([0,-r-t]) circle(t);
-    }
-}
+fhr=2;
+fhd=2.5*ceil((R+2.5*t)/2.5);
+module fhpos()
+{   for(x=fhd*[1,-1]) translate([x,0]) child(0); }
+
+vd=R+r+t;
+module valve_pos()
+{   for(a=[0,180]) rotate(a) translate([0,vd]) child(0); }
+
 module pump()
 {
     difference()
     {   union()
         {   cylinder(r=R+t,h=H);
-            translate([0,1.5*l+R,br+t]) rotate([90,0,0]) linear_extrude(height=3*l+2*R) 
-                cover2d(r=br,t=t);
             linear_extrude(height=t) difference()
             {   hull()
                 {   circle(R+2*t);
-                    for(x=(R+3*t)*[1,-1]) translate([x,0]) circle(3*t);
+                    fhpos() circle(fhr);
                 }
-                for(x=(R+3*t)*[1,-1]) translate([x,0]) circle(2*t);
+                fhpos() circle(fhr);
             }
-            for(x=(R+3*t)*[1,-1]) translate([x,0]) cylinder(r=3*t,h=2*br);
+            hull() fhpos() cylinder(r=fhr,h=2*br);
+            fhpos() cylinder(r=fhr+t,h=2*br);
+            
+            hull() valve_pos() cylinder(r=r+t,h=2*l+2*t);
         }
         translate([0,0,t]) cylinder(r=R,h=H);
-        for(x=(R+3*t)*[1,-1]) translate([x,0,-t]) cylinder(r=2*t,h=8*br);
-        translate([0,0,-4*H]) cube(H*[8,8,8],center=true);
-        for(y=[R,-l-R]) translate([0,y,br+t]) rotate([-90,0,0]) //The oneway thingies.
-        {   rotate(180) oneway_cut();
-            difference() //Space to flap rubber band onto.
-            {   translate([0,br-bw,l/2+bw/4]) cube(bw*[1,2,0.5],center=true);
-                cylinder(r=br+t-bt,h=l);
-            }
+        
+        translate([0,0,-4*H])
+        {   cube(H*[8,8,8],center=true);
+            fhpos() cylinder(r=fhr,h=8*H); //Feature hole.
         }
+
+        difference()
+        {   union()
+            {   translate([0,vd,t+r]) oneway_cut();
+                translate([0,-vd,l+t+r]) rotate([180,0,0]) oneway_cut();
+            }
+            translate([0,0,t-4*H]) cube(H*[8,8,8],center=true);
+        }
+        translate([0,0,2*l]) valve_pos() cylinder(r1=r,r2=r/2,h=l);
+        translate([0,0,t]) hull()
+        {   valve_pos() cylinder(r1=r-t,r2=0,h=l/2);
+            cylinder(r1=r,h=l);
+        }
+      //Too close..
+        //translate([0,0,-t]) valve_pos() 
+        //    for(a=[-30,-150]) rotate(a) translate([r+t/2,0]) cylinder(r=t/4,h=8*H);
     }
-    for(y=(1.5*l+R-ds)*[1,-1]) translate([0,y,br+t]) rotate([90,0,0]) rotate_extrude()
-        translate([r,0]) circle(ds);
-            
 }
 
 module plunger(fancy_center=false,fr=1)
@@ -87,19 +99,34 @@ module plunger(fancy_center=false,fr=1)
 }
 module plunger_fancy(fr=1){ plunger(fancy_center=true,fr=fr, H=H,R=R,t=t); }
 
-module cover(s=0.4)
-{
-    rotate(180) linear_extrude(height=l) difference()
-    {   intersection(){ cover2d(r=br,t=1.5*t); square((br+1.5*t)*[2,2],center=true); }
-        intersection(){ cover2d(r=br,t=t+s); square((br+t+s)*[2,2],center=true); }
+module cover2d(s)
+{   union()
+    {   circle(R+t+s);
+        hull() valve_pos() circle(r+t+s);
     }
 }
 
+module cover(s=0.4)
+{
+    difference()
+    {   union()
+        {   linear_extrude(height=l) 
+            {   cover2d(s+t);
+                fhpos() circle(fhr+t);
+            }
+            linear_extrude(height=t) hull(){ cover2d(s+t); fhpos() circle(fhr+t); }
+        }
+        translate([0,0,-l]) linear_extrude(height=8*l) 
+        {   cover2d(s);
+            fhpos() circle(fhr);
+        }
+    }
+}
 
 module show()
 {   pump();
     translate([0,0,4*t+H*$t/2]) color("blue") plunger();
-    translate([0,2*R+2*R*$t,br+t]) rotate([-90,0,0]) color("red") cover();
+    translate([0,0,l]) color("red") cover();
     translate([4*R,0]) rubber_oneway_lone();
 }
 show();
