@@ -1,10 +1,12 @@
+SCAD=../../../../bin/scad
 
-default:scad
+default: carriage output/fan_attach.stl
 
-all: scad
+carriage: output/carriage.stl output/rotate_lock.stl output/belt_holder_top.stl
 
-scad: output/carriage.stl output/rotate_lock.stl output/belt_holder_top.stl
+
+output/fan_%.stl: fan_attach.scad
+	$(SCAD) module $< $@
 
 output/%.stl: carriage.scad
-	sh ../../bin/scad.sh 'use<'`pwd`'/'$<'>;'`echo $@ | cut -f 2 -d/ |cut -f 1 -d.`'();'\
-	 $@
+	$(SCAD) module $< $@

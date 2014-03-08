@@ -15,7 +15,7 @@ $fn=60;
 
 //For reprappro mendel(~prusa 2), Tiny carriage with one quick fit.
 
-include<nut.scad>
+include<o-jasper/nut.scad>
 
 t=4; //Thicknesses
 
@@ -194,7 +194,7 @@ module carriage()
         translate([rx,ry,-t]) //Space for hinge rotation. 
         {   translate([0,0,t+rlz]) cylinder(r=rlr+s, h=h);
             cylinder(r=sr, h=2*h);
-            linear_extrude(height=rlz+nh-t/2) nut_profile(nt);
+            linear_extrude(height=rlz+nh-t/2) nut2d(nt);
         }
         //Dont need overhang over the whole thing.
         translate([0,0,h]) cube([lbd-2*(sr+t),sw,2*(h-bhz)],center=true);
@@ -211,16 +211,6 @@ module carriage()
                           {   cylinder(r=sr,h=3*lbr+t);
                               cylinder(r=2*sr,h=lbr+sr*sqrt(2));
                           }
-                            
-/*        intersection() //Cuts holes in sides but ugly.
-        {   for(a=[0:90:360])
-                translate([0,l,h/2]) rotate([90,0]) rotate(a)
-                    translate([(w-4*(lbr+t))/4,0]) cylinder(r=h/2-t,h=8*l,$fn=4);
-            translate([0,0,h/2]) difference()
-            {   cube([4*l,4*l,h-2*t],center=true);
-                cube([4*l,4*l,t],center=true);
-            }
-            }*/
     }
 }
 
@@ -232,7 +222,7 @@ module _rotate_lock_wall(r,h)
     }
 }
 
-use<../../logos/openhw.escad>
+use<logos/openhw.escad>
 
 module rotate_lock()
 {   difference()
