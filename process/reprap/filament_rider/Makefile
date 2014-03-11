@@ -1,10 +1,16 @@
 
-default: scad
+SCAD=../../../bin/scad
 
-all: scad
+default: rider leeway
 
-scad: output/hanger.stl output/wheel.stl
+rider:  output/hanger.stl output/wheel.stl
+leeway: output/leeway_spacer_plain.stl
+
+output/leeway_%.stl: leeway.scad
+	$(SCAD) module $< $@
+
+output/hanger.stl: rider.scad
+	sh ../../../bin/scad.sh 'use<'`pwd`'/rider.scad>; rotate([0,-90,0]) hanger();' $@
 
 output/%.stl: rider.scad
-	sh ../../bin/scad.sh 'use<'`pwd`'/'$<'>;'`echo $@ | cut -f 2 -d/ |cut -f 1 -d.`'();'\
-	 $@
+	$(SCAD) module $< $@

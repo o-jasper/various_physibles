@@ -9,15 +9,15 @@
 
 $fs=0.2;
 
-t=3;
-R=20;
-n=6;
-m=30;
+t=3;  //Thicknesses.
+R=20; //Radius of wheel.
+n=6;  
+m=30; //Number of indicators going round.
 Ri=t; //Extra hole size.
 
 sr=1.6;
 
-fr=2;
+fr=2; //Radius of filament.(over-estimated)
 
 decorate1=true;
 decorate2=true;
@@ -27,9 +27,12 @@ hole_thingy=true;
 module wheel()
 {   
     difference()
-    {   union() //Main shape.
-        {   cylinder(r1=R,r2=R-2*t,h=2*t);
-            cylinder(r1=R-2*t,r2=R,h=2*t);
+    {   intersection()
+        {   union() //Main shape.
+            {   cylinder(r1=R,r2=R-2*t,h=2*t);
+                cylinder(r1=R-2*t,r2=R,h=2*t);
+            }
+            cylinder(r=R-t/2,h=2*t);
         }
         //Ticks.
         for(a=[0:360/m:360*(1-1/m)]) rotate(a) if(teeth)
@@ -121,3 +124,5 @@ module show()
 }
 
 show();
+
+//rotate([0,-90,0]) hanger();
