@@ -110,8 +110,8 @@ module _hanger()
 module hanger()
 {
     difference()
-    {
-        _hanger();
+    {   _hanger(R=R,t=t,
+            decorate1=decorate1,decorate2=decorate2,teeth=teeth,hole_thingy=hole_thingy);
         translate([-4*R,R-t,t]) rotate([0,90,0]) cylinder(r=fr,h=8*R);
     }
     
@@ -125,4 +125,5 @@ module show()
 
 show();
 
-//rotate([0,-90,0]) hanger();
+module hanger_plain()
+{   hanger(decorate1=false,decorate2=false); }

@@ -3,8 +3,8 @@ SCAD=../../../bin/scad
 
 default: rider leeway
 
-rider:  output/hanger.stl output/wheel.stl
-leeway: output/leeway_spacer_plain.stl
+rider:  output/hanger.stl output/wheel.stl output/hanger_plain.stl
+leeway: output/leeway_spacer_plain.stl output/leeway_spacer_prettify.stl
 
 output/leeway_%.stl: leeway.scad
 	$(SCAD) module $< $@
