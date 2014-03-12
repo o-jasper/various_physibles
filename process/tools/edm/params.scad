@@ -25,5 +25,5 @@ bcr=6; bcz=1.5*t;bch=5; //'Cap' radius, height.
 s=0.1;
 
 sd=10;
-
 d=5*bcr; //Distance
+

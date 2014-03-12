@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 14-01-2014 Jasper den Ouden.
+//  Copyright (C) 24-01-2014 Jasper den Ouden.
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -11,7 +11,6 @@ include<params.scad>
 
 $fs=0.1;
 bl=170;
-d=5*bcr; //Distance
 
 module screwthing_add(d=(bcr+1.5*t+sr))
 {   hull() for(x=d*[1,-1]) translate([x,0]) circle(sr+t);

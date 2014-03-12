@@ -8,11 +8,11 @@
 //
 
 include <params.scad>
-use<edm_holder.scad>
+use<../edm/wobble_edm_holder.scad>
 use<holder.scad>
 
 module show_combine(z=t+h/2*$t)
-{   translate([0,d,bt+z+mrh+t]) show_edm();
+{   translate([0,d,bt+z+mrh+t]) show_wobble_edm();
     show(z=z);
 }
 show_combine(z=10);
