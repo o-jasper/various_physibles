@@ -32,13 +32,15 @@ module leeway_spacer_plain()
             hull() for(a=[-40,0,40]) rotate([0,a,0]) scale([0.5,1,1]) cylinder(r=fr,h=2*R);
             translate([0,0,-R]) cylinder(r=fr,h=2*R);
         }
-        cube([8*R,8*R,2*(fr+t)],center=true);
+        difference()
+        {   cube([8*R,8*R,2*(fr+t)],center=true);
+            for(s=[1,-1]) translate(R*[0.5*s,-0.65,-1]) 
+                              scale([1,1.3,1]) cylinder(r=t/2,h=8*R,$fn=4);
+        }
     }
 }
 
-use<logos/openhw.escad>
-
-module pretty_pos_f()
+module pretty_pos_f() //Note: Just happens to be useful.
 {   translate([0,-fr-t+0.1,R/2]) rotate([90,0,0]) child(0); }
 module pretty_pos_b()
 {   rotate(180) pretty_pos_f() child(0); }
@@ -58,6 +60,8 @@ module reprap_logo()
         translate([0,sqrt(2)*R/3-t/4]) sphere(t/4);
     }
 }
+
+use<logos/openhw.escad>
 
 module leeway_spacer_prettify()
 {
