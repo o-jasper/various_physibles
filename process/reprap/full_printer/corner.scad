@@ -1,5 +1,5 @@
 //
-//  Copyright (C) 04-01-2014 Jasper den Ouden.(ojasper.nl)
+//  Copyright (C) 16-03-2014 Jasper den Ouden.(ojasper.nl)
 //
 //  This is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published
@@ -11,8 +11,9 @@
 //All the corners excepting two that hold pulleys aswel are the same.
 
 include<params.scad>
+//include<fits/nema17.scad>
+
 use<pulley.scad>
-use<fits/nema17.scad>
 
 ut=2*t;
 
@@ -85,7 +86,7 @@ module base_corner_sub()
 
 module around_nema2d(sub=0)
 {
-    da = zrd+bbr+2*sr+3*t-sub;
+    da = zrd+sw/2+t-sub; //zrd+bbr+2*sr+3*t-sub;
     db= da+t;//hl+t-sub;
     hull()
     {   square([db,t]);
@@ -104,7 +105,7 @@ module corner()
     difference()
     {   union()
         {   base_corner();
-            translate([0,0,-bt]) linear_extrude(height=bt+t) around_nema2d(sub=0);
+            translate([0,0,-bt]) linear_extrude(height=bt+3*t) around_nema2d();
         }
         translate((pt+t/2)*[1,1]) difference()
         {   cube([sw,sw,2*sh]);
@@ -120,7 +121,7 @@ module corner()
 module x_rod_add()
 {   translate([zrd,zrd]) hull()
     {   translate([-3*t,0,xrh]) 
-            rotate([0,90,0]) cylinder(r=bbr+t/2,h=6*t); //x rod.
+            rotate([0,90,0]) cylinder(r=bbr+t,h=6*t); //x rod.
         cylinder(r=t,h=t);
     }
 }
@@ -149,6 +150,7 @@ module rod_block(a=0)
 
 module top_bare_corner(){   corner(); }
 
+//TOWER has holds pulley
 module pulley_holder()
 {
     translate([zrd,zrd]) difference()
@@ -157,17 +159,22 @@ module pulley_holder()
             {   translate([-2*t,0,phz]) rotate([0,90,0]) cylinder(r=sr+t,h=4*t);
             }
             //Pole it is on.
-            rotate(45) translate([(hl-zrd)/sqrt(2),0,-bt])  intersection()
-            {   union()
-                {   linear_extrude(height=phz+bt) difference()
-                    {   circle(3*t); scale([0.5,0.7]) circle(3*t); }
-                    cylinder(r=3*t,h=2*t);
-                }
-                cube([4*t,8*t,8*phz],center=true);
+            for(d=[1,-1]*(hl/2-zrd/2-pr-t)) hull()
+            {   translate([sw/2,sw/2,-bt]) cylinder(r=2*t,h=t);
+                rotate(45) 
+                    translate([(hl-zrd)/sqrt(2),d,phz]) 
+                        cylinder(r=2*t,h=t);
+            }
+            for(a= [0,90]) hull()
+            {
+                rotate(a) translate([sw/2,0,-bt]) cylinder(r=2*t,h=t);
+                rotate(45) for(d=[1,-1]*(hl/2-zrd/2-pr-t))
+                    translate([(hl-zrd)/sqrt(2),0,phz]) 
+                        cylinder(r=2*t,h=t);
             }
         }
         rotate(45) translate([(hl-zrd)/sqrt(2),4*hl,phz-pr])  //Hole for wire.
-            rotate([90,0,0]) cylinder(r=0.7*t,h=8*hl,$fn=4);
+            rotate([90,0,0]) cylinder(r=t,h=8*hl,$fn=4);
         translate([0,0,phz]) pulley_pos() union() //Hole for pulley.
         {   translate([-t,-pr]) rotate([0,90,0]) cylinder(r=pr+t/4,h=2*t);
             translate([-4*t,-pr]) rotate([0,90,0]) cylinder(r=sr,h=8*t);
@@ -198,7 +205,7 @@ module corner_show(place_block=true)
     translate([d,d]) top_motor_corner();
     if(place_block) color("blue") translate([d,d]) rod_block();
     translate([d+zrd,d+zrd,-bt-t/2-10]) color("purple") cylinder(r=20,h=10); 
-    translate([d,0]) tod_block();
+    translate([d,0]) rod_block();
 }
 
 $show=true;

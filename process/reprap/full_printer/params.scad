@@ -1,6 +1,6 @@
 
 sr=2; //Screw radius.
-t=4;
+t=2;
 pt=4; //Plate thickness.
 
 bh=20; //Bed height.
@@ -18,7 +18,9 @@ zrd=pt+t/2+sw/2; //... OR use gears at the bottom to get them as close as possib
 //zrd= pt+bbr+2*t; //Z rod distance.
 dc=bbr/sqrt(2)+t; //Distance of bed corners to rods.
 
-w= bw+2*pt+2*zrd-2*t; //bw+2*(zrd+bbr+2*sr+3*t); //
+//w= bw+2*pt+2*zrd-2*t; //bw+2*(zrd+bbr+2*sr+3*t); //
+w= bw+2*pt+2*zrd+t+sw/2;
+
 l=w; 
 fh=40; //Front height.
 
@@ -39,7 +41,7 @@ h=500; //Sizes.
 tbr=20; //Timing belt radius.
 
 pr = 10; //Radius of pulleys.
-phz = 5*t+2*bbr+pr; //Distance 'it hangs'
+phz = 5*t+2*bbr+2*pr; //Distance 'it hangs'
 hl=max(sw+pt+2*(t+sr),80); //Length it holds the plates.
 
 xrh = bbr+bt+2*t; //How far the x rod hangs.

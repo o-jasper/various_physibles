@@ -15,7 +15,8 @@ module pulley_pos() //At the position of the pulley.
 }
 
 $fs=0.1;
-module pulley(dec_ball=false, dec_ball_internal=true,dec_ball_extra=false,pt=1.5*t,f=1/8)
+module pulley(dec_cone=true,
+              dec_ball=false, dec_ball_internal=true,dec_ball_extra=false,pt=1.5*t,f=1/8)
 {   dr= pr/2+sr/2;
     difference()
     {   rotate_extrude() difference()
@@ -26,17 +27,22 @@ module pulley(dec_ball=false, dec_ball_internal=true,dec_ball_extra=false,pt=1.5
             translate([pr+f*t,pt/2]) scale([f*t/pt,1/3]) circle(pt);
         }
         //Taking out stuff.
-        if(dec_ball) for(a=[0:60:300]) rotate(a) translate([dr,0,pt]) 
-        {   if(dec_ball_internal)
-            {   translate([0,0,-pt/2]) scale([1,1,1.8])
-                    sphere(min(pr/2-sr/2-t/5, dr/2-t/8)); 
+        for(a=[0:60:300]) rotate(a) 
+        {   if(dec_ball)translate([dr,0,pt]) 
+            {   if(dec_ball_internal)
+                {   translate([0,0,-pt/2]) scale([1,1,1.8])
+                        sphere(min(pr/2-sr/2-t/5, dr/2-t/8)); 
+                }
+                else
+                {   sphere(min(pr/2-sr/2-t/5, dr/2-t/8)); }
             }
-            else
-            {   sphere(min(pr/2-sr/2-t/5, dr/2-t/8)); }
+            if(dec_ball_extra) rotate(30) 
+                translate([pr-t/2,0,pt+t/8]) sphere(t/2.6);
+            if(dec_cone) translate([dr,0,-pt]) 
+                {   cylinder(r1=t/4,r2=t/1.2,h=3*pt);
+                    cylinder(r1=t/1.2,r2=t/4,h=3*pt);
+                }
         }
-        if(dec_ball_extra) for(a=[0:60:300]) rotate(30+a) 
-            translate([pr-t/2,0,pt+t/8]) sphere(t/2.6);
     }
 }
-
 pulley();

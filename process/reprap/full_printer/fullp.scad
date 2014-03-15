@@ -64,7 +64,7 @@ module show(bed_z=h/2,$realnema=false)
 }
 
 
-show();
+show(bed_z=min_z);//h-3*fh);
 
 module bed_n_corner_show(bed_z=-3*fh)
 {
