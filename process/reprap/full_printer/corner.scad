@@ -150,35 +150,55 @@ module rod_block(a=0)
 
 module top_bare_corner(){   corner(); }
 
-//TOWER has holds pulley
+phd = hl/2-zrd/2-pr-t;
+
+module pulley_head_screw_holes(d)
+{
+    d = phd;
+    rotate(45) for(s= [1,0,-1]) translate([(hl-zrd)/sqrt(2),-d*s,phz])
+    {   translate([-3.6*t,0]) rotate([0,-90,0]) cylinder(r=2*t,h=8*t);
+        translate([4*t,0]) rotate([0,-90,0]) cylinder(r=sr,h=8*t);
+    }
+}
+
+module pulley_head(subtracting=false)
+{
+    difference() 
+    {   hull() pulley_pos() //Top bit.
+            translate([-2*t,-pr,phz]) rotate([0,90,0]) 
+            cylinder(r=sr+t,4*t);
+        if(!substracting) pulley_head_screw_holes();
+    }
+}
+
+//Tower that holds pulley
 module pulley_holder()
 {
+    d = phd; st=0.2*t;
     translate([zrd,zrd]) difference()
     {   union()
-        {   hull() pulley_pos() translate([0,-pr]) //Top bit.
-            {   translate([-2*t,0,phz]) rotate([0,90,0]) cylinder(r=sr+t,h=4*t);
-            }
-            //Pole it is on.
-            for(d=[1,-1]*(hl/2-zrd/2-pr-t)) hull()
-            {   translate([sw/2,sw/2,-bt]) cylinder(r=2*t,h=t);
-                rotate(45) 
-                    translate([(hl-zrd)/sqrt(2),d,phz]) 
+        {   //Pole it is on.
+            for(s= [1,0,-1]) rotate(45) 
+            {   hull()
+                {   rotate(s*45) translate([s==0? sw/sqrt(2) : sw/2,0,-bt]) 
                         cylinder(r=2*t,h=t);
-            }
-            for(a= [0,90]) hull()
-            {
-                rotate(a) translate([sw/2,0,-bt]) cylinder(r=2*t,h=t);
-                rotate(45) for(d=[1,-1]*(hl/2-zrd/2-pr-t))
-                    translate([(hl-zrd)/sqrt(2),0,phz]) 
+                    translate([(hl-zrd)/sqrt(2)-2*t,-d*s,phz-t]) 
                         cylinder(r=2*t,h=t);
+                }
             }
+            hull() for(s= [1,0,-1]) rotate(45) 
+                translate([(hl-zrd)/sqrt(2)-2*t,-d*s,phz-2*t+st]) 
+                                        cylinder(r=2*t,h=4*t-2*st);
+
         }
+        pulley_head_screw_holes();
         rotate(45) translate([(hl-zrd)/sqrt(2),4*hl,phz-pr])  //Hole for wire.
             rotate([90,0,0]) cylinder(r=t,h=8*hl,$fn=4);
         translate([0,0,phz]) pulley_pos() union() //Hole for pulley.
         {   translate([-t,-pr]) rotate([0,90,0]) cylinder(r=pr+t/4,h=2*t);
             translate([-4*t,-pr]) rotate([0,90,0]) cylinder(r=sr,h=8*t);
         }
+        pulley_head(substracting=true);
     }
     if($show) color("purple") translate([zrd,zrd,phz]) pulley_pos() 
                   translate([-0.75*t,-pr]) rotate([0,90,0]) pulley();
@@ -202,7 +222,10 @@ module corner_show(place_block=true)
 
     translate([0,d]) top_bare_corner();
     if(place_block) color("blue") translate([0,d]) rod_block();
-    translate([d,d]) top_motor_corner();
+    translate([d,d]) 
+    {   top_motor_corner();
+        translate([zrd,zrd]) color("blue") pulley_head();
+    }    
     if(place_block) color("blue") translate([d,d]) rod_block();
     translate([d+zrd,d+zrd,-bt-t/2-10]) color("purple") cylinder(r=20,h=10); 
     translate([d,0]) rod_block();

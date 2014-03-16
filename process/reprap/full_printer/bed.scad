@@ -80,7 +80,7 @@ wr=pz/2;
 mz=pz+pr-wr;
 
 module motor_pos()
-{   rotate(45) translate([sqrt(2)*dl,-sh/2]) rotate([90,0,0]){ child(0); child(1); }} 
+{   rotate(45) translate([sqrt(2)*dl,-sh/2]) rotate([90,0,0]){ child(0); }}
 
 module bed_holder_w_motor(save=true)
 {
@@ -88,7 +88,7 @@ module bed_holder_w_motor(save=true)
     bed_holder(save=save);
     color("red") translate([-zrd,-zrd]) difference()
     {   union()
-        {   translate([0,0,mz]) motor_pos() 
+        {   translate([0,0,mz]) motor_pos() union()
                 translate([-sw/2-t,-mz,-sh-t]) 
             {   cube([sw+2*t,sw/2,sh+2*t]);
                 cube([sw/2-t,sw+t,sh+2*t]);
@@ -127,7 +127,7 @@ module show_bed()
     $show=true;
     translate([zrd,zrd]) bed_holder_w_motor();
 //    planks_space();
-    translate([0,0,mz])motor_pos() 
+    translate([0,0,mz]) motor_pos() union()
     {   nema();
         translate([0,0,t]) winder();
     }

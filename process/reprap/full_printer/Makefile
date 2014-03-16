@@ -1,7 +1,8 @@
 
 default: corners bed pulley
 
-corners: output/corner.stl output/top_motor_corner.stl output/rod_block.stl
+corners: output/corner.stl output/top_motor_corner.stl output/rod_block.stl \
+	 output/pulley_head.stl
 bed:     output/bed_holder.stl output/bed_holder_w_motor.stl 
 pulley:  output/pulley.stl
 
