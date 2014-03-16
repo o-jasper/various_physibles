@@ -40,11 +40,11 @@ h=500; //Sizes.
 
 tbr=20; //Timing belt radius.
 
-pr = 10; //Radius of pulleys.
-phz = 5*t+2*bbr+2*pr; //Distance 'it hangs'
-hl=max(sw+pt+2*(t+sr),80); //Length it holds the plates.
+xrh = 2*bbr+bt+3.5*t; //How far the x rod hangs.
 
-xrh = bbr+bt+2*t; //How far the x rod hangs.
+pr = 10; //Radius of pulleys.
+phz = 2*xrh+pr; //Distance 'it hangs'
+hl=max(sw+pt+2*(t+sr),80); //Length it holds the plates.
 
 lh=sw+2*t; //Bed .. thing.
 pz=lh-pr-t-2*sr; //Bed pulley height.

@@ -15,9 +15,6 @@ use<plates.scad>;
 //TODO fix this link...
 use<pulley.scad>
 
-module bottom_bare_corner(){ corner(); }
-module bottom_motor_corner(){ corner(); }
-
 module show(bed_z=h/2,$realnema=false)
 {    
     $show=true;
@@ -59,7 +56,7 @@ module show(bed_z=h/2,$realnema=false)
 //                if(rod_adjustable) color("red") translate([-zrd,-zrd,h]) zrod_holder();
                 color("green") cylinder(r=bbr,h=h+2*bt);//h+fh); //z rods
             }
-            translate([-bw/2,-bw/2,bed_z+fh]) cube([bw,bw,bh]); //Bed itself.
+            color("orange") translate([-bw/2,-bw/2,bed_z+fh]) cube([bw,bw,bh]); //Bed itself.
         }
 }
 

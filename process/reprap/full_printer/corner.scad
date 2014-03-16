@@ -96,8 +96,8 @@ module around_nema2d(sub=0)
 }
 
 module rod_mounting_hole_pos() //Positions the blocks holding the sliders.
-{    translate([zrd,zrd,-bt]) for(a=[0:90:270]) rotate(a) 
-          translate((bbr+2*t)*[1,1]) child();
+{    translate([zrd,zrd,-bt]) for(a=[0:60:120]) rotate(-60+a) 
+          translate((a==60 ? sw/2-2*(t+sr) : bbr+2*t)*[1,1]) child();
 }
 
 module corner()
@@ -135,11 +135,12 @@ module rod_block(a=0)
     translate([zrd,zrd]) rotate(a) translate([-zrd,-zrd]) difference()
     {   union()
         {   x_rod_add();
-            translate([zrd,zrd]) cylinder(r=bbr+t,h=xrh+bbr+t);
-            linear_extrude(height=t) difference()
-            {   hull() rod_mounting_hole_pos() circle(sr+t);
-                translate([zrd,zrd]) for(a=[0:90:270]) rotate(a) 
-                     translate([bbr+1.8*t,0]) circle(t);
+            translate([zrd,zrd]) cylinder(r=bbr+t,h=xrh+2*(bbr+t));
+            linear_extrude(height=2.5*t) difference()
+            {   hull() 
+                {   rod_mounting_hole_pos() circle(sr+t);
+                    translate([zrd,zrd]) circle(bbr+t);
+                }
             }
         }
         x_rod_sub();
@@ -189,9 +190,9 @@ module pulley_holder()
     {   union()
         {   //Pole it is on.
             hull()
-            {   translate([sw,sw]/2) cylinder(r=2*t,h=phz);
-                translate([sw/4,sw/2]) cylinder(r=2*t,h=bt+t);
-                translate([sw/2,sw/4]) cylinder(r=2*t,h=bt+t);
+            {   translate([sw,sw]/2) cylinder(r=2*t,h=phz/2+3.6*t);
+                translate([sw/4,sw/2]) cylinder(r=2*t,h=bt/5);
+                translate([sw/2,sw/4]) cylinder(r=2*t,h=bt/5);
             }
             hull()
             {   translate([sw/2,sw/2,0.4*phz]) cylinder(r=2*t,h=t);
@@ -221,6 +222,9 @@ module top_motor_corner()
     pulley_holder();
 }
 
+module bottom_bare_corner(){ corner(); }
+module bottom_motor_corner(){ corner(); }
+
 //TODO feh make space for belt path..
 module corner_show(place_block=true)
 {
@@ -229,7 +233,6 @@ module corner_show(place_block=true)
     corner();
     translate([zrd,zrd,sh]) 
     {   translate([0,0,sh/2]) color("green") cylinder(r=bbr,h=4*sh);
-        nema17();
     }
 
     translate([0,d]) top_bare_corner();
