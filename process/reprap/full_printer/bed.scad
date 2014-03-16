@@ -19,7 +19,8 @@ module pulley_add()
 module pulley_sub(bottom=true)
 {
     pulley_pos() union()
-    {   cylinder(r=2*sr,h=l);
+    {   cylinder(r=2*sr,h=l); //Wire hole.
+        translate([pr,0,-pr]) rotate([0,90,0]) cylinder(r=2*sr,h=l);
         translate([pr,t]) rotate([90,0,0]) cylinder(r=pr+2*sr,h=2*t);
         translate([pr,fh]) rotate([90,0,0]) cylinder(r=sr,h=8*fh);
         translate([pr,6*t]) rotate([90,0,0]) cylinder(r=pr-t/2,h=4*t); 
@@ -51,11 +52,16 @@ module bed_holder(save=true) //TODO also raising method.
                     translate(pos*(dist-fh/1.5)/dist) cylinder(r=t,h=t);
                 }
             }
-            translate([dc+bsd,dc+bsd,fh-t]) cylinder(r=sr+2*t,h=t);
+            hull() //Little platform
+            {   translate([0,0,fh/4]) cylinder(r=bbr+t,h=3*fh/4+t/2);
+                translate([dc+bsd,dc+bsd,fh-t]) cylinder(r=sr+2*t,h=t);
+            }
+            translate([dc+bsd,dc+bsd,fh-t]) linear_extrude(height=t) hull()
+            {   circle(sr+2*t);
+                for(a=[180,0]) rotate(a) translate([-3*t,3*t]) circle(t);
+            }
 
-            //Screw 'platform'
-//            translate([dc,dc,fh-t]) rotate(45) cube(2*[sr+t,sqrt(2)*dc,t],center=true);
-            cylinder(r=bbr+t,h=th);
+            cylinder(r=bbr+t,h=th); //Around smooth rod.
 
             pulley_pos() hull()
             {   translate([0,0,pz]) pulley_add_1(); 
@@ -70,7 +76,7 @@ module bed_holder(save=true) //TODO also raising method.
         }
         translate([0,0,pz]) pulley_sub();
         if(save) translate((lh/2+bbr)*[1,1,0]+[0,0,hl/4+t]) for(a=[0,-90]) rotate(a)
-                 rotate([90,0,0]) scale([0.7,1]) cylinder(r=lh/2-t,8*hl,$fn=4);
+            rotate([90,0,0]) scale([0.8,1,1]) cylinder(r=lh/2-2*t,8*hl,$fn=4);
 
     }
     if($show) color("purple") pulley_pos() translate([pr,3*t/4,pz]) rotate([90,0,0]) pulley();
@@ -81,6 +87,23 @@ mz=pz+pr-wr;
 
 module motor_pos()
 {   rotate(45) translate([sqrt(2)*dl,-sh/2]) rotate([90,0,0]){ child(0); }}
+
+module motor_hold_walls2d(x=0)
+{
+    r=dl-sw/sqrt(8)-x;
+    hull() //Walls that connect motor thing.
+    {   translate([dl-x,zrd+t+x]) circle(t+x);
+        translate(r*[1,1]+(sw+2*t)*[1,-1]/sqrt(8)) circle(t+x);
+    }
+    hull()
+    {   translate([zrd+t+x,dl-x]) circle(t+x);
+        translate(r*[1,1]+(sw+2*t)*[-1,1]/sqrt(8)) circle(t+x);
+    }
+    if(x>0) hull()
+    {   translate(r*[1,1]+(sw+2*t)*[-1,1]/sqrt(8)) circle(t+x);
+        translate(r*[1,1]+(sw+2*t)*[1,-1]/sqrt(8)) circle(t+x);
+    }
+}
 
 module bed_holder_w_motor(save=true)
 {
@@ -93,16 +116,8 @@ module bed_holder_w_motor(save=true)
             {   cube([sw+2*t,sw/2,sh+2*t]);
                 cube([sw/2-t,sw+t,sh+2*t]);
             }
-            hull()
-            {   translate([dl,zrd+t]) cylinder(r=t,h=sw/2);
-                translate((dl-sw/sqrt(8))*[1,1]+(sw+2*t)*[1,-1]/sqrt(8)) 
-                    cylinder(r=t,h=sw/2);
-            }
-            hull()
-            {   translate([zrd+t,dl]) cylinder(r=t,h=sw/2);
-                translate((dl-sw/sqrt(8))*[1,1]+(sw+2*t)*[-1,1]/sqrt(8)) 
-                    cylinder(r=t,h=sw/2);
-            }
+            linear_extrude(height=sw/2) motor_hold_walls2d();
+            linear_extrude(height=t) motor_hold_walls2d(x=t);
         }
         translate([0,0,mz]) motor_pos() union()
         {   translate([0,0,-sh/2]) cube([sw+t,sw+t,sh+t/2],center=true);
@@ -110,9 +125,10 @@ module bed_holder_w_motor(save=true)
                 translate([x,y,-4*sh]) cylinder(r=sr,h=8*sh);
             translate([0,0,-4*sh]) cylinder(r=wr+t/3,h=8*sh);
             //Holes of saving
-            translate([0,0,-sh/2]) rotate([90,0,0]) cylinder(r=sw/2,h=8*sh,$fn=4);
-            translate([0,0,-sh/2]) rotate([0,-90,0]) cylinder(r=sw/2-t,h=8*sh,$fn=4);
+            translate([0,0,-sh/2]) rotate([90,0,0]) cylinder(r=sw/2-t,h=8*sh,$fn=4);
+            translate([0,-t,-sh/2]) rotate([0,-90,0]) cylinder(r=sw/2-2*t,h=8*sh,$fn=4);
         }
+       translate([0,0,pz]) pulley_sub();
     }
 }
 
@@ -132,4 +148,5 @@ module show_bed()
         translate([0,0,t]) winder();
     }
 }
-show_bed();
+//show_bed();
+bed_holder_w_motor();

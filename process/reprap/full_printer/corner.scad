@@ -161,13 +161,23 @@ module pulley_head_screw_holes(d)
     }
 }
 
-module pulley_head(subtracting=false)
+module pulley_head(substracting=false)
 {
-    difference() 
+    if(substracting)
     {   hull() pulley_pos() //Top bit.
-            translate([-2*t,-pr,phz]) rotate([0,90,0]) 
-            cylinder(r=sr+t,4*t);
-        if(!substracting) pulley_head_screw_holes();
+            translate([-2*t,-pr,phz]) rotate([0,90,0]) cylinder(r=sr+t,4*t);
+    }
+    else difference() 
+    {   hull() pulley_pos() //Top bit.
+            translate([-2*t,-pr,phz]) rotate([0,90,0]) linear_extrude(height=4*t)
+            intersection(){ scale([1.2,1]) circle(sr+t); square((sr+t)*[2,2],center=true); }
+        if(!substracting) 
+        {   pulley_head_screw_holes();
+            translate([0,0,phz]) pulley_pos() union() //Hole for pulley.
+            {   translate([-t,-pr]) rotate([0,90,0]) cylinder(r=pr+t/4,h=2*t);
+                translate([-4*t,-pr]) rotate([0,90,0]) cylinder(r=sr,h=8*t);
+            }
+        }
     }
 }
 
@@ -194,10 +204,6 @@ module pulley_holder()
         pulley_head_screw_holes();
         rotate(45) translate([(hl-zrd)/sqrt(2),4*hl,phz-pr])  //Hole for wire.
             rotate([90,0,0]) cylinder(r=t,h=8*hl,$fn=4);
-        translate([0,0,phz]) pulley_pos() union() //Hole for pulley.
-        {   translate([-t,-pr]) rotate([0,90,0]) cylinder(r=pr+t/4,h=2*t);
-            translate([-4*t,-pr]) rotate([0,90,0]) cylinder(r=sr,h=8*t);
-        }
         pulley_head(substracting=true);
     }
     if($show) color("purple") translate([zrd,zrd,phz]) pulley_pos() 
