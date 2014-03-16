@@ -4,7 +4,7 @@ t=2;
 pt=4; //Plate thickness.
 
 bh=20; //Bed height.
-bw=200;
+bw=220;
 
 bsd=5;
 
@@ -14,12 +14,12 @@ sbr=3;
 include<fits/nema17.scad>
 ssd=sw/6;
 
-zrd=pt+t/2+sw/2; //... OR use gears at the bottom to get them as close as possible..
-//zrd= pt+bbr+2*t; //Z rod distance.
+//zrd=pt+t/2+sw/2; //... OR use gears at the bottom to get them as close as possible..
+zrd= pt+bbr+3*t; //Z rod distance.
 dc=bbr/sqrt(2)+t; //Distance of bed corners to rods.
 
 //w= bw+2*pt+2*zrd-2*t; //bw+2*(zrd+bbr+2*sr+3*t); //
-w= bw+2*pt+2*zrd+t+sw/2;
+w= bw+2*pt+2*zrd+t;
 
 l=w; 
 fh=40; //Front height.

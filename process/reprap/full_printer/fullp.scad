@@ -31,7 +31,7 @@ module show(bed_z=h/2,$realnema=false)
             {   bottom_motor_corner(); //NOTE: bottom corners the same for simplicity
                 translate([0,0,h]) rotate(90) rotate([180,0,0]) 
                 {   top_bare_corner();
-                    color("blue") translate([0,0,bt]) belt_corner_block();
+                    color("blue") translate([0,0,bt]) rod_block();
                 }
             }
             translate([-l/2+0.3,-w/2+0.3]) 
@@ -42,7 +42,7 @@ module show(bed_z=h/2,$realnema=false)
                     color("green") cylinder(r=bbr,h=l-bbr-zrd); //y rods
                 translate([0,0,h]) rotate(90) rotate([180,0,0]) 
                 {   top_motor_corner();
-                    color("blue") translate([0,0,bt]) belt_corner_block(a=90);
+                    color("blue") translate([0,0,bt]) rod_block(a=90);
                 }
             }
             
@@ -73,7 +73,7 @@ module bed_n_corner_show(bed_z=-3*fh)
     }
     translate([0.3,0.3]) rotate(90) rotate([180,0,0]) 
     {   top_motor_corner();
-        color("blue") translate([0,0,bt]) belt_corner_block(a=90);
+        color("blue") translate([0,0,bt]) rod_block(a=90);
     }
     translate([zrd,zrd,-100]) pulley_pos() cylinder(r=1,h=200);
 

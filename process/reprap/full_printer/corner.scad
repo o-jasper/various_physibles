@@ -188,15 +188,20 @@ module pulley_holder()
     translate([zrd,zrd]) difference()
     {   union()
         {   //Pole it is on.
-            for(s= [1,0,-1]) rotate(45) 
-            {   hull()
-                {   rotate(s*45) translate([s==0? sw/sqrt(2) : sw/2,0,-bt]) 
-                        cylinder(r=2*t,h=t);
-                    translate([(hl-zrd)/sqrt(2)-2*t,-d*s,phz-t]) 
-                        cylinder(r=2*t,h=t);
-                }
+            hull()
+            {   translate([sw,sw]/2) cylinder(r=2*t,h=phz);
+                translate([sw/4,sw/2]) cylinder(r=2*t,h=bt+t);
+                translate([sw/2,sw/4]) cylinder(r=2*t,h=bt+t);
             }
-            hull() for(s= [1,0,-1]) rotate(45) 
+            hull()
+            {   translate([sw/2,sw/2,0.4*phz]) cylinder(r=2*t,h=t);
+                for(s= [1,-1]) rotate(45) 
+                    translate([(hl-zrd)/sqrt(2)-2*t,-d*s,phz-2*t+st]) 
+                                     cylinder(r=2*t,h=4*t-2*st);
+                translate([0.4*sw,sw/2,phz/2-t]) cylinder(r=t,h=t);
+                translate([sw/2,sw*0.4,phz/2-t]) cylinder(r=t,h=t);
+            }
+            *hull() for(s= [1,0,-1]) rotate(45) 
                 translate([(hl-zrd)/sqrt(2)-2*t,-d*s,phz-2*t+st]) 
                                         cylinder(r=2*t,h=4*t-2*st);
 
@@ -205,6 +210,7 @@ module pulley_holder()
         rotate(45) translate([(hl-zrd)/sqrt(2),4*hl,phz-pr])  //Hole for wire.
             rotate([90,0,0]) cylinder(r=t,h=8*hl,$fn=4);
         pulley_head(substracting=true);
+        translate([0,0,sh]) nema($realnema=false);        
     }
     if($show) color("purple") translate([zrd,zrd,phz]) pulley_pos() 
                   translate([-0.75*t,-pr]) rotate([0,90,0]) pulley();

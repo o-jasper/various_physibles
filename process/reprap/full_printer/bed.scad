@@ -138,15 +138,15 @@ module winder() //TODO hole should not be circular!
 
 include<fits/nema17.scad>
 
-module show_bed()
+module show_bed(ps=true)
 {
     $show=true;
     translate([zrd,zrd]) bed_holder_w_motor();
-//    planks_space();
+    if(ps) planks_space();
     translate([0,0,mz]) motor_pos() union()
     {   nema();
         translate([0,0,t]) winder();
     }
 }
-//show_bed();
-bed_holder_w_motor();
+show_bed();
+//bed_holder_w_motor();
