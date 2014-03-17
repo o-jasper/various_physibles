@@ -149,78 +149,57 @@ module rod_block(a=0)
     }
 }
 
-module top_bare_corner(){   corner(); }
-
-phd = hl/2-zrd/2-pr-t;
-
-module pulley_head_screw_holes(d)
+module pulley_head_base()
 {
-    d = phd;
-    rotate(45) for(s= [1,0,-1]) translate([(hl-zrd)/sqrt(2),-d*s,phz])
-    {   translate([-3.6*t,0]) rotate([0,-90,0]) cylinder(r=2*t,h=8*t);
-        translate([4*t,0]) rotate([0,-90,0]) cylinder(r=sr,h=8*t);
-    }
-}
-
-module pulley_head(substracting=false)
-{
-    if(substracting)
-    {   hull() pulley_pos() //Top bit.
-            translate([-2*t,-pr,phz]) rotate([0,90,0]) cylinder(r=sr+t,4*t);
-    }
-    else difference() 
-    {   hull() pulley_pos() //Top bit.
-            translate([-2*t,-pr,phz]) rotate([0,90,0]) linear_extrude(height=4*t)
-            intersection(){ scale([1.2,1]) circle(sr+t); square((sr+t)*[2,2],center=true); }
-        if(!substracting) 
-        {   pulley_head_screw_holes();
-            translate([0,0,phz]) pulley_pos() union() //Hole for pulley.
-            {   translate([-t,-pr]) rotate([0,90,0]) cylinder(r=pr+t/4,h=2*t);
-                translate([-4*t,-pr]) rotate([0,90,0]) cylinder(r=sr,h=8*t);
-            }
-        }
-    }
-}
-
-//Tower that holds pulley
-module pulley_holder()
-{
-    d = phd; st=0.2*t;
-    translate([zrd,zrd]) difference()
+    d = hl/2-zrd/2-pr-t;
+    difference() 
     {   union()
-        {   //Pole it is on.
-            hull()
-            {   translate([sw,sw]/2) cylinder(r=2*t,h=phz/2+3.6*t);
-                translate([sw/4,sw/2]) cylinder(r=2*t,h=bt/5);
-                translate([sw/2,sw/4]) cylinder(r=2*t,h=bt/5);
+        {   
+            hull() pulley_pos() //Top bit.
+                translate([-2*t,-pr]) rotate([0,90,0]) linear_extrude(height=4*t)
+                intersection()
+            { scale([1.2,1]) circle(sr+t); square((sr+t)*[2,2],center=true); }
+            for(s= [1,0,-1]) rotate(45) hull()
+            {               
+                translate([(hl-zrd)/sqrt(2)-2*t,-0.8*d*s,-2*t]) 
+                    cylinder(r=t,h=4*t);
+                rotate(-s*45) translate([bbr,0,-2*t]) cylinder(r=t,h=xrh+t);
             }
-            hull()
-            {   translate([sw/2,sw/2,0.4*phz]) cylinder(r=2*t,h=t);
-                for(s= [1,-1]) rotate(45) 
-                    translate([(hl-zrd)/sqrt(2)-2*t,-d*s,phz-2*t+st]) 
-                                     cylinder(r=2*t,h=4*t-2*st);
-                translate([0.4*sw,sw/2,phz/2-t]) cylinder(r=t,h=t);
-                translate([sw/2,sw*0.4,phz/2-t]) cylinder(r=t,h=t);
-            }
-            *hull() for(s= [1,0,-1]) rotate(45) 
-                translate([(hl-zrd)/sqrt(2)-2*t,-d*s,phz-2*t+st]) 
-                                        cylinder(r=2*t,h=4*t-2*st);
-
+            //Main thing around.
+            translate([0,0,-2*t]) cylinder(r=bbr+t,h=xrh+t);
+            //Clamping thing.
+            rotate(-45) translate([0,bbr-t/4,xrh/2-1.5*t]) 
+                cube([4*bbr+5*t,3*t,xrh+t],center=true);
         }
+        //Screw holes for clamping.
+        for(z=[0:4*t:xrh-2*t]) for(x=(2*bbr+t)*[1,-1])
+            rotate(-45) translate([x,2*bbr,z])
+                rotate([90,0,0]) cylinder(r=sr,h=8*t);
         pulley_head_screw_holes();
-        rotate(45) translate([(hl-zrd)/sqrt(2),4*hl,phz-pr])  //Hole for wire.
-            rotate([90,0,0]) cylinder(r=t,h=8*hl,$fn=4);
-        pulley_head(substracting=true);
-        translate([0,0,sh]) nema($realnema=false);        
+        pulley_pos() union() //Hole for pulley.
+        {   translate([-t,-pr]) rotate([0,90,0]) cylinder(r=pr+t/4,h=2*t);
+            translate([-4*t,-pr]) rotate([0,90,0]) cylinder(r=sr,h=8*t);
+        }
+        translate([0,0,-phz]) cylinder(r=bbr,h=8*phz);
     }
-    if($show) color("purple") translate([zrd,zrd,phz]) pulley_pos() 
-                  translate([-0.75*t,-pr]) rotate([0,90,0]) pulley();
+}
 
+module pulley_head()
+{   difference()
+    {   pulley_head_base(); 
+        rotate(45) translate([-phz,0]) cube(2*[phz+bbr-t/4,8*phz,8*phz],center=true);
+    }
 }
+module pulley_clamp()
+{   intersection()
+    {   pulley_head_base(); 
+        rotate(45) translate([-phz,0]) cube(2*[phz+bbr-t/4,8*phz,8*phz],center=true);
+    }    
+}
+
+module top_bare_corner(){ corner(); }
 module top_motor_corner()
-{   corner();
-    pulley_holder();
-}
+{   corner(); }
 
 module bottom_bare_corner(){ corner(); }
 module bottom_motor_corner(){ corner(); }
@@ -239,11 +218,16 @@ module corner_show(place_block=true)
     if(place_block) color("blue") translate([0,d]) rod_block();
     translate([d,d]) 
     {   top_motor_corner();
-        translate([zrd,zrd]) color("blue") pulley_head();
+        translate([zrd,zrd,phz]) 
+            rotate(-90) rotate([0,180,0]) 
+        {   color("purple") pulley_head();
+            color("green") translate([0.1,-0.1,0.1]) pulley_clamp();
+        }
     }    
     if(place_block) color("blue") translate([d,d]) rod_block();
     translate([d+zrd,d+zrd,-bt-t/2-10]) color("purple") cylinder(r=20,h=10); 
     translate([d,0]) rod_block();
+
 }
 
 $show=true;
