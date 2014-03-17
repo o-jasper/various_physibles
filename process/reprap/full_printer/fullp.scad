@@ -37,10 +37,7 @@ module show(bed_z=h/2,$realnema=false)
                 
                 translate([zrd+bbr+t/2,zrd,h-(bbr+bt+t)]) rotate([0,90,0]) 
                     color("green") cylinder(r=bbr,h=l-bbr-zrd); //y rods
-                translate([0,0,h]) rotate(90) rotate([180,0,0]) 
-                {   top_motor_corner();
-                    color("blue") translate([0,0,bt]) rod_block(a=90);
-                }
+                translate([0,0,h]) rotate(90) rotate([180,0,0]) top_motor_corner_show();
             }
             
             rotate(90)

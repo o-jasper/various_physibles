@@ -204,6 +204,17 @@ module top_motor_corner()
 module bottom_bare_corner(){ corner(); }
 module bottom_motor_corner(){ corner(); }
 
+module top_motor_corner_show()
+{
+    top_motor_corner();
+    color("blue") translate([0,0,bt]) rod_block(a=90);
+    translate([zrd,zrd,phz]) 
+        rotate(-90) rotate([0,180,0]) 
+    {   color("purple") pulley_head();
+        color("green") translate([0.1,-0.1,0.1]) pulley_clamp();
+    }
+}
+
 //TODO feh make space for belt path..
 module corner_show(place_block=true)
 {
@@ -216,14 +227,8 @@ module corner_show(place_block=true)
 
     translate([0,d]) top_bare_corner();
     if(place_block) color("blue") translate([0,d]) rod_block();
-    translate([d,d]) 
-    {   top_motor_corner();
-        translate([zrd,zrd,phz]) 
-            rotate(-90) rotate([0,180,0]) 
-        {   color("purple") pulley_head();
-            color("green") translate([0.1,-0.1,0.1]) pulley_clamp();
-        }
-    }    
+    translate([d,d]) top_motor_corner_show();
+
     if(place_block) color("blue") translate([d,d]) rod_block();
     translate([d+zrd,d+zrd,-bt-t/2-10]) color("purple") cylinder(r=20,h=10); 
     translate([d,0]) rod_block();
