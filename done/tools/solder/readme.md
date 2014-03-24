@@ -1,6 +1,8 @@
 *note* obviously soldering irons can get very hot! Be careful and make sure it
 is stable and you are not surprised by how much heat gets out of this thing.
-I am **not** convinced this thing is good enough!
+I am **NOTE** convinced this thing is good enough!
+
+**AT YOUR OWN RISK**
 
 # Soldering iron holder
 The idea is that the tin can and dissipates the heat, and wires inside
