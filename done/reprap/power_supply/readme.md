@@ -1,6 +1,6 @@
 
 # Power supply holder
-Holds a power supply (or a similar shaped box) to a wall. Obviously you *dont*
+Holds a power supply (or a similar shaped box) under a plank. Obviously you *dont*
 want it to fall! Make sure it is secure!(your safety is your responsibility)
 
 <img src="pics/photo.jpg">

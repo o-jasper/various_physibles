@@ -1,36 +1,21 @@
 objs/
 runs/
-*/*.stl
-*/*.gcode
-*/*/*.stl
-*/*/*.gcode
+**/*.stl
+**/*.gcode
 
 #'Raw' image
-*/pics/*.JPG
-*/pics/*.PNG
-*/*/pics/*.JPG
-*/*/pics/*.PNG
-*/pics/shot*.png
-*/pics/cat?/
+**/pics/*.JPG
+**/pics/*.PNG
+**/pics/shot*.png
+**/pics/cat?/
 
-.#*
-*/.#*
-*/*/.#*
-*/*/*/.#*
-*/old/
+**.#*
 # Possibly add these later
 cooler/
 old/
 
-*/readme.html
-*/*/readme.html
-*/*/*/readme.html
+**/readme.html
+**/output/
+**/tso
 
-*/output/
-*/*/output/
-*/*/*/output/
-
-*/pics/pics/
-*/pics/cat?/
-*/*/pics/pics/
-*/*/pics/cat?/
+**/index.html
