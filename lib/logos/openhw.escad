@@ -32,6 +32,7 @@ module oshw_logo_2d(d=10.0)
         }
     }
 }
+//module openhw(d=10.0){ oshw_logo_2d(d); }
 
 // usage : oshw_logo_2d(diameter)
 linear_extrude(height=2) oshw_logo_2d(25);

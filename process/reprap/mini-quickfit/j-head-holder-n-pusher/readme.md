@@ -27,5 +27,9 @@ Once the pusher is pushing the external pfte tube for bowden use should be still
 able to removed or reinstalled, if the filament is retracted first.
 
 ## TODO/NOTE
-* No testing on the 3mm version, tell me how it went.
+* Fan side attachment.
+
+Note: not sure if i will continue very far..
+
+* No testing on the 3mm version, tell me how it went if you try it.
 * Figure out a way to make everything epically clear, with diagrams and shit.

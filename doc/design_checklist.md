@@ -1,5 +1,7 @@
 Note: dont take this one too seriously, look for more involved suggestions.
 
+* Are the values right?!
+
 * Are you looking at it from the correct orientation?
 
 * Can you do better on any point? Unfortunately following this too strictly

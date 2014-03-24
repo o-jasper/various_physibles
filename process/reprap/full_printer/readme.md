@@ -59,8 +59,8 @@ Seems ridiculously good...
 ## Bed lifting.
 
 ### Option: Threaded rod
-Advantage is that it blocks movement, but i dont like it. Could be put parallel
-to the smooth rod and have a similar setup as a prusa.
+Advantage is that it blocks movement when the motor is off, but i dont like it.
+Could be put parallel to the smooth rod and have a similar setup as a prusa.
 
 ### Option straight lift
 It could be geared to deal with the torque, w/o smaller than 1cm(thats too small)
@@ -76,7 +76,8 @@ to put it.. Multiple stages, like x2x2 could be smaller, but..
 **Suboption: worm gear** 
 
 ### Option arm
-Basically an arm that pushes it up.
+Basically an arm that pushes it up. Left behind for the lack of mechanical
+advantage. Thinking of using an arm anyway..
 
 **Suboption: nylon wire pull**: current design idea. Have calculation for 
 mechanical advantage on paper. Looks like it needs much more mechanical advantage?
