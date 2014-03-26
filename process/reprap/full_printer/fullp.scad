@@ -33,9 +33,9 @@ module show(bed_z=h/2,$realnema=false)
             }
             translate([-l/2+0.3,-w/2+0.3]) 
             {   bottom_motor_corner();
-                translate((pt+t/2+sw/2)*[1,1,0]+[0,0,sh]) nema();
+                //translate((pt+t/2+sw/2)*[1,1,0]+[0,0,sh]) nema();
                 
-                translate([zrd+bbr+t/2,zrd,h-(bbr+bt+t)]) rotate([0,90,0]) 
+                translate([zrd+bbr+t/2,zrd,h-xrh-bt]) rotate([0,90,0]) 
                     color("green") cylinder(r=bbr,h=l-bbr-zrd); //y rods
                 translate([0,0,h]) rotate(90) rotate([180,0,0]) top_motor_corner_show();
             }
@@ -50,7 +50,6 @@ module show(bed_z=h/2,$realnema=false)
                 color("purple") translate([0,0,bed_z+pz]) pulley_pos() 
                     cylinder(r=1,h=h-bed_z-phz-pz);
                 
-//                if(rod_adjustable) color("red") translate([-zrd,-zrd,h]) zrod_holder();
                 color("green") cylinder(r=bbr,h=h+2*bt);//h+fh); //z rods
             }
             color("orange") translate([-bw/2,-bw/2,bed_z+fh]) cube([bw,bw,bh]); //Bed itself.

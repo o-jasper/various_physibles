@@ -18,7 +18,7 @@ use<pulley.scad>
 ut=2*t;
 
 hh=fh-bt;
-sr=2;
+sr=1.7;
 
 module planks_space()
 {   linear_extrude(height=8*hh) //Space for planks.
@@ -44,16 +44,9 @@ module base_corner(reinforce=false,plate=true)
                 {   sphere(r);
                     translate(-f*[r,r]) sphere((1-f)*r);
                 }
-                translate(pos) 
-                {   cylinder(r=r,h=bt);
-                    translate([0,0,h-r/2]) sphere(r);
-                }
+                translate(pos) cylinder(r=r,h=h);
             }
             cube([8*hl,8*hl,2*ch],center=true);
-        }
-        for(pos=[[0,d],[d,0]]) translate(pos) intersection()
-        {   scale([1,2]) cylinder(r=r,h=ch+r);
-            cube(2*[r,r,8*ch],center=true);
         }
         if(reinforce) hull() for(a=[0,90]) rotate(a) translate([hl-r,0]) cylinder(r=r,h=bt+t);
         if(plate) for(a=[0,-90]) rotate(a) scale([a<0 ? -1 : 1,1,1]) 
@@ -73,25 +66,14 @@ module base_corner(reinforce=false,plate=true)
 module base_corner_sub()
 {
     r=pt/2+t;
-    d2= hl-t;
+    d2= hl-2*t;
     union()
     {   planks_space();
-        difference()
-        {   translate([d2,d2,ch-r/2]) 
+        for( z = [bt+r,ch-2*r] ) translate([0,0,z]) difference()
+        {   translate([d2,d2]) 
                 for(a=[[0,-90,0],[90,0,0]]) rotate(a) cylinder(r=sr,h=2*d2);
             translate((pt+2*t)*[1,1]) cube(hl*[8,8,8]);
         }
-    }
-}
-
-module around_nema2d(sub=0)
-{
-    da = zrd+sw/2+t-sub; //zrd+bbr+2*sr+3*t-sub;
-    db= da+t;//hl+t-sub;
-    hull()
-    {   square([db,t]);
-        square([t,db]);
-        translate([da,da]) circle(t);
     }
 }
 
@@ -105,12 +87,16 @@ module corner()
     difference()
     {   union()
         {   base_corner();
-            translate([0,0,-bt]) linear_extrude(height=bt+3*t) around_nema2d();
+            translate([0,0,-bt]) linear_extrude(height=bt+3*t) hull() 
+            {   rod_mounting_hole_pos() circle(sr+3*t);
+                translate([zrd,zrd]) circle(bbr+3.5*t);
+            }
         }
-        translate((pt+t/2)*[1,1]) difference()
-        {   cube([sw,sw,2*sh]);
-            translate([0,0,sh+t]) rotate(45) cube(2*[sqrt(2)*ssd+sr+t,sw,t],center=true);
+        linear_extrude(height=8*h) hull() 
+        {   rod_mounting_hole_pos() circle(sr+2*t);
+            translate([zrd,zrd]) circle(bbr+2.5*t);
         }
+        
         translate([pt+t/2+ssd,pt+t/2+ssd,bt+t]) cylinder(r=sr,h=sw);
         base_corner_sub();
         rod_mounting_hole_pos() translate([0,0,-t]) cylinder(r=sr+t/2,h=8*t);
