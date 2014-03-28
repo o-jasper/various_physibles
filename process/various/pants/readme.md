@@ -23,9 +23,5 @@ There is also one with the openhardware logo.
   convenient.
 
 * More options for decoration everywhere. 
-   
-  About this, really wish i saw more progress in the openscad project. 
-  Importing images should be made easy, and user-friendly 'customizers' should
-  be in the binary..
 
 * Try a less high belt.
