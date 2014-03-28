@@ -1,0 +1,6 @@
+initially_povray output/recursive_cupoid.stl
+initially_povray output/recursive_spheroid.stl
+initially_povray output/recursive_tree.stl
+just_povray output/vtree.stl
+plain pics/bunch.jpg
+plain pics/tree.jpg

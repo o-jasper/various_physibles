@@ -1,0 +1,9 @@
+initially_povray output/split_spool_hangpart.stl
+initially_povray output/split_spool_plankpart.stl
+initially_povray output/spool_plank_long_hangpart.stl
+initially_povray output/spool_plank_long_onepiece.stl
+initially_povray output/spool_plank_long_plankpart.stl
+initially_povray output/spool_plank_short.stl
+initially_povray output/spool_plank.stl
+plain pics/plank_rod_green.jpg
+plain pics/plank_rod.jpg

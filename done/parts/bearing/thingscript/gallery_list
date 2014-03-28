@@ -1,0 +1,4 @@
+initially_povray output/guide.stl
+initially_povray output/inner.stl
+initially_povray output/outer_half_vertslide.stl
+initially_povray output/vertslide_show.stl

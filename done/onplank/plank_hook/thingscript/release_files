@@ -1,1 +1,8 @@
-Makefile tso/ output/ pics/*.jpg pics/tso thingscript/ readme.md *.scad
+readme.md
+Makefile
+*.scad
+output/*.stl
+output/tso/*.png
+output/tso/*_info
+pics/*.jpg
+thingscript/
