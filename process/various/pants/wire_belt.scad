@@ -112,6 +112,7 @@ module wire_flatback_segment(hole=false,d=h-t)
         }
     }
 }
+module wire_flatback_segment_hole(){ wire_flatback_segment(hole=true); }
 
 module show_segments()
 {
@@ -122,6 +123,7 @@ module show_segments()
     translate([0,d]) wire_h_arching_segment();
     translate([0,3*d]) wire_h_arching_segment(holes=false,dimples=false);
     translate([0,5*d]) wire_flatback_segment();
+    translate([0,7*d]) wire_flatback_segment_hole();
 }
 //Belt mechanism.
 
@@ -156,8 +158,8 @@ module wire_belt_female()
     {   union()
         {   translate([0,-sl+4*t]) rotate([90,0,0]) flattened_segment(h=h,t=t,lr=lr);
             scale([1,1,1.2]) hull()
-            {   sphere(lr+3*t);
-                translate([0,bsl]) sphere(lr+3*t);
+            {   sphere(lr+5*t);
+                translate([0,bsl]) sphere(lr+5*t);
             }
             translate([0,0,-0.75*(lr+t)]) linear_extrude(1.5*(lr+t)) hull()
             {   translate([0,sl]) circle(shr+t);

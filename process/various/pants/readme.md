@@ -15,4 +15,17 @@ There is a 'plain' batch' thingy, `plain.blend` contains one modified to
 be easy to use the blender sculpt tool. There are other sculpt tools that do as
 well, btw.
 
-There is also one with the openhardware logo. Maybe in the future some more..
+There is also one with the openhardware logo.
+
+## TODO
+
+* The current system requires getting the nut off all the way, not very
+  convenient.
+
+* More options for decoration everywhere. 
+   
+  About this, really wish i saw more progress in the openscad project. 
+  Importing images should be made easy, and user-friendly 'customizers' should
+  be in the binary..
+
+* Try a less high belt.
