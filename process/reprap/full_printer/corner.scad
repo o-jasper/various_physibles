@@ -107,8 +107,8 @@ module corner()
 module x_rod_add()
 {   translate([zrd,zrd]) hull()
     {   translate([-3*t,0,xrh]) 
-            rotate([0,90,0]) cylinder(r=bbr+t,h=6*t); //x rod.
-        cylinder(r=t,h=t);
+            rotate([0,90,0]) cylinder(r=bbr+t,h=4*bbr+2*t); //x rod.
+        cylinder(r=t,h=2*t);
     }
 }
 module x_rod_sub()
